@@ -10,11 +10,27 @@ namespace Tcc
     {
         static void Main(string[] args)
         {
-            SimulateXianglingBuffDuringBurst();
-            SimulateXianglingBuffDuringBurstStartup();
-            SimulateAyakaWithoutBuff();
-            SimulateAyakaWithBuffDuringBurst();
-            SimulateAyakaWithBuff();
+            // SimulateXianglingBuffDuringBurst();
+            // SimulateXianglingBuffDuringBurstStartup();
+            // SimulateAyakaWithoutBuff();
+            // SimulateAyakaWithBuffDuringBurst();
+            // SimulateAyakaWithBuff();
+            SimulateXianglingSkill();
+        }
+
+        static void SimulateXianglingSkill()
+        {
+            Xiangling xiangling = new Xiangling(0);
+
+            World world = new World();
+            world.SetUnits(xiangling, null, null, null);
+
+            world.AddCharacterEvent(1, xiangling.Skill);
+            world.AddCharacterEvent(4, hackBennettBuff(xiangling));
+
+            world.Simulate();
+
+            Console.WriteLine($"Total damage: {world.TotalDamage}");
         }
 
         static void SimulateXianglingBuffDuringBurst()

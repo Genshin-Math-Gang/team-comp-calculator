@@ -6,11 +6,20 @@ namespace Tcc.Units
 {
     public class Xiangling: Unit
     {
+        UnitStats skillStats;
         UnitStats burstStats;
 
         public Xiangling(int constellationLevel): base(constellationLevel, new StaticUnitStats(100))
         {
         }
+
+        public List<WorldEvent> Skill(double timestamp) => new List<WorldEvent> {
+            new WorldEvent(timestamp, (_) => skillStats = GetCurrentStats().snapshot()),
+            new Hit(timestamp, () => skillStats),
+            new Hit(timestamp + 2.5, () => skillStats),
+            new Hit(timestamp + 5.0, () => skillStats),
+            new Hit(timestamp + 7.5, () => skillStats),
+        };
 
         public List<WorldEvent> InitialBurst(double timestamp) => new List<WorldEvent> {
             new Hit(timestamp, GetCurrentStats),

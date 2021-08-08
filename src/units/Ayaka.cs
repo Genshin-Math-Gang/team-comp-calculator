@@ -6,19 +6,15 @@ namespace Tcc.Units
 {
     public class Ayaka: Unit
     {
-        UnitStats burstStats;
-
         public Ayaka(int constellationLevel): base(constellationLevel, new StaticUnitStats(100))
         {
         }
 
         public List<WorldEvent> Burst(double timestamp)
         {
-            var list = new List<WorldEvent> {
-                new WorldEvent(timestamp, (_) => burstStats = GetCurrentStats().snapshot()),
-            };
+            var list = new List<WorldEvent>();
 
-            for(int hit = 0; hit < 20; hit++) list.Add(new Hit(timestamp + hit * 0.3, () => burstStats));
+            for(int hit = 0; hit < 20; hit++) list.Add(new Hit(timestamp + hit * 0.3, GetCurrentStats));
 
             return list;
         }
