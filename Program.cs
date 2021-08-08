@@ -10,14 +10,42 @@ namespace Tcc
     {
         static void Main(string[] args)
         {
-            SimulateXianglingBuffDuringBurst();
+            SimulateXianglingBurst();
+/*          SimulateXianglingBuffDuringBurst();
             SimulateXianglingBuffDuringBurstStartup();
             SimulateAyakaWithoutBuff();
             SimulateAyakaWithBuffDuringBurst();
-            SimulateAyakaWithBuff();
+            SimulateAyakaWithBuff(); */
         }
 
-        static void SimulateXianglingBuffDuringBurst()
+        static void SimulateXianglingBurst()
+        {
+            Xiangling xiangling = new Xiangling(0);
+            Bennett bennett = new Bennett(0);
+
+            World world = new World();
+            world.SetUnits(xiangling, bennett, null, null);
+
+            world.AddCharacterEvent(1, bennett.switchUnit);
+            world.AddCharacterEvent(1.2, bennett.Burst);
+
+            world.AddCharacterEvent(1.7, xiangling.switchUnit);
+
+            world.AddCharacterEvent(3.8, xiangling.Skill);
+
+            world.AddCharacterEvent(5.5, bennett.switchUnit);
+
+            world.AddCharacterEvent(7, xiangling.switchUnit);
+
+            world.AddCharacterEvent(17, xiangling.Skill);
+
+            world.Simulate();
+
+            Console.WriteLine($"{xiangling} total DMG: {world.TotalDamage[0]}");
+            Console.WriteLine($"{bennett} total DMG: {world.TotalDamage[1]}");
+        }
+
+/*         static void SimulateXianglingBuffDuringBurst()
         {
             Xiangling xiangling = new Xiangling(0);
 
@@ -32,9 +60,9 @@ namespace Tcc
             world.Simulate();
 
             Console.WriteLine($"Buff during burst total damage: {world.TotalDamage}");
-        }
+        } */
 
-        static void SimulateXianglingBuffDuringBurstStartup()
+/*         static void SimulateXianglingBuffDuringBurstStartup()
         {
             Xiangling xiangling = new Xiangling(0);
 
@@ -49,9 +77,9 @@ namespace Tcc
             world.Simulate();
 
             Console.WriteLine($"Buff during startup total damage: {world.TotalDamage}");
-        }
+        } */
 
-        static void SimulateAyakaWithoutBuff()
+/*         static void SimulateAyakaWithoutBuff()
         {
             Ayaka ayaka = new Ayaka(0);
 
@@ -63,9 +91,9 @@ namespace Tcc
             world.Simulate();
 
             Console.WriteLine($"Ayaka without buff total damage: {world.TotalDamage}");
-        }
+        } */
 
-        static void SimulateAyakaWithBuff()
+/*         static void SimulateAyakaWithBuff()
         {
             Ayaka ayaka = new Ayaka(0);
 
@@ -78,9 +106,9 @@ namespace Tcc
             world.Simulate();
 
             Console.WriteLine($"Ayaka with buff throughout total damage: {world.TotalDamage}");
-        }
+        } */
 
-        static void SimulateAyakaWithBuffDuringBurst()
+/*         static void SimulateAyakaWithBuffDuringBurst()
         {
             Ayaka ayaka = new Ayaka(0);
 
@@ -93,13 +121,6 @@ namespace Tcc
             world.Simulate();
 
             Console.WriteLine($"Ayaka with buff during burst total damage: {world.TotalDamage}");
-        }
-
-        static Func<double, List<WorldEvent>> hackBennettBuff(Unit unitToBuff)
-        {
-            return (timestamp) => new List<Events.WorldEvent> {
-                new WorldEvent(timestamp, (_) => unitToBuff.AddBuff("Bennett Burst", new StaticUnitStats(50)))
-            };
-        }
+        } */
     }
 }
