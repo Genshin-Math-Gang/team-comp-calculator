@@ -62,10 +62,12 @@ namespace Tcc.Units
                 return snapshots[type];
             }
 
-            Stats.Stats requested = new Stats.Stats();
+            Stats.Stats requested = modifiers[type] + stats;
 
             foreach (KeyValuePair<string, Stats.Stats> x in buffs[Types.EVERYTHING])
-                requested += modifiers[type] + stats + x.Value;
+            {
+                requested += x.Value;
+            }
 
             foreach(KeyValuePair<string, Stats.Stats> x in buffs[type])
             {

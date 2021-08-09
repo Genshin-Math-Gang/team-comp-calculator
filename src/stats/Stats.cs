@@ -39,6 +39,11 @@ namespace Tcc.Stats
 
         public static Stats operator +(Stats a, Stats b)
         {
+            if (a.MV == null)
+            {
+                return a;
+            }
+
             double[] temp = new double[a.MV.Length];
 
             if (b.MV != null)
