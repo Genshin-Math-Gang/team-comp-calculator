@@ -31,7 +31,8 @@ namespace Tcc.Units
             {Types.CHARGED, new Dictionary<string, Stats.Stats>()},
             {Types.PLUNGE, new Dictionary<string, Stats.Stats>()},
             {Types.SKILL, new Dictionary<string, Stats.Stats>()},
-            {Types.BURST, new Dictionary<string, Stats.Stats>()} 
+            {Types.BURST, new Dictionary<string, Stats.Stats>()},
+            {Types.EVERYTHING, new Dictionary<string, Stats.Stats>()}
         };
 
         protected Unit(int constellationLevel, Stats.Stats stats, Stats.Stats burst, Stats.Stats skill, Stats.Stats normal, Stats.Stats charged, Stats.Stats plunge)
@@ -61,7 +62,10 @@ namespace Tcc.Units
                 return snapshots[type];
             }
 
-            Stats.Stats requested = modifiers[type] + stats;
+            Stats.Stats requested = new Stats.Stats();
+
+            foreach (KeyValuePair<string, Stats.Stats> x in buffs[Types.EVERYTHING])
+                requested += modifiers[type] + stats + x.Value;
 
             foreach(KeyValuePair<string, Stats.Stats> x in buffs[type])
             {
@@ -83,16 +87,6 @@ namespace Tcc.Units
 
         public void AddBuff(string name, Stats.Stats buff, Types type)
         {
-            if (type == Types.EVERYTHING)
-            {
-                foreach(KeyValuePair<Types, Dictionary<string, Stats.Stats>> x in buffs)
-                {
-                    if (!x.Value.ContainsKey(name))
-                        x.Value.Add(name, buff);
-                }
-                return;
-            }
-
             if (!buffs[type].ContainsKey(name))
             {
                buffs[type].Add(name, buff);
@@ -101,16 +95,6 @@ namespace Tcc.Units
 
         public void RemoveBuff(string name, Types type)
         {
-            if (type == Types.EVERYTHING)
-            {
-                foreach(KeyValuePair<Types, Dictionary<string, Stats.Stats>> x in buffs)
-                {
-                    if (x.Value.ContainsKey(name))
-                        x.Value.Remove(name);
-                }
-                return;
-            }
-
             if (buffs[type].ContainsKey(name))
             {
                 buffs[type].Remove(name);
