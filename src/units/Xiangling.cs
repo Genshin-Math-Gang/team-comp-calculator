@@ -39,8 +39,8 @@ namespace Tcc.Units
             new Hit(timestamp + 2.5, () => getStats(Types.SKILL), 0, this, "Guoba"),
             new Hit(timestamp + 5, () => getStats(Types.SKILL), 0, this, "Guoba"),
             new Hit(timestamp + 7.5, () => getStats(Types.SKILL), 0, this, "Guoba"),
-            new Hit (timestamp + 9, () => getStats(Types.SKILL), 0, this, "Guoba"),
-            new UnSnapshot(timestamp + 9, this, Types.SKILL, "Guoba")};
+            new Hit (timestamp + 10, () => getStats(Types.SKILL), 0, this, "Guoba"),
+            new UnSnapshot(timestamp + 10, this, Types.SKILL, "Guoba")};
         }
 
         public List<WorldEvent> BurstHit(double timestamp) { 

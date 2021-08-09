@@ -35,7 +35,7 @@ namespace Tcc
 
             world.AddCharacterEvent(5.5, bennett.switchUnit);
 
-            world.AddCharacterEvent(7, xiangling.switchUnit);
+            world.AddCharacterEvent(16, xiangling.switchUnit);
 
             world.AddCharacterEvent(17, xiangling.Skill);
 
