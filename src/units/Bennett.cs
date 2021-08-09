@@ -6,28 +6,27 @@ namespace Tcc.Units
 {
     public class Bennett: Unit
     {
-        public Bennett(int constellationLevel): base(constellationLevel, 
-        normal:new Stats.Stats(
-            new double[] {0.8806,0.8449,1.0795,1.11798,1.3209},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        charged: new Stats.Stats(
-            new double[] {1.105+1.202},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        plunge: new Stats.Stats(
-            new double[] {1.2638,2.527,3.1564},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        skill: new Stats.Stats(
-            new double[] {2.4768,1.512+1.656,1.584+1.728,2.376},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        burst: new Stats.Stats(
-            new double[] {4.1904,0.108,1.008},10876,0,0,0,225,0.466,311,0.5,1
-        ))
-        {
+        public Bennett(int constellationLevel): base(
+            constellationLevel,
+            stats: new Stats.Stats(
+                base_hp: 10876,
+                base_attack: 225,
+                attack_p: 0.466,
+                attack_f: 311,
+                crit_rate: 0.5,
+                crit_dmg: 1
+            ),
+            normal: new Stats.Stats(new double[] {0.8806,0.8449,1.0795,1.11798,1.3209}),
+            charged: new Stats.Stats(new double[] {1.105+1.202}),
+            plunge: new Stats.Stats(new double[] {1.2638,2.527,3.1564}),
+            skill: new Stats.Stats(new double[] {2.4768,1.512+1.656,1.584+1.728,2.376}),
+            burst: new Stats.Stats(new double[] {4.1904,0.108,1.008})
+        ) {
         }
 
         public List<WorldEvent> Burst(double timestamp)
         {
-            Stats.Stats buff = new Stats.Stats(new double[] {-1},0,0,0,0,0,0, getStats(Types.BURST).BaseAttack*getStats(Types.BURST).MV[2],0,0);
+            Stats.Stats buff = new Stats.Stats(attack_f: getStats(Types.BURST).BaseAttack * getStats(Types.BURST).MV[2]);
 
             List<WorldEvent> temp = new List<WorldEvent> {
                 new Hit(timestamp, () => getStats(Types.BURST) + buff, 0, this, "bennett burst"),

@@ -16,8 +16,11 @@ namespace Tcc.Stats
         public double CR { get; } //Crit rate
         public double CD { get; } //Crit DMG
 
-        public Stats (double[] mv, double base_hp, double hp_p, double hp_f, double total_DMG, double base_attack, double attack_p, double attack_f, double crit_rate, double crit_dmg)
-        {
+        public Stats (
+            double[] mv = null, double base_hp = 0, double hp_p = 0, double hp_f = 0,
+            double total_DMG = 0, double base_attack = 0, double attack_p = 0, double attack_f = 0,
+            double crit_rate = 0, double crit_dmg = 0
+        ) {
             this.MV = mv;
             this.BaseHP = base_hp;
             this.HPP = hp_p;
@@ -30,20 +33,6 @@ namespace Tcc.Stats
             this.CD = crit_dmg;
         }
 
-        public Stats ()
-        {
-            this.MV = new double[] {0.0};
-            this.BaseHP = 0.0;
-            this.HPP = 0.0;
-            this.HPF = 0.0;
-            this.TotalDMG = 0.0;
-            this.BaseAttack = 0.0;
-            this.AttackP = 0.0;
-            this.AttackF = 0.0;
-            this.CR = 0.0;
-            this.CD = 0.0;
-        }
-
         public double CalculateHitDamage(int index) {
             return this.MV[index] * (this.BaseAttack*(1 + AttackP) + AttackF) * (1 + this.TotalDMG) * (1 + this.CR * this.CD);
         }
@@ -52,7 +41,7 @@ namespace Tcc.Stats
         {
             double[] temp = new double[a.MV.Length];
 
-            if (b.MV[0] != -1)
+            if (b.MV != null)
             {
                 if (a.MV.Length != b.MV.Length)
                 throw new Exception("Cannot add different motion values together");

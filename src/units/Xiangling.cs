@@ -6,23 +6,22 @@ namespace Tcc.Units
 {
     public class Xiangling: Unit
     {
-        public Xiangling(int constellationLevel): base(constellationLevel, 
-        normal:new Stats.Stats(
-            new double[] {0.8313,0.833,0.5151*2,0.2788*4,1.4062},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        charged: new Stats.Stats(
-            new double[] {2.4055},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        plunge: new Stats.Stats(
-            new double[] {1.2638,2.527,3.1564},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        skill: new Stats.Stats(
-            new double[] {2.003},10876,0,0,0,225,0.466,311,0.5,1
-        ),
-        burst: new Stats.Stats(
-            new double[] {1.296,1.584,1.9728,2.016},10876,0,0,0,225,0.466,311,0.5,1
-        ))
-        {
+        public Xiangling(int constellationLevel): base(
+            constellationLevel,
+            stats: new Stats.Stats(
+                base_hp: 10876,
+                base_attack: 225,
+                attack_p: 0.466,
+                attack_f: 311,
+                crit_rate: 0.5,
+                crit_dmg: 1
+            ),
+            normal: new Stats.Stats(new double[] {0.8313,0.833,0.5151*2,0.2788*4,1.4062}),
+            charged: new Stats.Stats(new double[] {2.4055}),
+            plunge: new Stats.Stats(new double[] {1.2638,2.527,3.1564}),
+            skill: new Stats.Stats(new double[] {2.003}),
+            burst: new Stats.Stats(new double[] {1.296,1.584,1.9728,2.016})
+        ) {
         }
 
         public List<WorldEvent> InitialBurst(double timestamp) {
