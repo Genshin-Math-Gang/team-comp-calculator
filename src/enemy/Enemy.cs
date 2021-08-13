@@ -1,13 +1,14 @@
 ﻿using Tcc.Stats;
 using Tcc.Elements;
 
-namespace Tcc.Eenemy
+namespace Tcc.Enemy
 {
     public class Enemy
     {
-        private Stats stats;
-        private Guage guage;
-    
-
+        private Stats.Stats stats;
+        private Gauge gauge;
+        
     }
+
+    
 }
