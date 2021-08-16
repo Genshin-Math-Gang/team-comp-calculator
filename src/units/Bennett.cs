@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Tcc.Buffs.Characters;
 using Tcc.Events;
 using Tcc.Stats;
 
@@ -6,6 +7,12 @@ namespace Tcc.Units
 {
     public class Bennett: Unit
     {
+        const int N_BURST_TICKS = 12;
+
+        static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
+
+        Stats.Stats burstBuffModifier;
+
         public Bennett(int constellationLevel): base(
             constellationLevel,
             stats: new Stats.Stats(
@@ -24,25 +31,24 @@ namespace Tcc.Units
         ) {
         }
 
-        public List<WorldEvent> Burst(double timestamp)
+        public List<WorldEvent> Burst(Timestamp timestamp)
         {
-            Stats.Stats buff = new Stats.Stats(attack_f: getStats(Types.BURST).BaseAttack * getStats(Types.BURST).MV[2]);
+            // FIXME retrieval by timestamp must happen in a worldevent, this will break
+            var modifier = new Stats.Stats(attack_f: getStats(Types.BURST, timestamp).BaseAttack * getStats(Types.BURST, timestamp).MV[2]);
 
-            List<WorldEvent> temp = new List<WorldEvent> {
-                new Hit(timestamp, () => getStats(Types.BURST) + buff, 0, this, "bennett burst"),
-            };
+            var events = new List<WorldEvent>();
 
-            for(int i=1; i < 8; i++)
+            for(int tick = 0; tick < N_BURST_TICKS; tick++)
             {
-                temp.Add(new RemoveBuffGlobal(timestamp + i*2, "Fantastic Voyage", Types.EVERYTHING ,"bennett Q has been removed globally"));
-                temp.Add(new AddBuffOnField(timestamp + i*2, buff, "Fantastic Voyage", Types.EVERYTHING, "bennett Q added on on-field unit"));
+                var startTime = timestamp + tick * BUFF_FREQUENCY;
+                events.Add(new AddBuffOnField(startTime, new BennettBurstBuff(modifier, startTime), "Bennett burst buff added to on-field unit"));
             }
 
-            temp.Add(new RemoveBuffGlobal(timestamp + 14, "Fantastic Voyage", Types.EVERYTHING ,"bennett Q has been removed globally"));
+            events.Insert(1, new Hit(timestamp, getStats(Types.BURST), 0, this, "Bennett burst"));
 
-            return temp;
+            return events;
         }
-       
+
         public override string ToString()
         {
             return "Bennett";

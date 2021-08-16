@@ -6,6 +6,8 @@ namespace Tcc.Units
 {
     public class Xiangling: Unit
     {
+        Stats.Stats skillSnapshot, burstSnapshot;
+
         public Xiangling(int constellationLevel): base(
             constellationLevel,
             stats: new Stats.Stats(
@@ -24,28 +26,27 @@ namespace Tcc.Units
         ) {
         }
 
-        public List<WorldEvent> InitialBurst(double timestamp) {
+        public List<WorldEvent> InitialBurst(Timestamp timestamp) {
             return new List<WorldEvent> {
-            new Snapshot(timestamp, this, Types.BURST, "nado"),
-            new Hit(timestamp, () => getStats(Types.BURST), 0, this,"nado initial 1st hit"),
-            new Hit(timestamp + 0.5, () => getStats(Types.BURST), 1, this, "nado initial 2nd hit"),
-            new Hit(timestamp + 1.0, () => getStats(Types.BURST), 2, this, "nado initial 3rd hit"),
-            new UnSnapshot(timestamp + 10, this, Types.BURST, "nado")};
+                new Hit(timestamp, getStats(Types.BURST), 0, this,"nado initial 1st hit"),
+                new Hit(timestamp + 0.5, getStats(Types.BURST), 1, this, "nado initial 2nd hit"),
+                new Hit(timestamp + 1, getStats(Types.BURST), 2, this, "nado initial 3rd hit"),
+                new Snapshot(timestamp + 1, getStats(Types.BURST), (stats) => burstSnapshot = stats, "nado"),
+            };
         }
 
-        public List<WorldEvent> Skill(double timestamp) {
+        public List<WorldEvent> Skill(Timestamp timestamp) {
             return new List<WorldEvent> {
-            new Snapshot(timestamp, this, Types.SKILL, "Guoba"),
-            new Hit(timestamp + 2.5, () => getStats(Types.SKILL), 0, this, "Guoba"),
-            new Hit(timestamp + 5, () => getStats(Types.SKILL), 0, this, "Guoba"),
-            new Hit(timestamp + 7.5, () => getStats(Types.SKILL), 0, this, "Guoba"),
-            new Hit (timestamp + 10, () => getStats(Types.SKILL), 0, this, "Guoba"),
-            new UnSnapshot(timestamp + 10, this, Types.SKILL, "Guoba")};
+                new Snapshot(timestamp, getStats(Types.SKILL), (stats) => skillSnapshot = stats, "Guoba"),
+                new Hit(timestamp + 2.5, (_) => skillSnapshot, 0, this, "Guoba"),
+                new Hit(timestamp + 5, (_) => skillSnapshot, 0, this, "Guoba"),
+                new Hit(timestamp + 7.5, (_) => skillSnapshot, 0, this, "Guoba"),
+                new Hit(timestamp + 10, (_) => skillSnapshot, 0, this, "Guoba")
+            };
         }
 
-        public List<WorldEvent> BurstHit(double timestamp) { 
-            return new List<WorldEvent> {
-            new Hit(timestamp, () => getStats(Types.BURST), 3, this, "nado spin")};
+        public List<WorldEvent> BurstHit(Timestamp timestamp) {
+            return new List<WorldEvent> { new Hit(timestamp, (_) => burstSnapshot, 3, this, "nado spin") };
         }
 
         public override string ToString()

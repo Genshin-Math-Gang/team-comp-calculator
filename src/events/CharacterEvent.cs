@@ -5,15 +5,15 @@ namespace Tcc.Events
 {
     public class CharacterEvent
     {
-        readonly Func<double, List<WorldEvent>> worldEventGenerator;
+        readonly Func<Timestamp, List<WorldEvent>> worldEventGenerator;
 
-        public CharacterEvent(double timestamp, Func<double, List<WorldEvent>> worldEventGenerator)
+        public CharacterEvent(Timestamp timestamp, Func<Timestamp, List<WorldEvent>> worldEventGenerator)
         {
             this.Timestamp = timestamp;
             this.worldEventGenerator = worldEventGenerator;
         }
 
-        public double Timestamp { get; }
+        public Timestamp Timestamp { get; }
 
         public List<WorldEvent> GetWorldEvents() => worldEventGenerator(Timestamp);
     }

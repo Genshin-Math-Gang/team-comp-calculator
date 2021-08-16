@@ -6,13 +6,13 @@ namespace Tcc.Events
     {
         readonly Action<World> effect;
 
-        public WorldEvent(double timestamp, Action<World> effect)
+        public WorldEvent(Timestamp timestamp, Action<World> effect)
         {
             this.Timestamp = timestamp;
             this.effect = effect;
         }
 
-        public double Timestamp { get; }
+        public Timestamp Timestamp { get; }
 
         public void Apply(World world) => effect(world);
     }

@@ -5,9 +5,9 @@ namespace Tcc.Events
 {
     public class Hit: WorldEvent
     {
-        public Hit(double timestamp, Func<Stats.Stats> stats, int index, Units.Unit unit, string description = ""): base(
+        public Hit(Timestamp timestamp, Func<Timestamp, Stats.Stats> stats, int index, Units.Unit unit, string description = ""): base(
             timestamp,
-            (world) => world.Hit(timestamp, stats().CalculateHitDamage(index), unit, description)
+            (world) => world.Hit(timestamp, stats(timestamp).CalculateHitDamage(index), unit, description)
         ) {
         }
     }
