@@ -4,6 +4,7 @@ using System.Linq;
 using Tcc.Events;
 using Tcc.Units;
 using Tcc.Stats;
+using Tcc.Enemy;
 
 namespace Tcc
 {
@@ -12,18 +13,25 @@ namespace Tcc
         Unit onFieldUnit;
         List<Unit> units;
         List<CharacterEvent> characterEvents;
+        List<Enemy.Enemy> enemies;
         public double[] TotalDamage;
 
         public World()
         {
             this.characterEvents = new List<CharacterEvent>();
             this.TotalDamage = new double[4];
+            this.enemies = new List<Enemy.Enemy>();
         }
 
         public void SetUnits(Unit onFieldUnit, Unit unit2, Unit unit3, Unit unit4)
         {
             this.onFieldUnit = onFieldUnit;
             this.units = new List<Unit> { onFieldUnit, unit2, unit3, unit4 };
+        }
+
+        public void AddEnemy(Enemy.Enemy enemy)
+        {
+            this.enemies.Add(enemy);
         }
 
         public void AddCharacterEvent(double timestamp, Func<double, List<WorldEvent>> characterAction)

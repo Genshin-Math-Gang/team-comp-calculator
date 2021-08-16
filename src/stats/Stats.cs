@@ -15,11 +15,13 @@ namespace Tcc.Stats
         public double AttackF { get; } //Attack flat
         public double CR { get; } //Crit rate
         public double CD { get; } //Crit DMG
+        public double CurrentHP { get; } // Current health
+        public double Level { get; } // Level
 
         public Stats (
             double[] mv = null, double base_hp = 0, double hp_p = 0, double hp_f = 0,
             double total_DMG = 0, double base_attack = 0, double attack_p = 0, double attack_f = 0,
-            double crit_rate = 0, double crit_dmg = 0
+            double crit_rate = 0, double crit_dmg = 0, double current_hp=0, double level=0
         ) {
             this.MV = mv;
             this.BaseHP = base_hp;
