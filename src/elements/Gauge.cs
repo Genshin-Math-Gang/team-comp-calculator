@@ -12,29 +12,39 @@ namespace Tcc.Elements
         private Dictionary<Element, GaugeElement> gaugeDict;
         private double LastChecked { get; set; }
         private Aura aura = Aura.NONE;
+        private double FreezeDuration = 0;
+        private double FreezeAura = 0;
 
         public Gauge(double timestamp)
         {
             this.gaugeDict = new Dictionary<Element, GaugeElement> { };
             this.LastChecked = timestamp;
+
         }
         
         
         // change return type later
-        public void ElementApplied(double timestamp, Element elementType, double gaugeStrength)
+        public void ElementApplied(double timestamp, Element elementType, double gaugeStrength, bool isHeavy=false)
         {
             TimeDecay(timestamp);
+            if (isHeavy && aura == Aura.FROZEN)
+            {
+                RemoveFrozen();
+            }
             if (aura == ElementToAura(elementType))
             {
                 gaugeDict[elementType].GaugeValue = Math.Max(gaugeStrength, gaugeDict[elementType].GaugeValue);
-            } else if (elementType == Element.PHYSICAL)
+                return;
+            } 
+            if (elementType == Element.PHYSICAL)
             {
                 return;
             }
             // garbage code ensues
             var strength = gaugeStrength * 1.25;
-            // need to do something else regarding reactions but for now i just want to track aura properly
+            // need to do something else regarding damage but for now i just want to track aura properly
             // swirl is terrifying 
+            // frozen is weird
             switch (aura)
             {
                 case Aura.NONE:
@@ -68,9 +78,7 @@ namespace Tcc.Elements
                             strength /= 2;
                             break;
                         case Element.CRYO:
-                            aura = Aura.FROZEN;
-                            gaugeDict[elementType] = new GaugeElement(elementType, strength);
-                            strength = 0;
+                            SetFrozen(strength * 0.8, gaugeDict[Element.HYDRO].GaugeValue);
                             break;
                         case Element.ELECTRO:
                             aura = Aura.ELECTROCHARGED;
@@ -93,9 +101,7 @@ namespace Tcc.Elements
                             strength *= 2;
                             break;
                         case Element.HYDRO:
-                            aura = Aura.FROZEN;
-                            gaugeDict[elementType] = new GaugeElement(elementType, strength);
-                            strength = 0;
+                            SetFrozen(gaugeDict[Element.CRYO].GaugeValue, strength * 0.8);
                             break;
                         case Element.ELECTRO:
                             break;
@@ -155,12 +161,17 @@ namespace Tcc.Elements
                     DecreaseElement(Element.ELECTRO, strength);
                     break;
                 case Aura.FROZEN:
+                    // TODO: need to to testing with non heavy attacks can interact with hidden hydro/cryo aura
                     switch (elementType)
                     {
                         case Element.PYRO:
                             strength *= 2;
                             break;
                         case Element.HYDRO:
+                            gaugeDict[elementType].GaugeValue = Math.Max(gaugeStrength, gaugeDict[elementType].GaugeValue);
+                            strength = 0;
+                            break;
+                        case Element.CRYO:
                             gaugeDict[elementType].GaugeValue = Math.Max(gaugeStrength, gaugeDict[elementType].GaugeValue);
                             strength = 0;
                             break;
@@ -188,7 +199,15 @@ namespace Tcc.Elements
             }
 
             double timeSince = timestamp - LastChecked;
-            this.LastChecked = timestamp;
+            LastChecked = timestamp;
+            if (FreezeDuration > 0)
+            {
+                FreezeDuration = Math.Min(0, FreezeDuration - timeSince);
+                if (FreezeDuration == 0)
+                {
+                    RemoveFrozen();
+                }
+            }
             foreach (var pair in gaugeDict)
             {
                 GaugeElement element = pair.Value;
@@ -232,6 +251,31 @@ namespace Tcc.Elements
             }
 
             return Aura.NONE;
+        }
+
+        private void RemoveFrozen()
+        {
+            FreezeDuration = 0;
+            if (gaugeDict.ContainsKey(Element.CRYO))
+            {
+                aura = Aura.CRYO;
+            } else if (gaugeDict.ContainsKey(Element.HYDRO))
+            {
+                aura = Aura.HYDRO;
+            }
+            else
+            {
+                aura = Aura.NONE;
+            }
+        }
+
+        private void SetFrozen(double cryoStrength, double hydroStrength)
+        {
+            aura = Aura.FROZEN;
+            FreezeAura = 2 * Math.Min(cryoStrength, hydroStrength);
+            // KQM lists the formula as 2*sqrt(5*FreezeStrength+4)-4, however they are also stupid and use aura tax
+            // instead of multiplying reactions strengths by 5/4 which makes this formula and other things simpler
+            FreezeDuration = 4 * (Math.Sqrt(FreezeAura) - 1);
         }
     }
 }

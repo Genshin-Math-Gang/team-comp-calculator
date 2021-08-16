@@ -4,4 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Tcc</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="src\elements\DecayType.cs" />
+  </ItemGroup>
 </Project>
