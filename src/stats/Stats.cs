@@ -20,12 +20,13 @@ namespace Tcc.Stats
         public double Level { get; } // Level
 
         readonly KeyedPercentBonus<Element> elementalBonus;
+        readonly KeyedPercentBonus<Reaction> reactionBonus;
 
         public Stats (
             double[] mv = null, double base_hp = 0, double hp_p = 0, double hp_f = 0,
             double total_DMG = 0, double base_attack = 0, double attack_p = 0, double attack_f = 0,
             double crit_rate = 0, double crit_dmg = 0, double current_hp=0, double level=0,
-            KeyedPercentBonus<Element> elementalBonus = null
+            KeyedPercentBonus<Element> elementalBonus = null, KeyedPercentBonus<Reaction> reactionBonus = null
         ) {
             this.MV = mv;
             this.BaseHP = base_hp;
@@ -39,6 +40,7 @@ namespace Tcc.Stats
             this.CD = crit_dmg;
 
             this.elementalBonus = elementalBonus ?? new KeyedPercentBonus<Element>();
+            this.reactionBonus = reactionBonus ?? new KeyedPercentBonus<Reaction>();
         }
 
         public double CalculateHitDamage(int index) {
@@ -97,5 +99,6 @@ namespace Tcc.Stats
         }
 
         public static implicit operator Stats(KeyedPercentBonus<Element> bonus) => new Stats(elementalBonus: bonus);
+        public static implicit operator Stats(KeyedPercentBonus<Reaction> bonus) => new Stats(reactionBonus: bonus);
     }
 }

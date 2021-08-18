@@ -38,5 +38,17 @@ namespace Tcc.Stats
 
             return new KeyedPercentBonus<KeyT>(result);
         }
+
+        public static KeyedPercentBonus<KeyT> operator *(double scalar, KeyedPercentBonus<KeyT> bonus)
+        {
+            var result = new Dictionary<KeyT, double>();
+
+            foreach(var (key, damagePercent) in bonus.damagePercentBonuses)
+            {
+                result.Add(key, damagePercent * scalar);
+            }
+
+            return new KeyedPercentBonus<KeyT>(result);
+        }
     }
 }

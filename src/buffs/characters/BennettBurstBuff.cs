@@ -8,7 +8,7 @@ namespace Tcc.Buffs.Characters
         static readonly Timestamp DURATION = new Timestamp(2);
 
         public BennettBurstBuff(Stats.Stats modifier, Timestamp startTime)
-            : base(ID, Stats.Types.EVERYTHING, modifier, startTime + DURATION)
+            : base(ID, startTime + DURATION, modifier)
         {
         }
     }

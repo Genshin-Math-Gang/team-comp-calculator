@@ -12,7 +12,7 @@ namespace Tcc.Buffs
         readonly Timestamp expiryTime;
         readonly int maxStacks;
 
-        public RefreshableBuffFromUnit(Guid id, Stats.Types type, Stats.Stats modifier, Timestamp expiryTime, int maxStacks = 1): base(id, expiryTime)
+        public RefreshableBuffFromUnit(Guid id, Timestamp expiryTime, Stats.Stats modifier, Stats.Types type = Stats.Types.EVERYTHING, int maxStacks = 1): base(id, expiryTime)
         {
             this.type = type;
             this.modifier = modifier;
