@@ -11,9 +11,9 @@ namespace Tcc.Buffs
         readonly Stats.Types type;
         readonly Stats.Stats modifier;
 
-        public BasicBuffFromUnit(Guid id, Func<Unit, bool> condition, Stats.Types type, Stats.Stats modifier): base(id, Expirable.Never)
+        public BasicBuffFromUnit(Guid id, Stats.Stats modifier, Stats.Types type = Stats.Types.EVERYTHING, Func<Unit, bool> condition = null): base(id, Expirable.Never)
         {
-            this.condition = condition;
+            this.condition = condition ?? ((_) => true);
             this.type = type;
             this.modifier = modifier;
         }
