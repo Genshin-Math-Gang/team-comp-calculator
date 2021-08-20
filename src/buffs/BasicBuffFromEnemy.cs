@@ -11,7 +11,7 @@ namespace Tcc.Buffs
         readonly Stats.Types type;
         readonly Stats.Stats modifier;
 
-        public BasicBuffFromEnemy(Guid id, Func<Enemy.Enemy, bool> condition, Stats.Types type, Stats.Stats modifier): base(id, Expirable.Never)
+        public BasicBuffFromEnemy(Guid id, Func<Enemy.Enemy, bool> condition, Stats.Stats modifier, Stats.Types type = Stats.Types.ANY): base(id, Expirable.Never)
         {
             this.condition = condition;
             this.type = type;
@@ -30,7 +30,7 @@ namespace Tcc.Buffs
 
         public override Stats.Stats GetModifier(Enemy.Enemy enemy, Stats.Types type)
         {
-            return this.type == type && condition(enemy) ? modifier : new Stats.Stats();
+            return (this.type & type) != Stats.Types.NONE && condition(enemy) ? modifier : new Stats.Stats();
         }
     }
 }

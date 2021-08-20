@@ -5,14 +5,14 @@ using Tcc.Units;
 
 namespace Tcc.Buffs
 {
-    public class RefreshableBuffFromUnit: BuffFromUnit
+    public class RefreshableBuff: UnconditionalBuff
     {
         readonly Stats.Types type;
         readonly Stats.Stats modifier;
         readonly Timestamp expiryTime;
         readonly int maxStacks;
 
-        public RefreshableBuffFromUnit(Guid id, Timestamp expiryTime, Stats.Stats modifier, Stats.Types type = Stats.Types.EVERYTHING, int maxStacks = 1): base(id, expiryTime)
+        public RefreshableBuff(Guid id, Timestamp expiryTime, Stats.Stats modifier, Stats.Types type = Stats.Types.ANY, int maxStacks = 1): base(id, expiryTime)
         {
             this.type = type;
             this.modifier = modifier;
@@ -20,7 +20,7 @@ namespace Tcc.Buffs
             this.maxStacks = maxStacks;
         }
 
-        public override void AddToUnit(Unit unit, List<BuffFromUnit> buffs)
+        public override void AddToUnit(Unit unit, List<UnconditionalBuff> buffs)
         {
             buffs.Add(this);
 
@@ -30,14 +30,14 @@ namespace Tcc.Buffs
             if(existingStacks.Count() > maxStacks)
             {
                 var toRemove = existingStacks
-                    .Cast<RefreshableBuffFromUnit>()
+                    .Cast<RefreshableBuff>()
                     .Aggregate((buff1, buff2) => buff2.expiryTime < buff1.expiryTime ? buff2 : buff1);
 
                 buffs.Remove(toRemove);
             }
         }
 
-        public override Stats.Stats GetModifier(Unit unit, Stats.Types type)
+        public override Stats.Stats GetModifier(Stats.Types type)
         {
             return this.type == type ? modifier : new Stats.Stats();
         }

@@ -21,6 +21,7 @@ namespace Tcc.Units
             {Types.BURST, new Stats.Stats()} 
         };
 
+        private readonly List<UnconditionalBuff> unconditionalBuffs = new List<UnconditionalBuff>();
         private readonly List<BuffFromUnit> buffsFromUnit = new List<BuffFromUnit>();
         private readonly List<BuffFromEnemy> buffsFromEnemy = new List<BuffFromEnemy>();
 
@@ -37,6 +38,8 @@ namespace Tcc.Units
             this.modifiers[Types.SKILL] = skill;
         }
 
+        public double CurrentHp { get; }
+
         public List<WorldEvent> SwitchUnit(Timestamp timestamp)
         {
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
@@ -52,11 +55,14 @@ namespace Tcc.Units
 
         public Stats.Stats GetStatsFromUnit(Types type, Timestamp timestamp)
         {
+            unconditionalBuffs.RemoveAll((buff) => buff.HasExpired(timestamp));
             buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
 
-            var result = modifiers[type] + stats;
+            var unconditionalStats = modifiers[type] + stats;
+            foreach(var buff in unconditionalBuffs) unconditionalStats += buff.GetModifier(type);
 
-            foreach(var buff in buffsFromUnit) result += buff.GetModifier(this, type);
+            var result = unconditionalStats;
+            foreach(var buff in buffsFromUnit) result += buff.GetModifier(this, unconditionalStats, type);
 
             return result;
         }
@@ -78,6 +84,11 @@ namespace Tcc.Units
         protected Func<Enemy.Enemy, Timestamp, Stats.Stats> GetStats(Types type)
         {
             return (enemy, timestamp) => GetStats(type, enemy, timestamp);
+        }
+
+        public void AddBuff(UnconditionalBuff buff)
+        {
+            buff.AddToUnit(this, this.unconditionalBuffs);
         }
 
         public void AddBuff(BuffFromUnit buff)

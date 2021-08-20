@@ -12,6 +12,6 @@ namespace Tcc.Buffs
 
         public abstract void AddToUnit(Unit unit, List<BuffFromUnit> buffs);
 
-        public abstract Stats.Stats GetModifier(Unit unit, Stats.Types type);
+        public abstract Stats.Stats GetModifier(Unit unit, Stats.Stats unconditionalStats, Stats.Types type);
     }
 }

@@ -7,13 +7,18 @@ namespace Tcc.Buffs
 {
     public class BasicBuffFromUnit: BuffFromUnit
     {
-        readonly Func<Unit, bool> condition;
+        readonly Func<Unit, Stats.Stats, bool> condition;
         readonly Stats.Types type;
-        readonly Stats.Stats modifier;
+        readonly Func<Unit, Stats.Stats, Stats.Stats> modifier;
 
-        public BasicBuffFromUnit(Guid id, Stats.Stats modifier, Stats.Types type = Stats.Types.EVERYTHING, Func<Unit, bool> condition = null): base(id, Expirable.Never)
+        public BasicBuffFromUnit(Guid id, Stats.Stats modifier, Stats.Types type = Stats.Types.ANY, Func<Unit, Stats.Stats, bool> condition = null)
+            : this(id, (_, _) => modifier, type, condition)
         {
-            this.condition = condition ?? ((_) => true);
+        }
+
+        public BasicBuffFromUnit(Guid id, Func<Unit, Stats.Stats, Stats.Stats> modifier, Stats.Types type = Stats.Types.ANY, Func<Unit, Stats.Stats, bool> condition = null): base(id, Expirable.Never)
+        {
+            this.condition = condition ?? ((_, _) => true);
             this.type = type;
             this.modifier = modifier;
         }
@@ -28,9 +33,9 @@ namespace Tcc.Buffs
             buffs.Add(this);
         }
 
-        public override Stats.Stats GetModifier(Unit unit, Stats.Types type)
+        public override Stats.Stats GetModifier(Unit unit, Stats.Stats unconditionalStats, Stats.Types type)
         {
-            return this.type == type && condition(unit) ? modifier : new Stats.Stats();
+            return (this.type & type) != Stats.Types.NONE && condition(unit, unconditionalStats) ? modifier(unit, unconditionalStats) : new Stats.Stats();
         }
     }
 }
