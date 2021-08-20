@@ -26,18 +26,18 @@ namespace Tcc
             World world = new World();
             world.SetUnits(xiangling, bennett, null, null);
 
-            world.AddCharacterEvent(1, bennett.switchUnit);
-            world.AddCharacterEvent(1.2, bennett.Burst);
+            world.AddCharacterEvent(new Timestamp(1), bennett.SwitchUnit);
+            world.AddCharacterEvent(new Timestamp(1.2), bennett.Burst);
 
-            world.AddCharacterEvent(1.7, xiangling.switchUnit);
+            world.AddCharacterEvent(new Timestamp(1.7), xiangling.SwitchUnit);
 
-            world.AddCharacterEvent(3.8, xiangling.Skill);
+            world.AddCharacterEvent(new Timestamp(3.8), xiangling.Skill);
 
-            world.AddCharacterEvent(5.5, bennett.switchUnit);
+            world.AddCharacterEvent(new Timestamp(5.5), bennett.SwitchUnit);
 
-            world.AddCharacterEvent(16, xiangling.switchUnit);
+            world.AddCharacterEvent(new Timestamp(16), xiangling.SwitchUnit);
 
-            world.AddCharacterEvent(17, xiangling.Skill);
+            world.AddCharacterEvent(new Timestamp(17), xiangling.Skill);
 
             world.Simulate();
 

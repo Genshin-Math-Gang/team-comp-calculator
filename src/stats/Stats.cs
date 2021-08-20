@@ -5,97 +5,128 @@ namespace Tcc.Stats
 {
     public class Stats
     {
-        // Implemented all the stats
-        public double[] MV { get; } //Motion Value
-        public double BaseHP { get; } //Base HP
-        public double HPP { get; } //HP percantege
-        public double HPF { get; } //HP flat
-        public double TotalDMG { get; } //Total DMG%
-        public double BaseAttack { get; } //Base Attack
-        public double AttackP { get; } //Attack percantage, should be between 0 and 1.
-        public double AttackF { get; } //Attack flat
-        public double CR { get; } //Crit rate
-        public double CD { get; } //Crit DMG
-        public double CurrentHP { get; } // Current health
-        public double Level { get; } // Level
-
-        readonly KeyedPercentBonus<Element> elementalBonus;
-        readonly KeyedPercentBonus<Reaction> reactionBonus;
+        public double[] MotionValues { get; }
+        public MultipliableStat MaxHp { get; }
+        public MultipliableStat Attack { get; }
+        public MultipliableStat Defence { get; }
+        public double ElementalMastery { get; }
+        public double CritRate { get; }
+        public double CritDamage { get; }
+        public double HealingBonus { get; }
+        public double IncomingHealingBonus { get; }
+        public double EnergyRecharge { get; }
+        public double CdReduction { get; }
+        public double ShieldStrength { get; }
+        public double DamagePercent { get; }
+        public KeyedPercentBonus<Element> ElementalBonus { get; }
+        public KeyedPercentBonus<Reaction> ReactionBonus { get; }
 
         public Stats (
-            double[] mv = null, double base_hp = 0, double hp_p = 0, double hp_f = 0,
-            double total_DMG = 0, double base_attack = 0, double attack_p = 0, double attack_f = 0,
-            double crit_rate = 0, double crit_dmg = 0, double current_hp=0, double level=0,
+            double[] motionValues = null,
+            double baseHp = 0, double flatHp = 0, double hpPercent = 0,
+            double baseAttack = 0, double flatAttack = 0, double attackPercent = 0,
+            double baseDefence = 0, double flatDefence = 0, double defencePercent = 0,
+            double elementalMastery = 0, double critRate = 0, double critDamage = 0,
+            double healingBonus = 0, double incomingHealingBonus = 0, double energyRecharge = 0,
+            double cdReduction = 0, double shieldStrength = 0, double damagePercent = 0,
             KeyedPercentBonus<Element> elementalBonus = null, KeyedPercentBonus<Reaction> reactionBonus = null
+        ): this(
+            motionValues: motionValues,
+            maxHp: new MultipliableStat(baseValue: baseHp, flatBonus: flatHp, percentBonus: hpPercent),
+            attack: new MultipliableStat(baseValue: baseAttack, flatBonus: flatAttack, percentBonus: attackPercent),
+            defence: new MultipliableStat(baseValue: baseDefence, flatBonus: flatDefence, percentBonus: defencePercent),
+            elementalMastery: elementalMastery,
+            critRate: critRate,
+            critDamage: critDamage,
+            healingBonus: healingBonus,
+            incomingHealingBonus: incomingHealingBonus,
+            energyRecharge: energyRecharge,
+            cdReduction: cdReduction,
+            shieldStrength: shieldStrength,
+            damagePercent: damagePercent,
+            elementalBonus: elementalBonus,
+            reactionBonus: reactionBonus
         ) {
-            this.MV = mv;
-            this.BaseHP = base_hp;
-            this.HPP = hp_p;
-            this.HPF = hp_f;
-            this.TotalDMG = total_DMG;
-            this.BaseAttack = base_attack;
-            this.AttackP = attack_p;
-            this.AttackF = attack_f;
-            this.CR = crit_rate;
-            this.CD = crit_dmg;
-
-            this.elementalBonus = elementalBonus ?? new KeyedPercentBonus<Element>();
-            this.reactionBonus = reactionBonus ?? new KeyedPercentBonus<Reaction>();
         }
 
-        public double CalculateHitDamage(int index) {
-            return this.MV[index] * (this.BaseAttack*(1 + AttackP) + AttackF) * (1 + this.TotalDMG) * (1 + this.CR * this.CD);
+        Stats(
+            double[] motionValues, MultipliableStat maxHp, MultipliableStat attack, MultipliableStat defence,
+            double elementalMastery, double critRate, double critDamage,
+            double healingBonus, double incomingHealingBonus, double energyRecharge,
+            double cdReduction, double shieldStrength, double damagePercent,
+            KeyedPercentBonus<Element> elementalBonus, KeyedPercentBonus<Reaction> reactionBonus
+        ) {
+            this.MotionValues = motionValues;
+            this.MaxHp = maxHp;
+            this.Attack = attack;
+            this.Defence = defence;
+            this.ElementalMastery = elementalMastery;
+            this.CritRate = critRate;
+            this.CritDamage = critDamage;
+            this.HealingBonus = healingBonus;
+            this.IncomingHealingBonus = incomingHealingBonus;
+            this.EnergyRecharge = energyRecharge;
+            this.CdReduction = cdReduction;
+            this.ShieldStrength = shieldStrength;
+            this.DamagePercent = damagePercent;
+            this.ElementalBonus = elementalBonus ?? new KeyedPercentBonus<Element>();
+            this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<Reaction>();
         }
 
-        public static Stats operator +(Stats a, Stats b)
+        public double CalculateHitDamage(int mvIndex, Element element, Reaction? reaction = null)
         {
-            if (a.MV == null)
+            var totalDamagePercent = 1 + DamagePercent;
+
+            totalDamagePercent += ElementalBonus.GetDamagePercentBonus(element);
+            if(reaction.HasValue) totalDamagePercent += ReactionBonus.GetDamagePercentBonus(reaction.Value);
+
+            return MotionValues[mvIndex] * Attack * totalDamagePercent * (1 + CritRate * CritDamage);
+        }
+
+        public static Stats operator +(Stats first, Stats second)
+        {
+            double[] motionValues = null;
+
+            if(first.MotionValues != null)
             {
-                return a;
-            }
-
-            double[] temp = new double[a.MV.Length];
-
-            if (b.MV != null)
-            {
-                if (a.MV.Length != b.MV.Length)
-                throw new Exception("Cannot add different motion values together");
-
-                temp = new double[a.MV.Length];
-
-                for(int i=0; i < a.MV.Length; i++)
+                if(second.MotionValues != null)
                 {
-                    temp[i] = a.MV[i] + b.MV[i];
+                    if(first.MotionValues.Length != second.MotionValues.Length) throw new Exception("Cannot add different motion values together");
+
+                    motionValues = new double[first.MotionValues.Length];
+
+                    for(int i = 0; i < motionValues.Length; i++)
+                    {
+                        motionValues[i] = first.MotionValues[i] + second.MotionValues[i];
+                    }
+                }
+                else
+                {
+                    motionValues = (double[])first.MotionValues.Clone();
                 }
             }
-            else
-                a.MV.CopyTo(temp, 0);
+            else if(second.MotionValues != null)
+            {
+                motionValues = (double[])second.MotionValues.Clone();
+            }
 
             return new Stats(
-                mv:temp,
-                base_hp: a.BaseHP + b.BaseHP,
-                hp_p: a.HPP + b.HPP,
-                hp_f: a.HPF + b.HPF,
-                total_DMG: a.TotalDMG + b.TotalDMG,
-                base_attack: a.BaseAttack + b.BaseAttack,
-                attack_p: a.AttackP + b.AttackP,
-                attack_f: a.AttackF + b.AttackF,
-                crit_rate: a.CR + b.CR,
-                crit_dmg: a.CD + b.CD);
-        }
-        public static Stats operator -(Stats a)
-        {
-            return new Stats(
-                mv:a.MV,
-                base_hp: -a.BaseHP,
-                hp_p: -a.HPP,
-                hp_f: -a.HPF,
-                total_DMG: -a.TotalDMG,
-                base_attack: -a.BaseAttack,
-                attack_p: -a.AttackP,
-                attack_f: -a.AttackF,
-                crit_rate: -a.CR,
-                crit_dmg: -a.CD);
+                motionValues: motionValues,
+                maxHp: first.MaxHp + second.MaxHp,
+                attack: first.Attack + second.Attack,
+                defence: first.Defence + second.Defence,
+                elementalMastery: first.ElementalMastery + second.ElementalMastery,
+                critRate: first.CritRate + second.CritRate,
+                critDamage: first.CritDamage + second.CritDamage,
+                healingBonus: first.HealingBonus + second.HealingBonus,
+                incomingHealingBonus: first.IncomingHealingBonus + second.IncomingHealingBonus,
+                energyRecharge: first.EnergyRecharge + second.EnergyRecharge,
+                cdReduction: first.CdReduction + second.CdReduction,
+                shieldStrength: first.ShieldStrength + second.ShieldStrength,
+                damagePercent: first.DamagePercent + second.DamagePercent,
+                elementalBonus: first.ElementalBonus + second.ElementalBonus,
+                reactionBonus: first.ReactionBonus + second.ReactionBonus
+            );
         }
 
         public static implicit operator Stats(KeyedPercentBonus<Element> bonus) => new Stats(elementalBonus: bonus);

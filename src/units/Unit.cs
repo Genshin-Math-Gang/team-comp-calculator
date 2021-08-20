@@ -37,28 +37,47 @@ namespace Tcc.Units
             this.modifiers[Types.SKILL] = skill;
         }
 
-        public List<WorldEvent> switchUnit(Timestamp timestamp)
+        public List<WorldEvent> SwitchUnit(Timestamp timestamp)
         {
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
 
-        protected Stats.Stats getStats(Types type, Timestamp timestamp)
+        protected Stats.Stats GetStats(Types type, Enemy.Enemy enemy, Timestamp timestamp)
+        {
+            var result = GetStatsFromUnit(type, timestamp);
+            result = AddStatsFromEnemy(result, type, enemy, timestamp);
+
+            return result;
+        }
+
+        public Stats.Stats GetStatsFromUnit(Types type, Timestamp timestamp)
         {
             buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
 
-            Stats.Stats requested = modifiers[type] + stats;
+            var result = modifiers[type] + stats;
 
-            foreach (var buff in buffsFromUnit)
-            {
-                requested += buff.GetModifier(this, type);
-            }
+            foreach(var buff in buffsFromUnit) result += buff.GetModifier(this, type);
 
-            return requested;
+            return result;
         }
 
-        protected Func<Timestamp, Stats.Stats> getStats(Types type)
+        public Stats.Stats AddStatsFromEnemy(Stats.Stats statsFromUnit, Types type, Enemy.Enemy enemy, Timestamp timestamp)
         {
-            return (timestamp) => getStats(type, timestamp);
+            buffsFromEnemy.RemoveAll((buff) => buff.HasExpired(timestamp));
+
+            var result = statsFromUnit;
+
+            if(enemy != null)
+            {
+                foreach(var buff in buffsFromEnemy) result += buff.GetModifier(enemy, type);
+            }
+
+            return result;
+        }
+
+        protected Func<Enemy.Enemy, Timestamp, Stats.Stats> GetStats(Types type)
+        {
+            return (enemy, timestamp) => GetStats(type, enemy, timestamp);
         }
 
         public void AddBuff(BuffFromUnit buff)

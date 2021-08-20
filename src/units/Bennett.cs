@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Tcc.Buffs.Characters;
+using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
 
@@ -11,17 +12,17 @@ namespace Tcc.Units
 
         static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
 
-        Stats.Stats burstBuffModifier;
+        SnapshottedStats burstBuffSnapshot;
 
         public Bennett(int constellationLevel): base(
             constellationLevel,
             stats: new Stats.Stats(
-                base_hp: 10876,
-                base_attack: 225,
-                attack_p: 0.466,
-                attack_f: 311,
-                crit_rate: 0.5,
-                crit_dmg: 1
+                baseHp: 10876,
+                baseAttack: 225,
+                attackPercent: 0.466,
+                flatAttack: 311,
+                critRate: 0.5,
+                critDamage: 1
             ),
             normal: new Stats.Stats(new double[] {0.8806,0.8449,1.0795,1.11798,1.3209}),
             charged: new Stats.Stats(new double[] {1.105+1.202}),
@@ -29,24 +30,34 @@ namespace Tcc.Units
             skill: new Stats.Stats(new double[] {2.4768,1.512+1.656,1.584+1.728,2.376}),
             burst: new Stats.Stats(new double[] {4.1904,0.108,1.008})
         ) {
+            this.burstBuffSnapshot = new SnapshottedStats(this, Types.BURST);
         }
 
         public List<WorldEvent> Burst(Timestamp timestamp)
         {
-            // FIXME retrieval by timestamp must happen in a worldevent, this will break
-            var modifier = new Stats.Stats(attack_f: getStats(Types.BURST, timestamp).BaseAttack * getStats(Types.BURST, timestamp).MV[2]);
-
             var events = new List<WorldEvent>();
+            events.Add(burstBuffSnapshot.Snapshot(timestamp));
 
             for(int tick = 0; tick < N_BURST_TICKS; tick++)
             {
                 var startTime = timestamp + tick * BUFF_FREQUENCY;
-                events.Add(new AddBuffOnField(startTime, new BennettBurstBuff(modifier, startTime), "Bennett burst buff added to on-field unit"));
+
+                // TODO Self-apply pyro
+                events.Add(new AddBuffOnField(startTime, () => CreateBurstBuff(startTime), "Bennett burst buff added to on-field unit"));
+
+                // Deal burst damage after modifier snapshot and first application
+                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, GetStats(Types.BURST), 0, this, "Bennett burst"));
             }
 
-            events.Insert(1, new Hit(timestamp, getStats(Types.BURST), 0, this, "Bennett burst"));
-
             return events;
+        }
+
+        BennettBurstBuff CreateBurstBuff(Timestamp startTime)
+        {
+            var stats = burstBuffSnapshot.GetStats(null, startTime);
+            var modifier = new Stats.Stats(flatAttack: stats.Attack.Base * stats.MotionValues[2]);
+
+            return new BennettBurstBuff(modifier, startTime);
         }
 
         public override string ToString()

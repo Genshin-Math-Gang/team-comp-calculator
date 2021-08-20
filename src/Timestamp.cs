@@ -1,7 +1,8 @@
+using System;
 namespace Tcc
 {
     // We may eventually want to use frames, this abstraction means we change it in one place
-    public sealed class Timestamp
+    public sealed class Timestamp: IComparable<Timestamp>
     {
         readonly double time;
 
@@ -37,5 +38,14 @@ namespace Tcc
         public static bool operator >=(Timestamp time1, Timestamp time2) => time1?.time >= time2?.time;
         public static bool operator <(Timestamp time1, Timestamp time2) => time1?.time < time2?.time;
         public static bool operator <=(Timestamp time1, Timestamp time2) => time1?.time <= time2?.time;
+
+        public int CompareTo(Timestamp other)
+        {
+            if(other == null) throw new ArgumentNullException(nameof(other));
+
+            return this.time.CompareTo(other.time);
+        }
+
+        public override string ToString() => $"t = {time}";
     }
 }
