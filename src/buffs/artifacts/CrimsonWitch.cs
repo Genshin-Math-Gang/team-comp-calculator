@@ -1,41 +1,36 @@
 using System;
 using Tcc.Elements;
 using Tcc.Stats;
+using Tcc.Units;
 
 namespace Tcc.Buffs.Artifacts
 {
-    public class CrimsonWitch2pc: BasicUnconditionalBuff
+    public class CrimsonWitch: ArtifactSet
     {
-        static readonly Guid ID = new Guid("eb489029-e2e5-4028-b119-da6436ef24a0");
-        public static readonly KeyedPercentBonus<Element> MODIFIER = new KeyedPercentBonus<Element>(Element.PYRO, 0.15);
+        static readonly Guid ID_2PC = new Guid("eb489029-e2e5-4028-b119-da6436ef24a0");
+        static readonly Guid ID_4PC_PASSIVE = new Guid("608f7b4e-96a3-4731-954a-6ca247ade87e");
+        static readonly Guid ID_4PC_STACK = new Guid("73e3f42e-bfe4-4592-ac31-3db20097d8cb");
 
-        public CrimsonWitch2pc(): base(ID, MODIFIER)
-        {
-        }
-    }
+        static readonly KeyedPercentBonus<Element> MODIFIER_2PC = new KeyedPercentBonus<Element>(Element.PYRO, 0.15);
 
-    public class CrimsonWitch4pcPassive: BasicUnconditionalBuff
-    {
-        static readonly Guid ID = new Guid("608f7b4e-96a3-4731-954a-6ca247ade87e");
-        static readonly Stats.Stats MODIFIER = new KeyedPercentBonus<Reaction>(
+        static readonly Stats.Stats MODIFIER_4PC_PASSIVE = new KeyedPercentBonus<Reaction>(
             (Reaction.OVERLOADED, 40),
             (Reaction.BURNING, 40),
             (Reaction.MELT, 15),
             (Reaction.VAPORIZE, 15)
         );
 
-        public CrimsonWitch4pcPassive(): base(ID, MODIFIER)
-        {
-        }
-    }
+        static readonly Stats.Stats MODIFIER_4PC_STACK = 0.5 * MODIFIER_2PC;
 
-    public class CrimsonWitch4pcStack: RefreshableBuff
-    {
-        static readonly Guid ID = new Guid("73e3f42e-bfe4-4592-ac31-3db20097d8cb");
-        static readonly Stats.Stats MODIFIER = 0.5 * CrimsonWitch2pc.MODIFIER;
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
 
-        public CrimsonWitch4pcStack(Timestamp expiryTime): base(ID, expiryTime, MODIFIER, maxStacks: 3)
+        public override void Add4pc(World world, Unit unit)
         {
+            unit.AddBuff(new BasicUnconditionalBuff(ID_4PC_PASSIVE, MODIFIER_4PC_PASSIVE));
+
+            unit.skillActivatedHook += (_, data) => unit.AddBuff(
+                new RefreshableBuff(ID_4PC_STACK, data.timestamp + 10, MODIFIER_4PC_STACK, maxStacks: 3)
+            );
         }
     }
 }

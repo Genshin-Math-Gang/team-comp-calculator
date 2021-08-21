@@ -1,24 +1,26 @@
 using System;
+using Tcc.Units;
 
 namespace Tcc.Buffs.Artifacts
 {
-    public class MartialArtist2pc: BasicUnconditionalBuff
+    public class MartialArtist: ArtifactSet
     {
-        static readonly Guid ID = new Guid("3a34b09e-0ac2-44e5-a375-1cd19c903f0d");
-        static readonly Stats.Stats MODIFIER = new Stats.Stats(damagePercent: 0.15);
+        static readonly Guid ID_2PC = new Guid("3a34b09e-0ac2-44e5-a375-1cd19c903f0d");
+        static readonly Guid ID_4PC = new Guid("a971cb7a-5c2a-4944-a087-6024f40dcc4a");
 
-        public MartialArtist2pc(): base(ID, MODIFIER, Stats.Types.NORMAL | Stats.Types.CHARGED)
+        static readonly Stats.Stats MODIFIER_2PC = new Stats.Stats(damagePercent: 0.15);
+        static readonly Stats.Stats MODIFIER_4PC = new Stats.Stats(damagePercent: 0.25);
+
+        public override void Add2pc(World world, Unit unit)
         {
+            unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC, Stats.Types.NORMAL | Stats.Types.CHARGED));
         }
-    }
 
-    public class MartialArtist4pc: RefreshableBuff
-    {
-        static readonly Guid ID = new Guid("a971cb7a-5c2a-4944-a087-6024f40dcc4a");
-        static readonly Stats.Stats MODIFIER = new Stats.Stats(damagePercent: 0.25);
-
-        public MartialArtist4pc(): base(ID, new Timestamp(8), MODIFIER, Stats.Types.NORMAL | Stats.Types.CHARGED)
+        public override void Add4pc(World world, Unit unit)
         {
+            unit.skillActivatedHook += (_, data) => unit.AddBuff(
+                new RefreshableBuff(ID_4PC, data.timestamp + 8, MODIFIER_4PC, Stats.Types.NORMAL | Stats.Types.CHARGED)
+            );
         }
     }
 }

@@ -1,14 +1,15 @@
 using System;
+using Tcc.Units;
 
 namespace Tcc.Buffs.Artifacts
 {
-    public class LuckyDog2pc: BasicUnconditionalBuff
+    public class LuckyDog: ArtifactSet
     {
-        static readonly Guid ID = new Guid("063493f0-f5ca-472a-8b9f-20c3fc4072ad");
-        static readonly Stats.Stats MODIFIER = new Stats.Stats(flatDefence: 100);
+        static readonly Guid ID_2PC = new Guid("063493f0-f5ca-472a-8b9f-20c3fc4072ad");
 
-        public LuckyDog2pc(): base(ID, MODIFIER)
-        {
-        }
+        static readonly Stats.Stats MODIFIER_2PC = new Stats.Stats(flatDefence: 100);
+
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add4pc(World world, Unit unit) => throw new NotImplementedException();
     }
 }

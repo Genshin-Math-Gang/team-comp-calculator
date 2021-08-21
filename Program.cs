@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System;
+using Tcc.Buffs.Artifacts;
 using Tcc.Events;
 using Tcc.Stats;
 using Tcc.Units;
+using Tcc.Weapons;
 
 namespace Tcc
 {
@@ -25,6 +27,13 @@ namespace Tcc
 
             World world = new World();
             world.SetUnits(xiangling, bennett, null, null);
+
+            xiangling.Weapon = new DummyWeapon(WeaponType.POLEARM);
+            bennett.Weapon = new DummyWeapon(WeaponType.SWORD);
+
+            var crimsonWitch = new CrimsonWitch();
+            crimsonWitch.Add2pc(world, xiangling);
+            crimsonWitch.Add4pc(world, xiangling);
 
             world.AddCharacterEvent(new Timestamp(1), bennett.SwitchUnit);
             world.AddCharacterEvent(new Timestamp(1.2), bennett.Burst);

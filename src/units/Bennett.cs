@@ -16,6 +16,7 @@ namespace Tcc.Units
 
         public Bennett(int constellationLevel): base(
             constellationLevel,
+            element: Element.PYRO,
             stats: new Stats.Stats(
                 baseHp: 10876,
                 baseAttack: 225,
@@ -35,8 +36,10 @@ namespace Tcc.Units
 
         public List<WorldEvent> Burst(Timestamp timestamp)
         {
-            var events = new List<WorldEvent>();
-            events.Add(burstBuffSnapshot.Snapshot(timestamp));
+            var events = new List<WorldEvent> {
+                BurstActivated(timestamp),
+                burstBuffSnapshot.Snapshot(timestamp),
+            };
 
             for(int tick = 0; tick < N_BURST_TICKS; tick++)
             {

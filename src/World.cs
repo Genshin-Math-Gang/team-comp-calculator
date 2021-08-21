@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Tcc
         Unit onFieldUnit;
         List<Unit> units;
         List<CharacterEvent> characterEvents;
+        List<WorldEvent> queuedWorldEvents;
         List<Enemy.Enemy> enemies;
         public double[] TotalDamage;
 
@@ -28,6 +30,8 @@ namespace Tcc
             this.onFieldUnit = onFieldUnit;
             this.units = new List<Unit> { onFieldUnit, unit2, unit3, unit4 };
         }
+
+        public ReadOnlyCollection<Unit> GetUnits() => units.AsReadOnly();
 
         public void AddEnemy(Enemy.Enemy enemy)
         {
@@ -124,12 +128,27 @@ namespace Tcc
 
         public void Simulate()
         {
-            List<WorldEvent> worldEvents = characterEvents
+            queuedWorldEvents = characterEvents
                 .SelectMany((characterEvent) => characterEvent.GetWorldEvents())
                 .OrderBy((worldEvent) => worldEvent.Timestamp)
                 .ToList();
 
-            foreach(var worldEvent in worldEvents) worldEvent.Apply(this);
+            while(queuedWorldEvents.Any())
+            {
+                var nextEvent = queuedWorldEvents[0];
+
+                queuedWorldEvents.RemoveAt(0);
+                nextEvent.Apply(this);
+            }
+        }
+
+        public void AddWorldEvents(params WorldEvent[] events)
+        {
+            queuedWorldEvents.AddRange(events);
+
+            queuedWorldEvents = queuedWorldEvents
+                .OrderBy((worldEvent) => worldEvent.Timestamp)
+                .ToList();
         }
     }
 }

@@ -1,9 +1,10 @@
-using System.Linq;
-using System.Collections.Generic;
-using Tcc.Stats;
-using Tcc.Events;
-using Tcc.Buffs;
 using System;
+using System.Collections.Generic;
+using Tcc.Buffs;
+using Tcc.Elements;
+using Tcc.Events;
+using Tcc.Stats;
+using Tcc.Weapons;
 
 namespace Tcc.Units
 {
@@ -25,10 +26,16 @@ namespace Tcc.Units
         private readonly List<BuffFromUnit> buffsFromUnit = new List<BuffFromUnit>();
         private readonly List<BuffFromEnemy> buffsFromEnemy = new List<BuffFromEnemy>();
 
-        protected Unit(int constellationLevel, Stats.Stats stats, Stats.Stats burst, Stats.Stats skill, Stats.Stats normal, Stats.Stats charged, Stats.Stats plunge)
+        public event EventHandler<(World world, Timestamp timestamp)> skillActivatedHook;
+        public event EventHandler<(World world, Timestamp timestamp)> burstActivatedHook;
+        public event EventHandler<(World world, Timestamp timestamp, Reaction reaction)> triggeredReactionHook; // TODO Not fired by anything
+        public event EventHandler<(World world, Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
+
+        protected Unit(int constellationLevel, Element element, Stats.Stats stats, Stats.Stats burst, Stats.Stats skill, Stats.Stats normal, Stats.Stats charged, Stats.Stats plunge)
         {
             this.constellationLevel = constellationLevel;
 
+            this.Element = element;
             this.stats = stats;
 
             this.modifiers[Types.NORMAL] = normal;
@@ -38,6 +45,8 @@ namespace Tcc.Units
             this.modifiers[Types.SKILL] = skill;
         }
 
+        public Element Element { get; }
+        public Weapon Weapon { get; set; }
         public double CurrentHp { get; }
 
         public List<WorldEvent> SwitchUnit(Timestamp timestamp)
@@ -99,6 +108,28 @@ namespace Tcc.Units
         public void AddBuff(BuffFromEnemy buff)
         {
             buff.AddToUnit(this, this.buffsFromEnemy);
+        }
+
+        public void GiveEnergy(int energy) => throw new NotImplementedException();
+
+        protected WorldEvent SkillActivated(Timestamp timestamp)
+        {
+            return new WorldEvent(timestamp, (world) => skillActivatedHook?.Invoke(this, (world, timestamp)));
+        }
+
+        protected WorldEvent BurstActivated(Timestamp timestamp)
+        {
+            return new WorldEvent(timestamp, (world) => burstActivatedHook?.Invoke(this, (world, timestamp)));
+        }
+
+        protected WorldEvent TriggeredReaction(Timestamp timestamp, Reaction reaction)
+        {
+            return new WorldEvent(timestamp, (world) => triggeredReactionHook?.Invoke(this, (world, timestamp, reaction)));
+        }
+
+        protected WorldEvent ParticleCollected(Timestamp timestamp, Element? element)
+        {
+            return new WorldEvent(timestamp, (world) => particleCollectedHook?.Invoke(this, (world, timestamp, element)));
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Tcc.Units
 
         public Xiangling(int constellationLevel): base(
             constellationLevel,
+            element: Element.PYRO,
             stats: new Stats.Stats(
                 baseHp: 10876,
                 baseAttack: 225,
@@ -32,6 +33,7 @@ namespace Tcc.Units
         public List<WorldEvent> InitialBurst(Timestamp timestamp)
         {
             return new List<WorldEvent> {
+                BurstActivated(timestamp),
                 new Hit(timestamp, Element.PYRO, GetStats(Types.BURST), 0, this,"nado initial 1st hit"),
                 new Hit(timestamp + 0.5, Element.PYRO, GetStats(Types.BURST), 1, this, "nado initial 2nd hit"),
                 new Hit(timestamp + 1, Element.PYRO, GetStats(Types.BURST), 2, this, "nado initial 3rd hit"),
@@ -42,6 +44,7 @@ namespace Tcc.Units
         public List<WorldEvent> Skill(Timestamp timestamp)
         {
             return new List<WorldEvent> {
+                SkillActivated(timestamp), // Order important: Guoba snapshots CW skill activation buff
                 skillSnapshot.Snapshot(timestamp),
                 new Hit(timestamp + 2.5, Element.PYRO, skillSnapshot.GetStats, 0, this, "Guoba"),
                 new Hit(timestamp + 5, Element.PYRO, skillSnapshot.GetStats, 0, this, "Guoba"),
