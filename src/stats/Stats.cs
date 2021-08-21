@@ -20,6 +20,7 @@ namespace Tcc.Stats
         public double DamagePercent { get; }
         public KeyedPercentBonus<Element> ElementalBonus { get; }
         public KeyedPercentBonus<Reaction> ReactionBonus { get; }
+        public KeyedPercentBonus<Element> ElementalResistance { get; }
 
         public Stats (
             double[] motionValues = null,
@@ -29,7 +30,8 @@ namespace Tcc.Stats
             double elementalMastery = 0, double critRate = 0, double critDamage = 0,
             double healingBonus = 0, double incomingHealingBonus = 0, double energyRecharge = 0,
             double cdReduction = 0, double shieldStrength = 0, double damagePercent = 0,
-            KeyedPercentBonus<Element> elementalBonus = null, KeyedPercentBonus<Reaction> reactionBonus = null
+            KeyedPercentBonus<Element> elementalBonus = null, KeyedPercentBonus<Reaction> reactionBonus = null,
+            KeyedPercentBonus<Element> elementalResistance = null
         ): this(
             motionValues: motionValues,
             maxHp: new MultipliableStat(baseValue: baseHp, flatBonus: flatHp, percentBonus: hpPercent),
@@ -45,7 +47,8 @@ namespace Tcc.Stats
             shieldStrength: shieldStrength,
             damagePercent: damagePercent,
             elementalBonus: elementalBonus,
-            reactionBonus: reactionBonus
+            reactionBonus: reactionBonus,
+            elementalResistance: elementalResistance
         ) {
         }
 
@@ -54,7 +57,8 @@ namespace Tcc.Stats
             double elementalMastery, double critRate, double critDamage,
             double healingBonus, double incomingHealingBonus, double energyRecharge,
             double cdReduction, double shieldStrength, double damagePercent,
-            KeyedPercentBonus<Element> elementalBonus, KeyedPercentBonus<Reaction> reactionBonus
+            KeyedPercentBonus<Element> elementalBonus, KeyedPercentBonus<Reaction> reactionBonus,
+            KeyedPercentBonus<Element> elementalResistance
         ) {
             this.MotionValues = motionValues;
             this.MaxHp = maxHp;
@@ -71,6 +75,7 @@ namespace Tcc.Stats
             this.DamagePercent = damagePercent;
             this.ElementalBonus = elementalBonus ?? new KeyedPercentBonus<Element>();
             this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<Reaction>();
+            this.ElementalResistance = elementalResistance ?? new KeyedPercentBonus<Element>();
         }
 
         public double CalculateHitDamage(int mvIndex, Element element, Reaction? reaction = null)
@@ -125,7 +130,8 @@ namespace Tcc.Stats
                 shieldStrength: first.ShieldStrength + second.ShieldStrength,
                 damagePercent: first.DamagePercent + second.DamagePercent,
                 elementalBonus: first.ElementalBonus + second.ElementalBonus,
-                reactionBonus: first.ReactionBonus + second.ReactionBonus
+                reactionBonus: first.ReactionBonus + second.ReactionBonus,
+                elementalResistance: first.ElementalResistance + second.ElementalResistance
             );
         }
 

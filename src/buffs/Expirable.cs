@@ -10,6 +10,7 @@ namespace Tcc.Buffs
 
         public Expirable(Guid id, Timestamp expiryTime)
         {
+            this.Id = id;
             this.expiryTime = expiryTime;
         }
 
