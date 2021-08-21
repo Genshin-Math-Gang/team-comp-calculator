@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Tcc.Stats;
 using Tcc.Units;
 
 namespace Tcc.Buffs
@@ -35,7 +36,7 @@ namespace Tcc.Buffs
 
         public override Stats.Stats GetModifier(Unit unit, Stats.Stats unconditionalStats, Stats.Types type)
         {
-            return (this.type & type) != Stats.Types.NONE && condition(unit, unconditionalStats) ? modifier(unit, unconditionalStats) : new Stats.Stats();
+            return this.type.IsType(type) && condition(unit, unconditionalStats) ? modifier(unit, unconditionalStats) : new Stats.Stats();
         }
     }
 }

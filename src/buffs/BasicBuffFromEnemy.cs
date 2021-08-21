@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Tcc.Stats;
 using Tcc.Units;
 
 namespace Tcc.Buffs
@@ -30,7 +31,7 @@ namespace Tcc.Buffs
 
         public override Stats.Stats GetModifier(Enemy.Enemy enemy, Stats.Types type)
         {
-            return (this.type & type) != Stats.Types.NONE && condition(enemy) ? modifier : new Stats.Stats();
+            return this.type.IsType(type) && condition(enemy) ? modifier : new Stats.Stats();
         }
     }
 }
