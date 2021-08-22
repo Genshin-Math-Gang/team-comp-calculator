@@ -28,8 +28,8 @@ namespace Tcc.Buffs.Artifacts
         {
             unit.AddBuff(new BasicUnconditionalBuff(ID_4PC_PASSIVE, MODIFIER_4PC_PASSIVE));
 
-            unit.skillActivatedHook += (_, data) => unit.AddBuff(
-                new RefreshableBuff(ID_4PC_STACK, data.timestamp + 10, MODIFIER_4PC_STACK, maxStacks: 3)
+            unit.skillActivatedHook += (_, timestamp) => unit.AddBuff(
+                new RefreshableBuff(ID_4PC_STACK, timestamp + 10, MODIFIER_4PC_STACK, maxStacks: 3)
             );
         }
     }

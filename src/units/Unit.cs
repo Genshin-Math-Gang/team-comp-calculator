@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Tcc.Buffs;
 using Tcc.Elements;
@@ -11,6 +12,7 @@ namespace Tcc.Units
     public class Unit
     {
         protected readonly int constellationLevel;
+        protected readonly int burstEnergyCost;
 
         private readonly Stats.Stats stats;
         private readonly Dictionary<Types, Stats.Stats> modifiers = new Dictionary<Types, Stats.Stats>
@@ -26,16 +28,19 @@ namespace Tcc.Units
         private readonly List<BuffFromUnit> buffsFromUnit = new List<BuffFromUnit>();
         private readonly List<BuffFromEnemy> buffsFromEnemy = new List<BuffFromEnemy>();
 
-        public event EventHandler<(World world, Timestamp timestamp)> skillActivatedHook;
-        public event EventHandler<(World world, Timestamp timestamp)> burstActivatedHook;
-        public event EventHandler<(World world, Timestamp timestamp, Reaction reaction)> triggeredReactionHook; // TODO Not fired by anything
-        public event EventHandler<(World world, Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
+        public event EventHandler<Timestamp> skillActivatedHook;
+        public event EventHandler<Timestamp> burstActivatedHook;
+        public event EventHandler<(Timestamp timestamp, Reaction reaction)> triggeredReactionHook; // TODO Not fired by anything
+        public event EventHandler<(Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
 
-        protected Unit(int constellationLevel, Element element, Stats.Stats stats, Stats.Stats burst, Stats.Stats skill, Stats.Stats normal, Stats.Stats charged, Stats.Stats plunge)
+        protected Unit(int constellationLevel, Element element, int burstEnergyCost, Stats.Stats stats, Stats.Stats burst, Stats.Stats skill, Stats.Stats normal, Stats.Stats charged, Stats.Stats plunge)
         {
             this.constellationLevel = constellationLevel;
-
             this.Element = element;
+
+            this.burstEnergyCost = burstEnergyCost;
+            this.CurrentEnergy = burstEnergyCost;
+
             this.stats = stats;
 
             this.modifiers[Types.NORMAL] = normal;
@@ -47,7 +52,10 @@ namespace Tcc.Units
 
         public Element Element { get; }
         public Weapon Weapon { get; set; }
+
         public double CurrentHp { get; }
+        public double CurrentEnergy { get; private set; }
+        public bool IsShielded => throw new NotImplementedException();
 
         public List<WorldEvent> SwitchUnit(Timestamp timestamp)
         {
@@ -110,26 +118,34 @@ namespace Tcc.Units
             buff.AddToUnit(this, this.buffsFromEnemy);
         }
 
-        public void GiveEnergy(int energy) => throw new NotImplementedException();
+        public int GetBuffCount(Guid id)
+        {
+            return unconditionalBuffs.Count((buff) => buff.Id == id)
+                + buffsFromUnit.Count((buff) => buff.Id == id)
+                + buffsFromEnemy.Count((buff) => buff.Id == id);
+        }
+
+        public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, burstEnergyCost);
+        public void LoseEnergy(int energy) => CurrentEnergy = Math.Max(CurrentEnergy - energy, 0);
 
         protected WorldEvent SkillActivated(Timestamp timestamp)
         {
-            return new WorldEvent(timestamp, (world) => skillActivatedHook?.Invoke(this, (world, timestamp)));
+            return new WorldEvent(timestamp, (world) => skillActivatedHook?.Invoke(this, timestamp));
         }
 
         protected WorldEvent BurstActivated(Timestamp timestamp)
         {
-            return new WorldEvent(timestamp, (world) => burstActivatedHook?.Invoke(this, (world, timestamp)));
+            return new WorldEvent(timestamp, (world) => burstActivatedHook?.Invoke(this, timestamp));
         }
 
         protected WorldEvent TriggeredReaction(Timestamp timestamp, Reaction reaction)
         {
-            return new WorldEvent(timestamp, (world) => triggeredReactionHook?.Invoke(this, (world, timestamp, reaction)));
+            return new WorldEvent(timestamp, (world) => triggeredReactionHook?.Invoke(this, (timestamp, reaction)));
         }
 
         protected WorldEvent ParticleCollected(Timestamp timestamp, Element? element)
         {
-            return new WorldEvent(timestamp, (world) => particleCollectedHook?.Invoke(this, (world, timestamp, element)));
+            return new WorldEvent(timestamp, (world) => particleCollectedHook?.Invoke(this, (timestamp, element)));
         }
     }
 }

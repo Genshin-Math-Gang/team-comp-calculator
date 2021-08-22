@@ -1,4 +1,5 @@
-﻿using Tcc.Stats;
+﻿using System;
+using Tcc.Stats;
 using Tcc.Elements;
 
 namespace Tcc.Enemy
@@ -8,6 +9,7 @@ namespace Tcc.Enemy
         private Stats.Stats stats;
         private Gauge gauge;
         
+        public bool HasAura(Aura aura) => throw new NotImplementedException();
     }
 
     

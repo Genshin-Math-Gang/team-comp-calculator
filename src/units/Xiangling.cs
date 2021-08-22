@@ -10,8 +10,9 @@ namespace Tcc.Units
         SnapshottedStats skillSnapshot, burstSnapshot;
 
         public Xiangling(int constellationLevel): base(
-            constellationLevel,
+            constellationLevel: constellationLevel,
             element: Element.PYRO,
+            burstEnergyCost: 80,
             stats: new Stats.Stats(
                 baseHp: 10876,
                 baseAttack: 225,

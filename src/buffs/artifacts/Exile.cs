@@ -15,13 +15,13 @@ namespace Tcc.Buffs.Artifacts
 
         public override void Add4pc(World world, Unit unit)
         {
-            unit.burstActivatedHook += (_, data) =>
+            unit.burstActivatedHook += (_, timestamp) =>
             {
                 var worldEvents = new WorldEvent[3];
 
                 for(var tick = 0; tick < worldEvents.Length; tick++)
                 {
-                    worldEvents[tick] = new WorldEvent(data.timestamp + (tick + 1) * 2, (_) =>
+                    worldEvents[tick] = new WorldEvent(timestamp + (tick + 1) * 2, (_) =>
                     {
                         foreach(var unitInParty in world.GetUnits())
                         {

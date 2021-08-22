@@ -15,8 +15,9 @@ namespace Tcc.Units
         SnapshottedStats burstBuffSnapshot;
 
         public Bennett(int constellationLevel): base(
-            constellationLevel,
+            constellationLevel: constellationLevel,
             element: Element.PYRO,
+            burstEnergyCost: 60,
             stats: new Stats.Stats(
                 baseHp: 10876,
                 baseAttack: 225,

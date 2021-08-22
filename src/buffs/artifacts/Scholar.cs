@@ -24,7 +24,7 @@ namespace Tcc.Buffs.Artifacts
 
                 foreach(var unitInParty in world.GetUnits())
                 {
-                    WeaponType weaponType = unitInParty.Weapon.Type;
+                    var weaponType = unitInParty.Weapon.Type;
 
                     if(weaponType == WeaponType.BOW || weaponType == WeaponType.CATALYST) unitInParty.GiveEnergy(3);
                 }

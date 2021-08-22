@@ -18,8 +18,8 @@ namespace Tcc.Buffs.Artifacts
 
         public override void Add4pc(World world, Unit unit)
         {
-            unit.skillActivatedHook += (_, data) => unit.AddBuff(
-                new RefreshableBuff(ID_4PC, data.timestamp + 8, MODIFIER_4PC, Stats.Types.NORMAL | Stats.Types.CHARGED)
+            unit.skillActivatedHook += (_, timestamp) => unit.AddBuff(
+                new RefreshableBuff(ID_4PC, timestamp + 8, MODIFIER_4PC, Stats.Types.NORMAL | Stats.Types.CHARGED)
             );
         }
     }

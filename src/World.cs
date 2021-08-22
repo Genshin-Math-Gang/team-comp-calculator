@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tcc.Buffs;
+using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Units;
-using Tcc.Stats;
 
 namespace Tcc
 {
@@ -17,6 +17,8 @@ namespace Tcc
         List<WorldEvent> queuedWorldEvents;
         List<Enemy.Enemy> enemies;
         public double[] TotalDamage;
+
+        public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Stats.Types attackType)> enemyHitHook; // TODO Not fired by anything
 
         public World()
         {
