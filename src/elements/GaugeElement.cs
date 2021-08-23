@@ -18,7 +18,12 @@ namespace Tcc.Elements
 
         public void TimeDecay(double time)
         {
-            this.GaugeValue -= time / DecayRate;
+            GaugeValue = Math.Max(GaugeValue - time / DecayRate, 0);
+        }
+
+        public void UpdateGauge(double newStrength)
+        {
+            GaugeValue = Math.Max(newStrength, GaugeValue);
         }
 
 
