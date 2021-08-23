@@ -25,6 +25,8 @@ namespace Tcc.Buffs.Artifacts
 
             world.enemyHitHook += (_, data) =>
             {
+                if(!data.attackType.IsType(Stats.Types.SKILL)) return;
+
                 if(cooldown4pcUntil != null && data.timestamp < cooldown4pcUntil) return;
                 else cooldown4pcUntil = data.timestamp + 0.3;
 
