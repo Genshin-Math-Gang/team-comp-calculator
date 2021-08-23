@@ -16,6 +16,8 @@ namespace Tcc
         List<Enemy.Enemy> enemies;
         public double[] TotalDamage;
 
+        public event EventHandler<(Unit from, Unit to, Timestamp timestamp)> unitSwapped;
+
         public World()
         {
             this.characterEvents = new List<CharacterEvent>();
@@ -41,6 +43,7 @@ namespace Tcc
 
         public void SwitchUnit(Timestamp timestamp, Units.Unit unit)
         {
+            unitSwapped?.Invoke(this, (onFieldUnit, unit, timestamp));
             this.onFieldUnit = unit;
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }
