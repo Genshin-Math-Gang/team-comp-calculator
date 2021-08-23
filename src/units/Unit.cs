@@ -1,17 +1,18 @@
-using System.Linq;
 using System.Collections.Generic;
 using Tcc.Stats;
 using Tcc.Events;
+using Tcc.Buffs;
 using System;
 
 namespace Tcc.Units
 {
     public class Unit
     {
-        protected int constellationLevel;
+        protected readonly int constellationLevel;
 
-        private Stats.Stats stats;
-        private Dictionary<Types, Stats.Stats> modifiers = new Dictionary<Types, Stats.Stats>(){
+        private readonly Stats.Stats stats;
+        private readonly Dictionary<Types, Stats.Stats> modifiers = new Dictionary<Types, Stats.Stats>
+        {
             {Types.NORMAL, new Stats.Stats()},
             {Types.CHARGED, new Stats.Stats()},
             {Types.PLUNGE, new Stats.Stats()},
@@ -19,21 +20,9 @@ namespace Tcc.Units
             {Types.BURST, new Stats.Stats()} 
         };
 
-        private Dictionary<Types, Stats.Stats> snapshots = new Dictionary<Types, Stats.Stats>(){
-            {Types.NORMAL, new Stats.Stats()},
-            {Types.CHARGED, new Stats.Stats()},
-            {Types.PLUNGE, new Stats.Stats()},
-            {Types.SKILL, new Stats.Stats()},
-            {Types.BURST, new Stats.Stats()} 
-        };
-        private Dictionary<Types, Dictionary<string, Stats.Stats>> buffs = new Dictionary<Types, Dictionary<string, Stats.Stats>>(){
-            {Types.NORMAL, new Dictionary<string, Stats.Stats>()},
-            {Types.CHARGED, new Dictionary<string, Stats.Stats>()},
-            {Types.PLUNGE, new Dictionary<string, Stats.Stats>()},
-            {Types.SKILL, new Dictionary<string, Stats.Stats>()},
-            {Types.BURST, new Dictionary<string, Stats.Stats>()},
-            {Types.EVERYTHING, new Dictionary<string, Stats.Stats>()}
-        };
+        private readonly List<BuffFromUnit> buffsFromUnit = new List<BuffFromUnit>();
+        private readonly List<BuffFromStats> buffsFromStats = new List<BuffFromStats>();
+        private readonly List<BuffFromEnemy> buffsFromEnemy = new List<BuffFromEnemy>();
 
         protected Unit(int constellationLevel, Stats.Stats stats, Stats.Stats burst, Stats.Stats skill, Stats.Stats normal, Stats.Stats charged, Stats.Stats plunge)
         {
@@ -48,59 +37,84 @@ namespace Tcc.Units
             this.modifiers[Types.SKILL] = skill;
         }
 
-        public List<WorldEvent> switchUnit(double tiemstamp)
+        public double CurrentHp { get; }
+
+        public List<WorldEvent> SwitchUnit(Timestamp timestamp)
         {
-            return new List<WorldEvent>{
-                new SwitchUnit(tiemstamp, this)
-            };
+            return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
 
-        protected Stats.Stats getStats(Types type)
+        protected Stats.Stats GetStats(Types type, Enemy.Enemy enemy, Timestamp timestamp)
         {
-            if (snapshots[type].BaseHP != 0)
-            {
-                return snapshots[type];
-            }
+            var result = GetStatsFromUnit(type, timestamp);
+            result = AddStatsFromEnemy(result, type, enemy, timestamp);
 
-            Stats.Stats requested = modifiers[type] + stats;
-
-            foreach (KeyValuePair<string, Stats.Stats> x in buffs[Types.EVERYTHING])
-            {
-                requested += x.Value;
-            }
-
-            foreach(KeyValuePair<string, Stats.Stats> x in buffs[type])
-            {
-                requested += x.Value;
-            }
-
-            return requested;
+            return result;
         }
 
-        public void Snapshot(Types type)
+        public Stats.Stats GetStatsFromUnitWithoutScaled(Types type, Timestamp timestamp)
         {
-            snapshots[type] = getStats(type);
+            buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
+
+            var firstPassStats = modifiers[type] + stats;
+            foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
+
+            return firstPassStats;
         }
 
-        public void UnSnapshot(Types type)
+        public Stats.Stats GetStatsFromUnit(Types type, Timestamp timestamp)
         {
-            snapshots[type] = new Stats.Stats();
+            buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
+            buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
+
+            var firstPassStats = modifiers[type] + stats;
+            foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
+
+            var result = firstPassStats;
+            foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, timestamp, type);
+
+            return result;
         }
 
-        public void AddBuff(string name, Stats.Stats buff, Types type)
+        public Stats.Stats AddStatsFromEnemy(Stats.Stats statsFromUnit, Types type, Enemy.Enemy enemy, Timestamp timestamp)
         {
-            if (!buffs[type].ContainsKey(name))
+            buffsFromEnemy.RemoveAll((buff) => buff.HasExpired(timestamp));
+
+            var result = statsFromUnit;
+
+            if(enemy != null)
             {
-               buffs[type].Add(name, buff);
+                foreach(var buff in buffsFromEnemy) result += buff.GetModifier(enemy, type);
             }
+
+            return result;
         }
 
-        public void RemoveBuff(string name, Types type)
+        protected Func<Enemy.Enemy, Timestamp, Stats.Stats> GetStats(Types type)
         {
-            if (buffs[type].ContainsKey(name))
-            {
-                buffs[type].Remove(name);
-            }
+            return (enemy, timestamp) => GetStats(type, enemy, timestamp);
+        }
+
+        public void AddBuff(BuffFromUnit buff)
+        {
+            buff.AddToUnit(this, this.buffsFromUnit);
+        }
+
+        public void AddBuff(BuffFromStats buff)
+        {
+            buff.AddToUnit(this, this.buffsFromStats);
+        }
+
+        public void AddBuff(BuffFromEnemy buff)
+        {
+            buff.AddToUnit(this, this.buffsFromEnemy);
+        }
+
+        public void RemoveAllBuff(Guid id)
+        {
+            buffsFromUnit.RemoveAll((buff) => buff.Id == id);
+            buffsFromStats.RemoveAll((buff) => buff.Id == id);
+            buffsFromEnemy.RemoveAll((buff) => buff.Id == id);
         }
     }
 }

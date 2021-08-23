@@ -1,13 +1,12 @@
-using System;
-using Tcc.Stats;
+using Tcc.Buffs;
 
 namespace Tcc.Events
 {
     public class AddBuffGlobal: WorldEvent
     {
-        public AddBuffGlobal(double timestamp, Stats.Stats stats, string name, Types type, string description = ""): base(
+        public AddBuffGlobal(Timestamp timestamp, BuffFromUnit buff, string description = ""): base(
             timestamp,
-            (world) => world.AddBuffGlobal(timestamp, stats, name, type, description)
+            (world) => world.AddBuffGlobal(timestamp, buff, description)
         ) {
         }
     }
