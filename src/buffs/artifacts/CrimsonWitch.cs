@@ -4,7 +4,7 @@ using Tcc.Stats;
 
 namespace Tcc.Buffs.Artifacts
 {
-    public class CrimsonWitch2pc: BasicUnconditionalBuff
+    public class CrimsonWitch2pc: BasicBuffFromUnit
     {
         static readonly Guid ID = new Guid("eb489029-e2e5-4028-b119-da6436ef24a0");
         public static readonly KeyedPercentBonus<Element> MODIFIER = new KeyedPercentBonus<Element>(Element.PYRO, 0.15);
@@ -14,7 +14,7 @@ namespace Tcc.Buffs.Artifacts
         }
     }
 
-    public class CrimsonWitch4pcPassive: BasicUnconditionalBuff
+    public class CrimsonWitch4pcPassive: BasicBuffFromUnit
     {
         static readonly Guid ID = new Guid("608f7b4e-96a3-4731-954a-6ca247ade87e");
         static readonly Stats.Stats MODIFIER = new KeyedPercentBonus<Reaction>(

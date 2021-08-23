@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Collections.Generic;
 using Tcc.Stats;
 using Tcc.Events;
@@ -21,8 +20,8 @@ namespace Tcc.Units
             {Types.BURST, new Stats.Stats()} 
         };
 
-        private readonly List<UnconditionalBuff> unconditionalBuffs = new List<UnconditionalBuff>();
         private readonly List<BuffFromUnit> buffsFromUnit = new List<BuffFromUnit>();
+        private readonly List<BuffFromStats> buffsFromStats = new List<BuffFromStats>();
         private readonly List<BuffFromEnemy> buffsFromEnemy = new List<BuffFromEnemy>();
 
         protected Unit(int constellationLevel, Stats.Stats stats, Stats.Stats burst, Stats.Stats skill, Stats.Stats normal, Stats.Stats charged, Stats.Stats plunge)
@@ -55,14 +54,14 @@ namespace Tcc.Units
 
         public Stats.Stats GetStatsFromUnit(Types type, Timestamp timestamp)
         {
-            unconditionalBuffs.RemoveAll((buff) => buff.HasExpired(timestamp));
             buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
+            buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
 
-            var unconditionalStats = modifiers[type] + stats;
-            foreach(var buff in unconditionalBuffs) unconditionalStats += buff.GetModifier(type);
+            var firstPassStats = modifiers[type] + stats;
+            foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
 
-            var result = unconditionalStats;
-            foreach(var buff in buffsFromUnit) result += buff.GetModifier(this, unconditionalStats, type);
+            var result = firstPassStats;
+            foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, type);
 
             return result;
         }
@@ -86,14 +85,14 @@ namespace Tcc.Units
             return (enemy, timestamp) => GetStats(type, enemy, timestamp);
         }
 
-        public void AddBuff(UnconditionalBuff buff)
-        {
-            buff.AddToUnit(this, this.unconditionalBuffs);
-        }
-
         public void AddBuff(BuffFromUnit buff)
         {
             buff.AddToUnit(this, this.buffsFromUnit);
+        }
+
+        public void AddBuff(BuffFromStats buff)
+        {
+            buff.AddToUnit(this, this.buffsFromStats);
         }
 
         public void AddBuff(BuffFromEnemy buff)

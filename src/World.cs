@@ -72,7 +72,7 @@ namespace Tcc
         //         Console.WriteLine($"{unit} un-snapshotted {description} at {timestamp}");
         // }
 
-        public void AddBuff(Timestamp timestamp, Units.Unit unit, UnconditionalBuff buff, string description)
+        public void AddBuff(Timestamp timestamp, Units.Unit unit, BuffFromUnit buff, string description)
         {
             unit.AddBuff(buff);
 
@@ -80,7 +80,7 @@ namespace Tcc
             else Console.WriteLine($"Buff added by {description} to {unit} at {timestamp}");
         }
 
-        public void AddBuffOnField(Timestamp timestamp, UnconditionalBuff buff, string description)
+        public void AddBuffOnField(Timestamp timestamp, BuffFromUnit buff, string description)
         {
             this.onFieldUnit.AddBuff(buff);
 
@@ -88,7 +88,7 @@ namespace Tcc
             else Console.WriteLine($"Buff added by {description} to {this.onFieldUnit} at {timestamp}");
         }
 
-        public void AddBuffGlobal(Timestamp timestamp, UnconditionalBuff buff, string description)
+        public void AddBuffGlobal(Timestamp timestamp, BuffFromUnit buff, string description)
         {
             foreach(Unit x in units)
             {

@@ -6,7 +6,7 @@ using Tcc.Units;
 
 namespace Tcc.Buffs
 {
-    public class RefreshableBuff: UnconditionalBuff
+    public class RefreshableBuff: BuffFromUnit
     {
         readonly Stats.Types type;
         readonly Stats.Stats modifier;
@@ -21,7 +21,7 @@ namespace Tcc.Buffs
             this.maxStacks = maxStacks;
         }
 
-        public override void AddToUnit(Unit unit, List<UnconditionalBuff> buffs)
+        public override void AddToUnit(Unit unit, List<BuffFromUnit> buffs)
         {
             buffs.Add(this);
 
@@ -38,7 +38,7 @@ namespace Tcc.Buffs
             }
         }
 
-        public override Stats.Stats GetModifier(Stats.Types type)
+        public override Stats.Stats GetModifier(Unit unit, Stats.Types type)
         {
             return this.type.IsType(type) ? modifier : new Stats.Stats();
         }
