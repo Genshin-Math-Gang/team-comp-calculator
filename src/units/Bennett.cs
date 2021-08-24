@@ -1,5 +1,6 @@
+using System;
 using System.Collections.Generic;
-using Tcc.Buffs.Characters;
+using Tcc.Buffs;
 using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
@@ -8,9 +9,10 @@ namespace Tcc.Units
 {
     public class Bennett: Unit
     {
+        static readonly Guid BURST_BUFF_ID = new Guid("c1a23bde-db12-4589-9baf-d25b76ccb989");
         const int N_BURST_TICKS = 12;
-
         static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
+        static readonly Timestamp BUFF_DURATION = new Timestamp(2);
 
         SnapshottedStats burstBuffSnapshot;
 
@@ -52,12 +54,12 @@ namespace Tcc.Units
             return events;
         }
 
-        BennettBurstBuff CreateBurstBuff(Timestamp startTime)
+        BuffFromUnit CreateBurstBuff(Timestamp startTime)
         {
             var stats = burstBuffSnapshot.GetStats(null, startTime);
             var modifier = new Stats.Stats(flatAttack: stats.Attack.Base * stats.MotionValues[2]);
 
-            return new BennettBurstBuff(modifier, startTime);
+            return new RefreshableBuff(BURST_BUFF_ID, startTime + BUFF_DURATION, modifier);
         }
 
         public override string ToString()
