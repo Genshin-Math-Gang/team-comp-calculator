@@ -14,6 +14,7 @@ namespace Tcc.Elements
         private Aura aura = Aura.NONE;
         private double FreezeDuration = 0;
         private double FreezeAura = 0;
+        private double FreezeDecay = 1;
 
         public Gauge(double timestamp)
         {
@@ -154,9 +155,24 @@ namespace Tcc.Elements
                             break;
                         case Element.ANEMO:
                             strength /= 2;
+                            if (gaugeDict[Element.ELECTRO].GaugeValue > strength)
+                            {
+                                // swirl electro
+                                DecreaseElement(Element.ELECTRO, strength);
+                            }
+                            else
+                            {
+                                // swirl both 
+                                DecreaseElement(Element.ELECTRO, strength);
+                                DecreaseElement(Element.HYDRO, strength);
+                            }
+
+                            strength = 0;
                             break;
                         case Element.GEO:
-                            strength /= 2;
+                            // always reacts with electro
+                            DecreaseElement(Element.ELECTRO, strength / 2);
+                            strength = 0;
                             break;
                     }
                     DecreaseElement(Element.HYDRO, strength);
@@ -181,9 +197,23 @@ namespace Tcc.Elements
                             break;
                         case Element.ANEMO:
                             strength /= 2;
+                            if (!gaugeDict.ContainsKey(Element.HYDRO))
+                            {
+                                // swirl cryo
+                            }
+                            else if (gaugeDict[Element.HYDRO].GaugeValue > strength)
+                            {
+                                // swirl hydro
+                                DecreaseElement(Element.HYDRO, strength);
+                            }
+                            else
+                            {
+                                //swirl both
+                                DecreaseElement(Element.HYDRO, strength);
+                            }
                             break;
                         case Element.GEO:
-                            strength /= 2;
+                            // geo should always be a heavy hit so this should never trigger
                             break;
                     }
                     DecreaseFrozen(strength);
@@ -191,13 +221,6 @@ namespace Tcc.Elements
                     {
                         // if a frozen enemy has an underlying cryo aura that also has gauge consumed on reaction
                         DecreaseElement(Element.CRYO, strength);
-                    }
-                    // swirl and geo can cause double reaction if they are strong enough to fully consume the frozen
-                    // this is kinda ugly but it should work
-                    if (aura != Aura.FROZEN && gaugeDict.ContainsKey(Element.HYDRO) && 
-                        elementType is Element.GEO or Element.ANEMO)
-                    {
-                        goto case Aura.HYDRO;
                     }
                     break;
             }
@@ -251,6 +274,7 @@ namespace Tcc.Elements
             if (aura == Aura.FROZEN)
             {
                 FreezeDuration = Math.Min(0, FreezeDuration - timeSince);
+                FreezeAura = Math.Min(0, FreezeAura - timeSince * FreezeDecay);
                 if (FreezeDuration == 0)
                 {
                     RemoveFrozen();
@@ -320,6 +344,7 @@ namespace Tcc.Elements
             {
                 RemoveFrozen();
             }
+            FreezeDuration = FreezeAura / FreezeDecay;
         }
 
         private void SetFrozen(double auraStrength, double triggerStrength)
@@ -330,6 +355,7 @@ namespace Tcc.Elements
             // KQM lists the formula as 2*sqrt(5*FreezeStrength+4)-4, however they are also stupid and use aura tax
             // instead of multiplying reactions strengths by 5/4 which makes this formula and other things simpler
             FreezeDuration = 4 * (Math.Sqrt(FreezeAura) - 1);
+            FreezeDecay = FreezeAura / FreezeDuration;
         }
     }
 }
