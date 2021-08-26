@@ -35,7 +35,7 @@ namespace Tcc.Units
         public List<WorldEvent> Skill(Timestamp timestamp)
         {
             var events = new List<WorldEvent>();
-            var expiryTime = timestamp + BUFF_DURATION;
+            var expiryTime = timestamp + BUFF_DURATION; //Bugged because it was static
 
             EventHandler<(Unit from, Unit to, Timestamp)> newBuffListener = null;
 
