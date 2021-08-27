@@ -14,8 +14,8 @@ namespace Tcc.Units
         protected readonly int constellationLevel;
         protected readonly int burstEnergyCost;
 
-        private readonly Stats.Stats stats;
-        private readonly Dictionary<Types, Stats.Stats> modifiers = new Dictionary<Types, Stats.Stats>
+        public readonly Stats.Stats stats;
+        public readonly Dictionary<Types, Stats.Stats> modifiers = new Dictionary<Types, Stats.Stats>
         {
             {Types.NORMAL, new Stats.Stats()},
             {Types.CHARGED, new Stats.Stats()},
@@ -24,9 +24,9 @@ namespace Tcc.Units
             {Types.BURST, new Stats.Stats()} 
         };
 
-        private readonly List<BuffFromUnit> buffsFromUnit = new List<BuffFromUnit>();
-        private readonly List<BuffFromStats> buffsFromStats = new List<BuffFromStats>();
-        private readonly List<BuffFromEnemy> buffsFromEnemy = new List<BuffFromEnemy>();
+        public readonly List<BuffFromUnit> buffsFromUnit = new List<BuffFromUnit>();
+        public readonly List<BuffFromStats> buffsFromStats = new List<BuffFromStats>();
+        public readonly List<BuffFromEnemy> buffsFromEnemy = new List<BuffFromEnemy>();
 
         public event EventHandler<Timestamp> skillActivatedHook;
         public event EventHandler<Timestamp> burstActivatedHook;
@@ -62,7 +62,7 @@ namespace Tcc.Units
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
 
-        protected Stats.Stats GetStats(Types type, Enemy.Enemy enemy, Timestamp timestamp)
+        public Stats.Stats GetStats(Types type, Enemy.Enemy enemy, Timestamp timestamp)
         {
             var result = GetStatsFromUnit(type, timestamp);
             result = AddStatsFromEnemy(result, type, enemy, timestamp);
@@ -90,6 +90,23 @@ namespace Tcc.Units
 
             var result = firstPassStats;
             foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, timestamp, type);
+
+            return result;
+        }
+
+        public Stats.Stats SnapshotStats(Timestamp timestamp)
+        {
+            buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
+            buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
+
+            var firstPassStats = stats;
+            foreach(var buff in buffsFromUnit) 
+            {
+                firstPassStats += buff.GetModifier(this, Types.GENERIC);
+            }
+
+            var result = firstPassStats;
+            foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, timestamp, Types.GENERIC);
 
             return result;
         }

@@ -9,7 +9,6 @@ namespace Tcc.Buffs
     public class BasicBuffFromEnemy: BuffFromEnemy
     {
         readonly Func<Enemy.Enemy, bool> condition;
-        readonly Stats.Types type;
         readonly Stats.Stats modifier;
 
         public BasicBuffFromEnemy(Guid id, Func<Enemy.Enemy, bool> condition, Stats.Stats modifier, Stats.Types type = Stats.Types.ANY): base(id, Expirable.Never)

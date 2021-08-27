@@ -8,7 +8,8 @@ namespace Tcc.Stats
         PLUNGE = 0b100,
         SKILL = 0b1000,
         BURST = 0b10000,
-        ANY = NORMAL | CHARGED | PLUNGE | SKILL | BURST
+        GENERIC = 0b100000,
+        ANY = GENERIC | NORMAL | CHARGED | PLUNGE | SKILL | BURST
     }
 
     public static class TypeHelper

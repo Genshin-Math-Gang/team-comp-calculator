@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Tcc.Buffs.Characters;
 using Tcc.Buffs;
-using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
 
@@ -10,7 +8,8 @@ namespace Tcc.Units
 {
     public class Shogun: Unit
     {
-        readonly static Guid SKILL_BUFF_ID = new Guid("0e88cab3-e1d1-4592-9059-b36e6595e25d");
+        static readonly Guid SKILL_BUFF_ID = new Guid("0e88cab3-e1d1-4592-9059-b36e6595e25d");
+        static readonly Timestamp BUFF_DURATION = new Timestamp(25);
 
         EventHandler<(Unit from, Unit to, Timestamp)> currentBuffListener = null;
 
@@ -36,7 +35,7 @@ namespace Tcc.Units
         public List<WorldEvent> Skill(Timestamp timestamp)
         {
             var events = new List<WorldEvent>();
-            var expiryTime = timestamp + 25;
+            var expiryTime = timestamp + BUFF_DURATION; //Bugged because it was static
 
             EventHandler<(Unit from, Unit to, Timestamp)> newBuffListener = null;
 
@@ -67,7 +66,7 @@ namespace Tcc.Units
         {
             return new BasicBuffFromStats(
                 SKILL_BUFF_ID,
-                (_, _, timestamp) => new Stats.Stats(damagePercent: this.GetStatsFromUnitWithoutScaled(Types.BURST, timestamp).EnergyRecharge * 0.3),
+                (_, _, timestamp) => new Stats.Stats(damagePercent: this.GetStatsFromUnitWithoutScaled(Types.BURST, timestamp).EnergyRecharge * 0.3), // TODO Will become part of burst MVs
                 Types.BURST,
                 expiryTime: expiryTime
             );

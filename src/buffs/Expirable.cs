@@ -8,6 +8,8 @@ namespace Tcc.Buffs
     {
         readonly Timestamp expiryTime;
 
+        public Stats.Types type;
+
         public Expirable(Guid id, Timestamp expiryTime)
         {
             this.Id = id;
