@@ -70,6 +70,16 @@ namespace Tcc.Units
             return result;
         }
 
+        public Stats.Stats GetStatsFromUnitWithoutScaled(Types type, Timestamp timestamp)
+        {
+            buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
+
+            var firstPassStats = modifiers[type] + stats;
+            foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
+
+            return firstPassStats;
+        }
+
         public Stats.Stats GetStatsFromUnit(Types type, Timestamp timestamp)
         {
             buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
@@ -79,7 +89,7 @@ namespace Tcc.Units
             foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
 
             var result = firstPassStats;
-            foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, type);
+            foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, timestamp, type);
 
             return result;
         }
@@ -123,6 +133,13 @@ namespace Tcc.Units
             return buffsFromUnit.Count((buff) => buff.Id == id)
                 + buffsFromStats.Count((buff) => buff.Id == id)
                 + buffsFromEnemy.Count((buff) => buff.Id == id);
+        }
+
+        public void RemoveAllBuff(Guid id)
+        {
+            buffsFromUnit.RemoveAll((buff) => buff.Id == id);
+            buffsFromStats.RemoveAll((buff) => buff.Id == id);
+            buffsFromEnemy.RemoveAll((buff) => buff.Id == id);
         }
 
         public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, burstEnergyCost);

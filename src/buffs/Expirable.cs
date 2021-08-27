@@ -18,6 +18,6 @@ namespace Tcc.Buffs
 
         public bool HasExpired(Timestamp currentTime) => expiryTime != null && expiryTime <= currentTime;
 
-        public static readonly Timestamp Never = null;
+        public const Timestamp Never = null;
     }
 }

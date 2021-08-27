@@ -19,6 +19,7 @@ namespace Tcc
         public double[] TotalDamage;
 
         public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Stats.Types attackType)> enemyHitHook; // TODO Not fired by anything
+        public event EventHandler<(Unit from, Unit to, Timestamp timestamp)> unitSwapped;
 
         public World()
         {
@@ -47,6 +48,7 @@ namespace Tcc
 
         public void SwitchUnit(Timestamp timestamp, Units.Unit unit)
         {
+            unitSwapped?.Invoke(this, (onFieldUnit, unit, timestamp));
             this.onFieldUnit = unit;
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }

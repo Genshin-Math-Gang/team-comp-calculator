@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System;
 using Tcc.Buffs.Artifacts;
+using Tcc.Buffs;
 using Tcc.Events;
-using Tcc.Stats;
 using Tcc.Units;
 using Tcc.Weapons;
 
@@ -12,12 +12,52 @@ namespace Tcc
     {
         static void Main(string[] args)
         {
-            SimulateXianglingBurst();
+            // SimulateXianglingBurst();
 /*          SimulateXianglingBuffDuringBurst();
             SimulateXianglingBuffDuringBurstStartup();
             SimulateAyakaWithoutBuff();
             SimulateAyakaWithBuffDuringBurst();
             SimulateAyakaWithBuff(); */
+            SimulateShogunNonsense();
+        }
+
+        static void SimulateShogunNonsense()
+        {
+            Shogun shogun = new Shogun(0);
+            Xiangling xiangling = new Xiangling(0);
+
+            World world = new World();
+            world.SetUnits(shogun, xiangling, null, null);
+
+            world.AddCharacterEvent(new Timestamp(0), shogun.Skill);
+
+            world.AddCharacterEvent(new Timestamp(1), xiangling.SwitchUnit);
+            world.AddCharacterEvent(new Timestamp(1.5), xiangling.InitialBurst);
+
+            world.AddCharacterEvent(new Timestamp(3), xiangling.BurstHit);
+
+            world.AddCharacterEvent(new Timestamp(4), shogun.SwitchUnit);
+    
+            world.AddCharacterEvent(new Timestamp(4), (timestamp) => new List<WorldEvent> {
+                new WorldEvent(timestamp, (world) => world.AddBuff(timestamp, shogun, new BasicBuffFromUnit(new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), new Stats.Stats(energyRecharge: 0.5)), "test buff"))
+            });
+
+            world.AddCharacterEvent(new Timestamp(4.5), xiangling.BurstHit);
+
+            // world.AddCharacterEvent(new Timestamp(10.5), shogun.Skill);
+
+            world.AddCharacterEvent(new Timestamp(11), xiangling.SwitchUnit);
+            world.AddCharacterEvent(new Timestamp(11.5), xiangling.InitialBurst);
+
+            world.AddCharacterEvent(new Timestamp(26), xiangling.InitialBurst);
+
+            world.AddCharacterEvent(new Timestamp(35.5), xiangling.InitialBurst);
+
+            // world.AddCharacterEvent(new Timestamp(500), xiangling.SwitchUnit);
+            world.AddCharacterEvent(new Timestamp(501), xiangling.InitialBurst);
+            world.AddCharacterEvent(new Timestamp(503), xiangling.BurstHit);
+
+            world.Simulate();
         }
 
         static void SimulateXianglingBurst()
