@@ -18,20 +18,22 @@ namespace Tcc.Units
             constellationLevel: constellationLevel,
             element: Element.ELECTRO,
             burstEnergyCost: 90,
-            stats: new Stats.Stats(
+            capacityStats: new CapacityStats(
                 baseHp: 10876,
+                energy: 90
+            ),
+            generalStats: new GeneralStats(
                 baseAttack: 225,
                 attackPercent: 0.466,
                 flatAttack: 311,
                 critRate: 0.5,
-                critDamage: 1,
-                energyRecharge: 2.5
+                critDamage: 1
             ),
-            normal: new Stats.Stats(new double[] {0.8806,0.8449,1.0795,1.11798,1.3209}),
-            charged: new Stats.Stats(new double[] {1.105+1.202}),
-            plunge: new Stats.Stats(new double[] {1.2638,2.527,3.1564}),
-            skill: new Stats.Stats(new double[] {2.4768,1.512+1.656,1.584+1.728,2.376}),
-            burst: new Stats.Stats(new double[] {4.1904,0.108,1.008})
+            normal: new AbilityStats(motionValues: new double[] {0.8806,0.8449,1.0795,1.11798,1.3209}),
+            charged: new AbilityStats(motionValues: new double[] {1.105+1.202}),
+            plunge: new AbilityStats(motionValues: new double[] {1.2638,2.527,3.1564}),
+            skill: new AbilityStats(motionValues: new double[] {2.4768,1.512+1.656,1.584+1.728,2.376}),
+            burst: new AbilityStats(motionValues: new double[] {4.1904,0.108,1.008})
         ) {
         }
 
@@ -47,13 +49,13 @@ namespace Tcc.Units
                 Console.WriteLine($"Shogun skill at {timestamp}");
                 world.unitSwapped -= currentBuffListener;
 
-                this.RemoveAllBuff(SKILL_BUFF_ID);
-                this.AddBuff(CreateSkillBuff(world, expiryTime));
+                this.RemoveAllBuffs(SKILL_BUFF_ID);
+                this.AddBuff(CreateSkillBuff(expiryTime), Types.BURST);
 
                 newBuffListener = (_, data) =>
                 {
-                    data.from.RemoveAllBuff(SKILL_BUFF_ID);
-                    data.to.AddBuff(CreateSkillBuff(world, expiryTime));
+                    data.from.RemoveAllBuffs(SKILL_BUFF_ID);
+                    data.to.AddBuff(CreateSkillBuff(expiryTime), Types.BURST);
                 };
 
                 world.unitSwapped += newBuffListener;
@@ -65,13 +67,12 @@ namespace Tcc.Units
             return events;
         }
 
-        BuffFromStats CreateSkillBuff(World world, Timestamp expiryTime)
+        Buff<AbilityModifier> CreateSkillBuff(Timestamp expiryTime)
         {
-            return new BasicBuffFromStats(
+            return new RefreshableBuff<AbilityModifier>(
                 SKILL_BUFF_ID,
-                (_, _, timestamp) => new Stats.Stats(damagePercent: this.GetStatsFromUnitWithoutScaled(Types.BURST, timestamp).EnergyRecharge * 0.3), // TODO Will become part of burst MVs
-                Types.BURST,
-                expiryTime: expiryTime
+                expiryTime: expiryTime,
+                (data) => new AbilityStats(damagePercentBonus: GetFirstPassStats(data.timestamp).EnergyRecharge * 0.3) // TODO Will become part of burst MVs
             );
         }
 

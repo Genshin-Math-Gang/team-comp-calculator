@@ -1,46 +1,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Tcc.Stats;
-using Tcc.Units;
 
 namespace Tcc.Buffs
 {
-    public class RefreshableBuff: BuffFromUnit
+    public class RefreshableBuff<ModifierT>: Buff<ModifierT>
     {
-        readonly Stats.Types type;
-        readonly Stats.Stats modifier;
         readonly Timestamp expiryTime;
         readonly int maxStacks;
 
-        public RefreshableBuff(Guid id, Timestamp expiryTime, Stats.Stats modifier, Stats.Types type = Stats.Types.ANY, int maxStacks = 1): base(id, expiryTime)
+        public RefreshableBuff(Guid id, Timestamp expiryTime, ModifierT modifier, int maxStacks = 1): base(id, modifier)
         {
-            this.type = type;
-            this.modifier = modifier;
             this.expiryTime = expiryTime;
             this.maxStacks = maxStacks;
         }
 
-        public override void AddToUnit(Unit unit, List<BuffFromUnit> buffs)
+        public override void AddToList(List<Buff<ModifierT>> buffs)
         {
             buffs.Add(this);
 
-            var existingStacks = buffs
-                .Where((buff) => buff.Id == this.Id);
+            var existingStacks = buffs.Where((buff) => buff.id == this.id);
 
             if(existingStacks.Count() > maxStacks)
             {
                 var toRemove = existingStacks
-                    .Cast<RefreshableBuff>()
+                    .Cast<RefreshableBuff<ModifierT>>()
                     .Aggregate((buff1, buff2) => buff2.expiryTime < buff1.expiryTime ? buff2 : buff1);
 
                 buffs.Remove(toRemove);
             }
         }
 
-        public override Stats.Stats GetModifier(Unit unit, Stats.Types type)
-        {
-            return this.type.IsType(type) ? modifier : new Stats.Stats();
-        }
+        public override bool ShouldRemove(Timestamp currentTime) => currentTime >= expiryTime;
     }
 }
