@@ -10,13 +10,13 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly Stats.Stats MODIFIER_2PC = new Stats.Stats(energyRecharge: 0.2);
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
 
         public override void Add4pc(World world, Unit unit)
         {
-            unit.AddBuff(new BasicBuffFromUnit(
+            unit.AddBuff(new BasicBuffFromStats(
                 ID_4PC,
-                (_, unconditionalStats) => new Stats.Stats(damagePercent: Math.Min(unconditionalStats.EnergyRecharge * 0.25, 0.75)),
+                (_, unconditionalStats, _) => new Stats.Stats(damagePercent: Math.Min(unconditionalStats.EnergyRecharge * 0.25, 0.75)),
                 Stats.Types.BURST
             ));
         }

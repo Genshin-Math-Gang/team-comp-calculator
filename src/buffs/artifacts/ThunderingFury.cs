@@ -18,7 +18,7 @@ namespace Tcc.Buffs.Artifacts
             (Reaction.SUPERCONDUCT, 0.4)
         );
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
-        public override void Add4pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_4PC, MODIFIER_4PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
+        public override void Add4pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_4PC, MODIFIER_4PC));
     }
 }

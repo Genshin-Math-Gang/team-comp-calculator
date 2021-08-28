@@ -14,7 +14,7 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly Stats.Stats MODIFIER_2PC = new Stats.Stats(defencePercent: 0.3);
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
 
         public override void Add4pc(World world, Unit unit)
         {
@@ -25,7 +25,7 @@ namespace Tcc.Buffs.Artifacts
 
             var elementalResistance = new KeyedPercentBonus<Element>(resistances);
 
-            unit.AddBuff(new BasicUnconditionalBuff(ID_4PC, new Stats.Stats(elementalResistance: elementalResistance)));
+            unit.AddBuff(new BasicBuffFromUnit(ID_4PC, new Stats.Stats(elementalResistance: elementalResistance)));
         }
     }
 }

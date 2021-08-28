@@ -9,7 +9,7 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly Stats.Stats MODIFIER_2PC = new Stats.Stats(flatDefence: 100);
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
         public override void Add4pc(World world, Unit unit) => throw new NotImplementedException();
     }
 }

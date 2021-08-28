@@ -12,14 +12,14 @@ namespace Tcc.Buffs.Artifacts
         static readonly Stats.Stats MODIFIER_2PC = new Stats.Stats(attackPercent: 0.18);
         static readonly Stats.Stats MODIFIER_4PC = new Stats.Stats(damagePercent: 0.35);
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
         public override void Add4pc(World world, Unit unit)
         {
             var weaponType = unit.Weapon.Type;
 
             if(weaponType == WeaponType.SWORD || weaponType == WeaponType.CLAYMORE || weaponType == WeaponType.POLEARM)
             {
-                unit.AddBuff(new BasicUnconditionalBuff(ID_4PC, MODIFIER_4PC, Stats.Types.NORMAL));
+                unit.AddBuff(new BasicBuffFromUnit(ID_4PC, MODIFIER_4PC, Stats.Types.NORMAL));
             }
         }
     }

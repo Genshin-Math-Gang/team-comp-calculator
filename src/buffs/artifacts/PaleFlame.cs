@@ -17,11 +17,11 @@ namespace Tcc.Buffs.Artifacts
 
         Timestamp cooldown4pcUntil;
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
 
         public override void Add4pc(World world, Unit unit)
         {
-            unit.AddBuff(new BasicBuffFromUnit(ID_4PC_CONDITIONAL, MODIFIER_4PC_CONDITIONAL, condition: (unit, _) => unit.GetBuffCount(ID_4PC_STACK) == 2));
+            unit.AddBuff(new BasicBuffFromStats(ID_4PC_CONDITIONAL, MODIFIER_4PC_CONDITIONAL, condition: (_, _, _) => unit.GetBuffCount(ID_4PC_STACK) == 2));
 
             world.enemyHitHook += (_, data) =>
             {

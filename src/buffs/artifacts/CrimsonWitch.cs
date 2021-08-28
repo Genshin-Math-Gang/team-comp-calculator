@@ -22,11 +22,11 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly Stats.Stats MODIFIER_4PC_STACK = 0.5 * MODIFIER_2PC;
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
 
         public override void Add4pc(World world, Unit unit)
         {
-            unit.AddBuff(new BasicUnconditionalBuff(ID_4PC_PASSIVE, MODIFIER_4PC_PASSIVE));
+            unit.AddBuff(new BasicBuffFromUnit(ID_4PC_PASSIVE, MODIFIER_4PC_PASSIVE));
 
             unit.skillActivatedHook += (_, timestamp) => unit.AddBuff(
                 new RefreshableBuff(ID_4PC_STACK, timestamp + 10, MODIFIER_4PC_STACK, maxStacks: 3)

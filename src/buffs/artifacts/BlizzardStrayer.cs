@@ -15,7 +15,7 @@ namespace Tcc.Buffs.Artifacts
         static readonly Stats.Stats MODIFIER_4PC_IF_CRYO = new Stats.Stats(critRate: 0.2);
         static readonly Stats.Stats MODIFIER_4PC_IF_FROZEN = new Stats.Stats(critRate: 0.2);
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC));
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
 
         public override void Add4pc(World world, Unit unit)
         {

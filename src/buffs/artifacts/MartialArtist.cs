@@ -13,7 +13,7 @@ namespace Tcc.Buffs.Artifacts
 
         public override void Add2pc(World world, Unit unit)
         {
-            unit.AddBuff(new BasicUnconditionalBuff(ID_2PC, MODIFIER_2PC, Stats.Types.NORMAL | Stats.Types.CHARGED));
+            unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC, Stats.Types.NORMAL | Stats.Types.CHARGED));
         }
 
         public override void Add4pc(World world, Unit unit)

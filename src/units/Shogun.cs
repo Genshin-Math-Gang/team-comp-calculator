@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Tcc.Buffs;
+using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
 
@@ -14,7 +15,9 @@ namespace Tcc.Units
         EventHandler<(Unit from, Unit to, Timestamp)> currentBuffListener = null;
 
         public Shogun(int constellationLevel): base(
-            constellationLevel,
+            constellationLevel: constellationLevel,
+            element: Element.ELECTRO,
+            burstEnergyCost: 90,
             stats: new Stats.Stats(
                 baseHp: 10876,
                 baseAttack: 225,
