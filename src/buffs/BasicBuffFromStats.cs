@@ -9,7 +9,6 @@ namespace Tcc.Buffs
     public class BasicBuffFromStats: BuffFromStats
     {
         readonly Func<Unit, Stats.Stats, Timestamp, bool> condition;
-        readonly Stats.Types type;
         readonly Func<Unit, Stats.Stats, Timestamp, Stats.Stats> modifier;
 
         public BasicBuffFromStats(Guid id, Stats.Stats modifier, Stats.Types type = Stats.Types.ANY, Func<Unit, Stats.Stats, Timestamp, bool> condition = null)
@@ -26,10 +25,8 @@ namespace Tcc.Buffs
 
         public override void AddToUnit(Unit unit, List<BuffFromStats> buffs)
         {
-            if(buffs.Any((buff) => buff.Id == this.Id))
-            {
-                throw new InvalidBuffException("Cannot duplicate permanent buff");
-            }
+
+            buffs.RemoveAll((buff) => buff.Id == this.Id);
 
             buffs.Add(this);
         }

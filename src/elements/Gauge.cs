@@ -45,6 +45,7 @@ namespace Tcc.Elements
             // need to do something else regarding damage but for now i just want to track aura properly
             // swirl is terrifying 
             // frozen is weird
+            // malding
             switch (aura)
             {
                 case Aura.NONE:
