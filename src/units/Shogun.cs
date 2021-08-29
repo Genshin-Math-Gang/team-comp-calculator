@@ -4,6 +4,7 @@ using Tcc.Buffs;
 using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
+using Tcc.Elements;
 
 namespace Tcc.Units
 {
@@ -32,7 +33,7 @@ namespace Tcc.Units
             normal: new AbilityStats(motionValues: new double[] {0.8806,0.8449,1.0795,1.11798,1.3209}),
             charged: new AbilityStats(motionValues: new double[] {1.105+1.202}),
             plunge: new AbilityStats(motionValues: new double[] {1.2638,2.527,3.1564}),
-            skill: new AbilityStats(motionValues: new double[] {2.4768,1.512+1.656,1.584+1.728,2.376}),
+            skill: new AbilityStats(motionValues: new double[] {2.1096,0.756,0.03}),
             burst: new AbilityStats(motionValues: new double[] {4.1904,0.108,1.008})
         ) {
         }
@@ -46,7 +47,6 @@ namespace Tcc.Units
 
             events.Add(new WorldEvent(timestamp, (world) =>
             {
-                Console.WriteLine($"Shogun skill at {timestamp}");
                 world.unitSwapped -= currentBuffListener;
 
                 this.RemoveAllBuffs(SKILL_BUFF_ID);
@@ -63,6 +63,7 @@ namespace Tcc.Units
             }));
 
             events.Add(new WorldEvent(expiryTime, (world) => world.unitSwapped -= newBuffListener));
+            events.Add(new Hit(timestamp, Elements.Element.ELECTRO, 0, this.GetStats(Types.SKILL), this, Types.SKILL, false, true, true, 1, "shogun E"));
 
             return events;
         }

@@ -54,8 +54,8 @@ namespace Tcc.Units
                 // TODO Self-apply pyro
                 events.Add(new AddBuffOnField(startTime, () => CreateBurstBuff(startTime), "Inspiration Field"));
 
-                // Deal burst damage after modifier snapshot and first application
-                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, GetSecondPassStats, Types.BURST, 0, this, "Bennett burst"));
+                // Deal burst damage after modifier snapshot and first application,
+                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStats(Types.BURST), this, Types.BURST, false, true, true, 1, "Bennett burst"));
             }
 
             return events;
@@ -63,8 +63,8 @@ namespace Tcc.Units
 
         Buff<SecondPassModifier> CreateBurstBuff(Timestamp startTime)
         {
-            var stats = burstBuffSnapshot.GetStats(null, startTime);
-            var modifier = new GeneralStats(flatAttack: stats.Attack.Base * stats.MotionValues[2]);
+            var stats = burstBuffSnapshot.GetStats(startTime);
+            var modifier = new Stats.Stats(flatAttack: stats.Attack.Base * stats.MotionValues[2]);
 
             return new RefreshableBuff<SecondPassModifier>(BURST_BUFF_ID, startTime + BUFF_DURATION, (_) => modifier);
         }
