@@ -16,7 +16,7 @@ namespace Tcc.Elements
             this.DecayRate = 2.5 + 7 / strength;
         }
 
-        public void TimeDecay(double time)
+        public void TimeDecay(Timestamp time)
         {
             GaugeValue = Math.Max(GaugeValue - time / DecayRate, 0);
         }

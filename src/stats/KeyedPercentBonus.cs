@@ -7,7 +7,7 @@ namespace Tcc.Stats
     {
         readonly Dictionary<KeyT, double> damagePercentBonuses;
 
-        KeyedPercentBonus(Dictionary<KeyT, double> damagePercentBonuses)
+        public KeyedPercentBonus(Dictionary<KeyT, double> damagePercentBonuses)
         {
             this.damagePercentBonuses = damagePercentBonuses;
         }
@@ -21,7 +21,7 @@ namespace Tcc.Stats
         {
         }
 
-        public double GetDamagePercentBonus(KeyT key)
+        public double GetPercentBonus(KeyT key)
         {
             return damagePercentBonuses.TryGetValue(key, out var damagePercent) ? damagePercent : 0;
         }

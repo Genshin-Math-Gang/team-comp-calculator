@@ -1,6 +1,5 @@
 using Tcc.Events;
 using Tcc.Units;
-using System;
 
 namespace Tcc.Stats
 {
@@ -9,7 +8,7 @@ namespace Tcc.Stats
         readonly Unit unit;
         readonly Types type;
 
-        Stats stats;
+        SecondPassStatsPage stats;
 
         public SnapshottedStats(Unit unit, Types type)
         {
@@ -17,32 +16,15 @@ namespace Tcc.Stats
             this.type = type;
         }
 
-        public Stats GetStats(Enemy.Enemy enemy, Timestamp timestamp)
-        {
-            unit.buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
-            unit.buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
-
-            var firstPassStats = unit.modifiers[type] + stats;
-            foreach(var buff in unit.buffsFromUnit) 
-            {
-                if (buff.type == type) 
-                firstPassStats += buff.GetModifier(unit, type);
-            }
-
-            var result = firstPassStats;
-            foreach(var buff in unit.buffsFromStats) 
-            {
-                if (buff.type == type) 
-                result += buff.GetModifier(unit, firstPassStats, timestamp, type);
-            }
-
-            result = unit.AddStatsFromEnemy(result, type, enemy, timestamp);
-            return result;
-        }
+        public SecondPassStatsPage GetStats(Timestamp _) => stats;
 
         public WorldEvent Snapshot(Timestamp timestamp)
         {
-            return new WorldEvent(timestamp, (_) => {stats = unit.SnapshotStats(timestamp); System.Console.WriteLine($"Snapshotted {this.unit} {this.type}");});
+            return new WorldEvent(timestamp, (_) =>
+            {
+                stats = unit.GetStatsPage(timestamp);
+                System.Console.WriteLine($"Snapshotted {unit} {type}");
+            });
         }
     }
 }
