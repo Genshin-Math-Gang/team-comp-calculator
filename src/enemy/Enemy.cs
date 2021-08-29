@@ -16,7 +16,8 @@ namespace Tcc.Enemy
             this.gauge = gauge ?? new Gauge();
         }
 
-        public double takeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage stats_of_unit, Unit unit, int mvIndex, int reaction = Reaction.NONE, bool? isHeavy = false)
+        public double takeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage stats_of_unit, 
+        Unit unit, int mvIndex = 0, int reaction = Reaction.NONE, bool isHeavy = false)
         {
             var unitAbilityStats = unit.GetAbilityStats(stats_of_unit, type, this, timestamp);
             

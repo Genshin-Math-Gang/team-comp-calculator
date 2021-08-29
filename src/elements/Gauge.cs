@@ -12,40 +12,26 @@ namespace Tcc.Elements
     {        
         private Dictionary<Element, GaugeElement> gaugeDict = new Dictionary<Element, GaugeElement>();
         private Timestamp LastChecked = new Timestamp(0);
-        private Dictionary<Tuple<Units.Unit, Types>, Timestamp> ICDtimer = new Dictionary<Tuple<Units.Unit, Types>, Timestamp>();
-        private Dictionary<Tuple<Units.Unit, Types>, int> hitPity = new Dictionary<Tuple<Units.Unit, Types>, int>();
+        private Dictionary<Tuple<Units.Unit, Types>, ICD> ICDtimer = new Dictionary<Tuple<Units.Unit, Types>, ICD>();
         private Aura aura = Aura.NONE;
         private Timestamp FreezeDuration = new Timestamp(0);
         private Timestamp FreezeAura = new Timestamp(0);
 
         public Gauge() {}
         
-        public double ElementApplied(Timestamp timestamp, Element elementType, Units.Unit unit, Types type, bool isHeavy=false)
+        public double ElementApplied(Timestamp timestamp, Element elementType, World world, double GaugeStrength, Units.Unit unit, SecondPassStatsPage statsPage, Types type, bool isHeavy=false, 
+        int icdOveride = 0)
         {
-            if (type == Types.TRANSFORMATIVE)
-            {
-                return Reaction.NONE;
-            }
+            if (type == Types.TRANSFORMATIVE) return Reaction.NONE;  
+
             Tuple<Units.Unit, Types> key = new Tuple<Units.Unit, Types>(unit, type);
-            if (!ICDtimer.ContainsKey(key))
-            {
-                ICDtimer.Add(key, timestamp);
-                hitPity.Add(key, 1);
-            }
-            else
-            {
-                hitPity[key] += 1;
-                
-                if ((timestamp - ICDtimer[key] <= unit.stats.ICD) && (hitPity[key] != unit.stats.HitPity)) return Reaction.NONE;
-
-                if (hitPity[key] == unit.stats.HitPity) hitPity[key] = 0;
-
-                if (timestamp - ICDtimer[key] > unit.stats.ICD) {hitPity[key] = 0; ICDtimer[key] = timestamp;}
-            }
+            if (!ICDtimer.ContainsKey(key)) ICDtimer.Add(key, new ICD(timestamp));
+            else if (!ICDtimer[key].checkICD(timestamp, icdOveride)) return Reaction.NONE;
+            
 
             if (aura == Aura.NONE) 
             {
-                gaugeDict.Add(elementType, new GaugeElement(elementType, unit.modifiers[type].GaugeStrength)); 
+                gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
                 LastChecked = timestamp; 
                 this.aura = ElementToAura(elementType);
                 return Reaction.NONE;
@@ -58,7 +44,7 @@ namespace Tcc.Elements
             }
             if (aura == ElementToAura(elementType))
             {
-                gaugeDict[elementType].UpdateGauge(unit.modifiers[type].GaugeStrength);
+                gaugeDict[elementType].UpdateGauge(GaugeStrength);
                 return Reaction.NONE;
             } 
             if (elementType == Element.PHYSICAL)
@@ -66,7 +52,7 @@ namespace Tcc.Elements
                 return Reaction.NONE;
             }
 
-            var strength = unit.modifiers[type].GaugeStrength * 1.25;
+            var strength = GaugeStrength * 1.25;
             // need to do something else regarding damage but for now i just want to track aura properly
             // swirl is terrifying 
             // frozen is weird
@@ -74,7 +60,7 @@ namespace Tcc.Elements
             switch (aura)
             {
                 case Aura.NONE:
-                    gaugeDict[elementType] = new GaugeElement(elementType, unit.modifiers[type].GaugeStrength);
+                    gaugeDict[elementType] = new GaugeElement(elementType, GaugeStrength);
                     aura = ElementToAura(elementType);
                     return Reaction.NONE;
                 case Aura.PYRO:
@@ -82,11 +68,12 @@ namespace Tcc.Elements
                     {
                         case Element.HYDRO:
                             strength *= 2;
-                            return 2 * (1 + 2.78 * unit.stats.ElementalMastery / (unit.stats.ElementalMastery + 1400) + unit.stats.ReactionBonus.GetDamagePercentBonus(Reaction.VAPORIZE));
+                            return 2 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
                         case Element.CRYO:
                             strength /= 2;
-                            return 1.5 * (1 + 2.78 * unit.stats.ElementalMastery / (unit.stats.ElementalMastery + 1400) + unit.stats.ReactionBonus.GetDamagePercentBonus(Reaction.MELT));
+                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.MELT));
                         case Element.ELECTRO:
+                            world.AddWorldEvents(new Overload(timestamp, statsPage, unit));
                             return Reaction.OVERLOADED;
                         case Element.ANEMO:
                             strength /= 2;
@@ -102,7 +89,7 @@ namespace Tcc.Elements
                     {
                         case Element.PYRO:
                             strength /= 2;
-                            return 1.5 * (1 + 2.78 * unit.stats.ElementalMastery / (unit.stats.ElementalMastery + 1400) + unit.stats.ReactionBonus.GetDamagePercentBonus(Reaction.VAPORIZE));
+                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
                         case Element.CRYO:
                             SetFrozen(gaugeDict[Element.HYDRO].GaugeValue, strength);
                             break;
@@ -125,7 +112,7 @@ namespace Tcc.Elements
                     {
                         case Element.PYRO:
                             strength *= 2;
-                            return 2 * (1 + 2.78 * unit.stats.ElementalMastery / (unit.stats.ElementalMastery + 1400) + unit.stats.ReactionBonus.GetDamagePercentBonus(Reaction.MELT));
+                            return 2 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.MELT));
                         case Element.HYDRO:
                             SetFrozen(gaugeDict[Element.CRYO].GaugeValue, strength);
                             break;
@@ -167,15 +154,15 @@ namespace Tcc.Elements
                         case Element.PYRO:
                             DecreaseElement(Element.HYDRO, 2 * strength);
                             DecreaseElement(Element.ELECTRO, strength);
-                            return 1.5 * (1 + 2.78 * unit.stats.ElementalMastery / (unit.stats.ElementalMastery + 1400) + unit.stats.ReactionBonus.GetDamagePercentBonus(Reaction.VAPORIZE));
+                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
                         case Element.HYDRO:
-                            gaugeDict[elementType].UpdateGauge(unit.modifiers[type].GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.CRYO:
                             break;
                         case Element.ELECTRO:
-                            gaugeDict[elementType].UpdateGauge(unit.modifiers[type].GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.ANEMO:
@@ -196,11 +183,11 @@ namespace Tcc.Elements
                             strength *= 2;
                             break;
                         case Element.HYDRO:
-                            gaugeDict[elementType].UpdateGauge(unit.modifiers[type].GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.CRYO:
-                            gaugeDict[elementType].UpdateGauge(unit.modifiers[type].GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.ELECTRO:

@@ -7,15 +7,16 @@ namespace Tcc.Stats
     {
         readonly GeneralStats generalStats;
         readonly double[] motionValues;
+        public Timestamp ICD { get; }
+        public double GaugeStrength;
 
-        public AbilityStats(GeneralStats generalStats = null, double[] motionValues = null, Timestamp icd = null)
+        public AbilityStats(GeneralStats generalStats = null, double[] motionValues = null, Timestamp icd = null, double gaugeStrength = 1)
         {
             this.generalStats = generalStats ?? new GeneralStats();
             this.motionValues = motionValues;
-            this.Icd = icd ?? new Timestamp(0);
+            this.ICD = icd ?? new Timestamp(0);
+            this.GaugeStrength = gaugeStrength;
         }
-
-        public Timestamp Icd { get; }
 
         public double CalculateHitDamage(int mvIndex, Element element)
         {

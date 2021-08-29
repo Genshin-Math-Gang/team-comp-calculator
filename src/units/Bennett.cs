@@ -55,7 +55,7 @@ namespace Tcc.Units
                 events.Add(new WorldEvent(startTime, (world) => world.OnFieldUnit.AddBuff(CreateBurstBuff(startTime))));
 
                 // Deal burst damage after modifier snapshot and first application,
-                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, false, true, true, 1, "Bennett burst"));
+                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, false, true, 1, 1, "burst"));
             }
 
             return events;

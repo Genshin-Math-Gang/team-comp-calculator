@@ -8,15 +8,15 @@ namespace Tcc.Events
     {
         public Hit(
             Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
-             Units.Unit unit, Types type, bool isHeavy = false, bool applyElement = false,
-              bool isAoe = true, int bounces = 1, string description = ""): 
+             Units.Unit unit, Types type, bool isHeavy = false,
+              bool isAoe = true, int bounces = 1, int icdOveride = 0, string description = ""): 
             base(
             timestamp,
 
             // TODO We'll need to hook in reactions, enemies, multi-target and infusion here
-            (world) => world.Hit(
+            (world) => world.CalculateDamage(
                 timestamp, element, mvIndex, stats(timestamp), 
-                unit, type, Reaction.NONE, isHeavy, isAoe, applyElement, bounces, description)
+                unit, type, Reaction.NONE, isHeavy, isAoe, bounces, icdOveride, description)
         ) {
         }
     }

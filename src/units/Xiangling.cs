@@ -39,9 +39,9 @@ namespace Tcc.Units
         {
             return new List<WorldEvent> {
                 BurstActivated(timestamp),
-                new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, false, true, true, 1, "nado initial 1st hit"),
-                new Hit(timestamp + 0.5, Element.PYRO, 1, GetStatsPage, this, Types.BURST, false, true, true, 1, "nado initial 2nd hit"),
-                new Hit(timestamp + 1, Element.PYRO, 2, GetStatsPage, this, Types.BURST, false, true, true, 1, "nado initial 3rd hit"),
+                new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 0, "nado initial 1st hit"),
+                new Hit(timestamp + 0.5, Element.PYRO, 1, GetStatsPage, this, Types.SKILL, false, true, 1, 0, "nado initial 2nd hit"),
+                new Hit(timestamp + 1, Element.PYRO, 2, GetStatsPage, this, Types.SKILL, false, true, 1, 0, "nado initial 3rd hit"),
                 burstSnapshot.Snapshot(timestamp + 1)
             };
         }
@@ -51,16 +51,16 @@ namespace Tcc.Units
             return new List<WorldEvent> {
                 SkillActivated(timestamp), // Order important: Guoba snapshots CW skill activation buff
                 skillSnapshot.Snapshot(timestamp),
-                new Hit(timestamp + 2, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.BURST, false, true, true, 1, "Guoba"),
-                new Hit(timestamp + 3.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.BURST, false, true, true, 1, "Guoba"),
-                new Hit(timestamp + 5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.BURST, false, true, true, 1, "Guoba"),
-                new Hit(timestamp + 7.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.BURST, false, true, true, 1, "Guoba")
+                new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
+                new Hit(timestamp + 3.5, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
+                new Hit(timestamp + 5, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
+                new Hit(timestamp + 7.5, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
             };
         }
 
         public List<WorldEvent> BurstHit(Timestamp timestamp)
         {
-            return new List<WorldEvent> { new Hit(timestamp, Element.PYRO, 3, burstSnapshot.GetStats, this, Types.BURST, false, true, true, 1, "nado spin") };
+            return new List<WorldEvent> { new Hit(timestamp + 1, Element.PYRO, 3, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "nado") };
         }
 
         public override string ToString()

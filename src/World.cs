@@ -1,3 +1,4 @@
+  
 using System.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace Tcc
         List<Enemy.Enemy> enemies;
         public double[] TotalDamage;
 
-        public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Stats.Types attackType)> enemyHitHook; // TODO Not fired by anything
+        public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Stats.Types attackType)> enemyHitHook;
         public event EventHandler<(Unit from, Unit to, Timestamp timestamp)> unitSwapped;
 
         public World(List<Enemy.Enemy> enemies)
@@ -55,77 +56,46 @@ namespace Tcc
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }
 
-        public void Hit(Timestamp timestamp, Element element, int mvIndex, SecondPassStatsPage stats, Units.Unit unit, Types type, int reaction = Reaction.NONE, bool isHeavy = false, bool applyElement = true, bool isAoe = true, int bounces = 1, string description = "")
+        public void DealDamage(Timestamp timestamp, Element element, SecondPassStatsPage statsPage, Unit unit, Types type, Enemy.Enemy enemy, int mvIndex, int reaction, bool isHeavy, int icdOveride, string description = null)
         {
-            double result = Reaction.NONE;
-            double final_damage = 0;
-            for (int i = 1; i <= bounces; i++)
+            double final_damage;
+            double result = enemy.gauge.ElementApplied(timestamp, element, this, unit.GetAbilityStats(statsPage, type, enemy, timestamp).GaugeStrength, unit, statsPage, type, isHeavy, icdOveride);
+            if (result > 0) final_damage = enemy.takeDamage(timestamp, element, type, statsPage, unit, mvIndex, reaction, isHeavy) * result;
+            else final_damage = enemy.takeDamage(timestamp, element, type, statsPage, unit, mvIndex, reaction, isHeavy);
+
+            this.TotalDamage[units.IndexOf(unit)] += final_damage;
+            if (description != null)
+            {
+                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage}");
+            }
+            else
+            {
+                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage}");
+            }
+        }
+
+        public void CalculateDamage(Timestamp timestamp, Element element, int mvIndex, SecondPassStatsPage statsPage, Units.Unit unit, Types type, int reaction = Reaction.NONE, bool isHeavy = false, bool isAoe = true, int bounces = 1, int icdOveride = 0, string description = null)
+        {
+            for (int i = 0; i < bounces; i++)
             {
                 if (isAoe)
                 {
-                foreach (Enemy.Enemy enemy in enemies)
+                    foreach(Enemy.Enemy enemy in enemies) 
                     {
-                        if (applyElement)
-                        {
-                            result = enemy.gauge.ElementApplied(timestamp, element, unit, type, isHeavy);
-                        }
-                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy) * (result > 0 ? result : 1);
+                        DealDamage(timestamp, element, statsPage, unit, type, enemy, mvIndex, reaction, isAoe, icdOveride, description);
                     }
                 }
                 else
                 {
-                foreach (Enemy.Enemy enemy in enemies)
+                    foreach(Enemy.Enemy enemy in enemies)
                     {
                         if (i > bounces) break;
-                        if (applyElement)
-                        {
-                            result = enemy.gauge.ElementApplied(timestamp, element, unit, type, isHeavy);
-                        }
-                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy) * (result > 0 ? result : 1);
+                        DealDamage(timestamp, element, statsPage, unit, type, enemy, mvIndex, reaction, isAoe, icdOveride, description);
                         i++;
                     }
                 }
             }
-
-            this.TotalDamage[units.IndexOf(unit)] += final_damage;
-            if (description == "")
-                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage}");
-            else
-                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage}");
-
-            switch (result)
-            {
-                case Reaction.OVERLOADED : {AddWorldEvents(new Overload(timestamp, stats, unit)); break;}
-            }
         }
-
-        //public void AddBuff(Timestamp timestamp, Units.Unit unit, BuffFromUnit buff, string description)
-        //{
-        //    unit.AddBuff(buff);
-
-        //    if (description == "") Console.WriteLine($"Buff added to {unit} at {timestamp}");
-        //    else Console.WriteLine($"Buff added by {description} to {unit} at {timestamp}");
-        //}
-
-        //public void AddBuffOnField(Timestamp timestamp, BuffFromUnit buff, string description)
-        //{
-        //    this.onFieldUnit.AddBuff(buff);
-
-        //    if (description == "") Console.WriteLine($"Buff added to {this.onFieldUnit} at {timestamp}");
-        //    else Console.WriteLine($"Buff added by {description} to {this.onFieldUnit} at {timestamp}");
-        //}
-
-        //public void AddBuffGlobal(Timestamp timestamp, BuffFromUnit buff, string description)
-        //{
-        //    foreach(Unit x in units)
-        //    {
-        //        if (x != null) x.AddBuff(buff);
-        //    }
-
-        //    if (description == "") Console.WriteLine($"Buff added at {timestamp}");
-        //    else Console.WriteLine($"Buff added by {description} at {timestamp}");
-        //}
-
         public void Simulate()
         {
             queuedWorldEvents = characterEvents

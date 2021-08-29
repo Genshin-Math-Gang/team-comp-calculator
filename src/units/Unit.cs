@@ -18,7 +18,7 @@ namespace Tcc.Units
         // Base stats
         protected readonly CapacityStats startingCapacityStats;
         protected readonly GeneralStats startingGeneralStats;
-        protected readonly Dictionary<Types, AbilityStats> startingAbilityStats;
+        protected readonly Dictionary<Types, AbilityStats> startingAbilityStats = new Dictionary<Types, AbilityStats>();
 
         // Snapshottable buffs
         protected readonly List<Buff<CapacityModifier>> capacityBuffs = new List<Buff<CapacityModifier>>();

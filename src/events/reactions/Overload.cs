@@ -6,13 +6,11 @@ namespace Tcc.Events
     public class Overload: WorldEvent
     {
         public Overload(
-            Timestamp timestamp, StatsPage stats, Units.Unit unit): 
+            Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit): 
             base(
             timestamp,
 
-            (world) => world.Hit(
-                timestamp, Element.PYRO, 0, stats, 
-                unit, Types.TRANSFORMATIVE, Reaction.OVERLOADED, true, false, true, 1, "overload")
+            (world) => world.CalculateDamage(timestamp, Element.PYRO, 0, stats, unit, Types.TRANSFORMATIVE, Reaction.OVERLOADED, true, true, 1, -1)
         ) {
         }
     }

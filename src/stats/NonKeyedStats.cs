@@ -22,7 +22,7 @@ namespace Tcc.Stats
         public double IndependentMultiplier { get; }
 
         public NonKeyedStats(
-            int level = 0,
+            int level = 1,
             double baseAttack = 0, double flatAttack = 0, double attackPercent = 0,
             double baseDefence = 0, double flatDefence = 0, double defencePercent = 0,
             double elementalMastery = 0,
