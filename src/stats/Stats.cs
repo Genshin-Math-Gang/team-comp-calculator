@@ -1,5 +1,6 @@
 using System;
 using Tcc.Elements;
+using System.Collections.Generic;
 
 namespace Tcc.Stats
 {
@@ -15,13 +16,18 @@ namespace Tcc.Stats
         public double HealingBonus { get; }
         public double IncomingHealingBonus { get; }
         public double EnergyRecharge { get; }
-        public double CdReduction { get; }
+        public double CdReduction { get; } //This seems useless?
         public double ShieldStrength { get; }
         public double DamagePercent { get; }
         public KeyedPercentBonus<Element> ElementalBonus { get; }
-        public KeyedPercentBonus<Reaction> ReactionBonus { get; }
+        public KeyedPercentBonus<double> ReactionBonus { get; }
         public KeyedPercentBonus<Element> ElementalResistance { get; }
         public int Energy { get; }
+        public int Level { get; }
+        public double DEFReduction { get; }
+        public double GaugeStrength { get; }
+        public Timestamp ICD { get; }
+        public int HitPity { get; }
 
         public Stats (
             double[] motionValues = null,
@@ -31,27 +37,32 @@ namespace Tcc.Stats
             double elementalMastery = 0, double critRate = 0, double critDamage = 0,
             double healingBonus = 0, double incomingHealingBonus = 0, double energyRecharge = 0,
             double cdReduction = 0, double shieldStrength = 0, double damagePercent = 0,
-            KeyedPercentBonus<Element> elementalBonus = null, KeyedPercentBonus<Reaction> reactionBonus = null,
-            KeyedPercentBonus<Element> elementalResistance = null, int energy = 0
-        ): this(
-            motionValues: motionValues,
-            maxHp: new MultipliableStat(baseValue: baseHp, flatBonus: flatHp, percentBonus: hpPercent),
-            attack: new MultipliableStat(baseValue: baseAttack, flatBonus: flatAttack, percentBonus: attackPercent),
-            defence: new MultipliableStat(baseValue: baseDefence, flatBonus: flatDefence, percentBonus: defencePercent),
-            elementalMastery: elementalMastery,
-            critRate: critRate,
-            critDamage: critDamage,
-            healingBonus: healingBonus,
-            incomingHealingBonus: incomingHealingBonus,
-            energyRecharge: energyRecharge,
-            cdReduction: cdReduction,
-            shieldStrength: shieldStrength,
-            damagePercent: damagePercent,
-            elementalBonus: elementalBonus,
-            reactionBonus: reactionBonus,
-            elementalResistance: elementalResistance,
-            energy: energy
+            KeyedPercentBonus<Element> elementalBonus = null, KeyedPercentBonus<double> reactionBonus = null,
+            KeyedPercentBonus<Element> elementalResistance = null, int energy = 0, int level = 1, double defReduction = 0,
+            double gaugeStrength = 1, Timestamp icd = null, int hitPity = 3
         ) {
+            this.MotionValues = motionValues;
+            this.MaxHp = new MultipliableStat(baseValue: baseHp, flatBonus: flatHp, percentBonus: hpPercent);
+            this.Attack = new MultipliableStat(baseValue: baseAttack, flatBonus: flatAttack, percentBonus: attackPercent);
+            this.Defence = new MultipliableStat(baseValue: baseDefence, flatBonus: flatDefence, percentBonus: defencePercent);
+            this.ElementalMastery = elementalMastery;
+            this.CritRate = critRate;
+            this.CritDamage = critDamage;
+            this.HealingBonus = healingBonus;
+            this.IncomingHealingBonus = incomingHealingBonus;
+            this.EnergyRecharge = energyRecharge;
+            this.CdReduction = cdReduction;
+            this.ShieldStrength = shieldStrength;
+            this.DamagePercent = damagePercent;
+            this.ElementalBonus = elementalBonus ?? new KeyedPercentBonus<Element>();
+            this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<double>(new Dictionary<double, double>() {{Reaction.BURNING, 0}, {Reaction.ELECTROCHARGED, 0}, {Reaction.MELT, 0}, {Reaction.OVERLOADED, 0}, {Reaction.SUPERCONDUCT, 0}, {Reaction.SWIRL_CRYO, 0}, {Reaction.SWIRL_ELECTRO, 0}, {Reaction.SWIRL_HYDRO, 0}, {Reaction.SWIRL_PYRO, 0}, {Reaction.VAPORIZE, 0}});
+            this.ElementalResistance = elementalResistance ?? new KeyedPercentBonus<Element>(new Dictionary<Element, double>() {{Element.ANEMO, 0.1}, {Element.CRYO, 0.1}, {Element.DENDRO, 0.1}, {Element.ELECTRO, 0.1}, {Element.GEO, 0.1}, {Element.HYDRO, 0.1}, {Element.PHYSICAL, 0.1}, {Element.PYRO, 0.1}});
+            this.Energy = energy;
+            this.Level = level;
+            this.DEFReduction = defReduction;
+            this.GaugeStrength = gaugeStrength;
+            this.HitPity = hitPity;
+            this.ICD = icd ?? new Timestamp(2.5);
         }
 
         Stats(
@@ -59,8 +70,9 @@ namespace Tcc.Stats
             double elementalMastery, double critRate, double critDamage,
             double healingBonus, double incomingHealingBonus, double energyRecharge,
             double cdReduction, double shieldStrength, double damagePercent,
-            KeyedPercentBonus<Element> elementalBonus, KeyedPercentBonus<Reaction> reactionBonus,
-            KeyedPercentBonus<Element> elementalResistance, int energy
+            KeyedPercentBonus<Element> elementalBonus, KeyedPercentBonus<double> reactionBonus,
+            KeyedPercentBonus<Element> elementalResistance, int energy, int level, double defReduction,
+            double gaugeStrength, Timestamp icd, int hitPity
         ) {
             this.MotionValues = motionValues;
             this.MaxHp = maxHp;
@@ -76,19 +88,14 @@ namespace Tcc.Stats
             this.ShieldStrength = shieldStrength;
             this.DamagePercent = damagePercent;
             this.ElementalBonus = elementalBonus ?? new KeyedPercentBonus<Element>();
-            this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<Reaction>();
+            this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<double>();
             this.ElementalResistance = elementalResistance ?? new KeyedPercentBonus<Element>();
             this.Energy = energy;
-        }
-
-        public double CalculateHitDamage(int mvIndex, Element element, Reaction? reaction = null)
-        {
-            var totalDamagePercent = 1 + DamagePercent;
-
-            totalDamagePercent += ElementalBonus.GetDamagePercentBonus(element);
-            if(reaction.HasValue) totalDamagePercent += ReactionBonus.GetDamagePercentBonus(reaction.Value);
-
-            return MotionValues[mvIndex] * Attack * totalDamagePercent * (1 + CritRate * CritDamage);
+            this.Level = Level;
+            this.DEFReduction = defReduction;
+            this.GaugeStrength = gaugeStrength;
+            this.HitPity = hitPity;
+            this.ICD = icd;
         }
 
         public static Stats operator +(Stats first, Stats second)
@@ -135,11 +142,15 @@ namespace Tcc.Stats
                 elementalBonus: first.ElementalBonus + second.ElementalBonus,
                 reactionBonus: first.ReactionBonus + second.ReactionBonus,
                 elementalResistance: first.ElementalResistance + second.ElementalResistance,
-                energy: first.Energy + second.Energy
+                energy: first.Energy + second.Energy,
+                level: first.Level + second.Level,
+                defReduction: first.DEFReduction + second.DEFReduction,
+                gaugeStrength: first.GaugeStrength + second.GaugeStrength,
+                icd: first.ICD + second.ICD,
+                hitPity: first.HitPity + second.HitPity
             );
         }
-
         public static implicit operator Stats(KeyedPercentBonus<Element> bonus) => new Stats(elementalBonus: bonus);
-        public static implicit operator Stats(KeyedPercentBonus<Reaction> bonus) => new Stats(reactionBonus: bonus);
+        public static implicit operator Stats(KeyedPercentBonus<double> bonus) => new Stats(reactionBonus: bonus);
     }
 }

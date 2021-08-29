@@ -9,6 +9,8 @@ namespace Tcc.Stats
         SKILL = 0b1000,
         BURST = 0b10000,
         GENERIC = 0b100000,
+        TRANSFORMATIVE = 0b1000000,
+        SWIRL = 0b10000000,
         ANY = GENERIC | NORMAL | CHARGED | PLUNGE | SKILL | BURST
     }
 

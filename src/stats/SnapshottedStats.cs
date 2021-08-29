@@ -17,7 +17,7 @@ namespace Tcc.Stats
             this.type = type;
         }
 
-        public Stats GetStats(Enemy.Enemy enemy, Timestamp timestamp)
+        public Stats GetStats(Timestamp timestamp)
         {
             unit.buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
             unit.buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
@@ -36,7 +36,7 @@ namespace Tcc.Stats
                 result += buff.GetModifier(unit, firstPassStats, timestamp, type);
             }
 
-            result = unit.AddStatsFromEnemy(result, type, enemy, timestamp);
+            //result = unit.AddStatsFromEnemy(result, type, timestamp);
             return result;
         }
 

@@ -44,10 +44,10 @@ namespace Tcc.Units
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
 
-        public Stats.Stats GetStats(Types type, Enemy.Enemy enemy, Timestamp timestamp)
+        public Stats.Stats GetStats(Types type, Timestamp timestamp)
         {
             var result = GetStatsFromUnit(type, timestamp);
-            result = AddStatsFromEnemy(result, type, enemy, timestamp);
+            //result = AddStatsFromEnemy(result, type, timestamp);
 
             return result;
         }
@@ -67,7 +67,7 @@ namespace Tcc.Units
             buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
             buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
 
-            var firstPassStats = modifiers[type] + stats;
+            var firstPassStats = this.modifiers[type] + this.stats;
             foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
 
             var result = firstPassStats;
@@ -107,9 +107,9 @@ namespace Tcc.Units
             return result;
         }
 
-        protected Func<Enemy.Enemy, Timestamp, Stats.Stats> GetStats(Types type)
+        protected Func<Timestamp, Stats.Stats> GetStats(Types type)
         {
-            return (enemy, timestamp) => GetStats(type, enemy, timestamp);
+            return (timestamp) => GetStats(type, timestamp);
         }
 
         public void AddBuff(BuffFromUnit buff)

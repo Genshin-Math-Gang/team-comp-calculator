@@ -17,7 +17,7 @@ namespace Tcc.Buffs.Artifacts
     public class CrimsonWitch4pcPassive: BasicBuffFromUnit
     {
         static readonly Guid ID = new Guid("608f7b4e-96a3-4731-954a-6ca247ade87e");
-        static readonly Stats.Stats MODIFIER = new KeyedPercentBonus<Reaction>(
+        static readonly Stats.Stats MODIFIER = new KeyedPercentBonus<double>(
             (Reaction.OVERLOADED, 40),
             (Reaction.BURNING, 40),
             (Reaction.MELT, 15),

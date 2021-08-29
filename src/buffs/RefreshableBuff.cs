@@ -8,7 +8,6 @@ namespace Tcc.Buffs
 {
     public class RefreshableBuff: BuffFromUnit
     {
-        readonly Stats.Types type;
         readonly Stats.Stats modifier;
         readonly Timestamp expiryTime;
         readonly int maxStacks;

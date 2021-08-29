@@ -5,6 +5,7 @@ using Tcc.Buffs;
 using Tcc.Events;
 using Tcc.Units;
 using Tcc.Stats;
+using Tcc.Elements;
 
 namespace Tcc
 {
@@ -13,16 +14,17 @@ namespace Tcc
         Unit onFieldUnit;
         List<Unit> units;
         List<CharacterEvent> characterEvents;
+        List<WorldEvent> queuedWorldEvents;
         List<Enemy.Enemy> enemies;
         public double[] TotalDamage;
 
         public event EventHandler<(Unit from, Unit to, Timestamp timestamp)> unitSwapped;
 
-        public World()
+        public World(List<Enemy.Enemy> enemies)
         {
             this.characterEvents = new List<CharacterEvent>();
             this.TotalDamage = new double[4];
-            this.enemies = new List<Enemy.Enemy>();
+            this.enemies = enemies;
         }
 
         public void SetUnits(Unit onFieldUnit, Unit unit2, Unit unit3, Unit unit4)
@@ -48,32 +50,49 @@ namespace Tcc
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }
 
-        public void Hit(Timestamp timestamp, double damage, Units.Unit unit, string description)
+        public void Hit(Timestamp timestamp, Elements.Element element, int mvIndex, Stats.Stats stats, Units.Unit unit, Types type, double reaction = Reaction.NONE, bool isHeavy = false, bool applyElement = true, bool isAoe = true, int bounces = 1, string description = "")
         {
-            this.TotalDamage[units.IndexOf(unit)] += damage;
+            double result = Reaction.NONE;
+            double final_damage = 0;
+            for (int i = 1; i <= bounces; i++)
+            {
+                if (isAoe)
+                {
+                foreach (Enemy.Enemy enemy in enemies)
+                    {
+                        if (applyElement)
+                        {
+                            result = enemy.gauge.ElementApplied(timestamp, element, unit, type, isHeavy);
+                        }
+                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy);
+                    }
+                }
+                else
+                {
+                foreach (Enemy.Enemy enemy in enemies)
+                    {
+                        if (i > bounces) break;
+                        if (applyElement)
+                        {
+                            result = enemy.gauge.ElementApplied(timestamp, element, unit, type, isHeavy);
+                        }
+                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy);
+                        i++;
+                    }
+                }
+            }
+
+            this.TotalDamage[units.IndexOf(unit)] += final_damage;
             if (description == "")
-                Console.WriteLine($"Damage dealt at {timestamp} is {damage}");
+                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage}");
             else
-                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {damage}");
+                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage}");
+
+            switch (result)
+            {
+                case Reaction.OVERLOADED : {AddWorldEvents(new Overload(timestamp, stats, unit)); break;}
+            }
         }
-
-        // public void Snapshot(Timestamp timestamp, Unit unit, Types type, string description)
-        // {
-        //     unit.Snapshot(type);
-        //     if (description == "")
-        //         Console.WriteLine($"{unit} snapshotted at {timestamp}");
-        //     else
-        //         Console.WriteLine($"{unit} snapshotted {description} at {timestamp}");
-        // }
-
-        // public void UnSnapshot(Timestamp timestamp, Unit unit, Types type, string description)
-        // {
-        //     unit.UnSnapshot(type);
-        //     if (description == "")
-        //         Console.WriteLine($"{unit} un-snapshotted at {timestamp}");
-        //     else
-        //         Console.WriteLine($"{unit} un-snapshotted {description} at {timestamp}");
-        // }
 
         public void AddBuff(Timestamp timestamp, Units.Unit unit, BuffFromUnit buff, string description)
         {
@@ -102,37 +121,29 @@ namespace Tcc
             else Console.WriteLine($"Buff added by {description} at {timestamp}");
         }
 
-        // public void RemoveBuff(Timestamp timestamp, Units.Unit unit, string name, Types type, string description)
-        // {
-        //     unit.RemoveBuff(name, type);
-        //     if (description == "")
-        //         Console.WriteLine($"Buff expired to {unit} at {timestamp}");
-        //     else
-        //         Console.WriteLine($"Buff expired by {description} to {unit} at {timestamp}");
-        // }
-
-        // public void RemoveBuffGlobal(Timestamp timestamp, string name, Types type, string description)
-        // {
-        //     foreach(Unit x in units)
-        //     {
-        //         if (x != null)
-        //             x.RemoveBuff(name, type);
-        //     }
-        //     if (description == "")
-        //         Console.WriteLine($"Buff expired at {timestamp}");
-        //     else
-        //         Console.WriteLine($"Buff expired by {description} at {timestamp}");
-            
-        // }
-
         public void Simulate()
         {
-            List<WorldEvent> worldEvents = characterEvents
+            queuedWorldEvents = characterEvents
                 .SelectMany((characterEvent) => characterEvent.GetWorldEvents())
                 .OrderBy((worldEvent) => worldEvent.Timestamp)
                 .ToList();
 
-            foreach(var worldEvent in worldEvents) worldEvent.Apply(this);
+            while(queuedWorldEvents.Any())
+            {
+                var nextEvent = queuedWorldEvents[0];
+
+                queuedWorldEvents.RemoveAt(0);
+                nextEvent.Apply(this);
+            }
+        }
+
+        public void AddWorldEvents(params WorldEvent[] events)
+        {
+            queuedWorldEvents.AddRange(events);
+
+            queuedWorldEvents = queuedWorldEvents
+                .OrderBy((worldEvent) => worldEvent.Timestamp)
+                .ToList();
         }
     }
 }
