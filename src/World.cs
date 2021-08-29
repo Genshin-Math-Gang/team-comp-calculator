@@ -55,7 +55,7 @@ namespace Tcc
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }
 
-        public void Hit(Timestamp timestamp, Element element, int mvIndex, StatsPage stats, Units.Unit unit, Types type, double reaction = Reaction.NONE, bool isHeavy = false, bool applyElement = true, bool isAoe = true, int bounces = 1, string description = "")
+        public void Hit(Timestamp timestamp, Element element, int mvIndex, SecondPassStatsPage stats, Units.Unit unit, Types type, int reaction = Reaction.NONE, bool isHeavy = false, bool applyElement = true, bool isAoe = true, int bounces = 1, string description = "")
         {
             double result = Reaction.NONE;
             double final_damage = 0;

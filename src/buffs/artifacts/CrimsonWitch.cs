@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Tcc.Elements;
 using Tcc.Stats;
 using Tcc.Units;
@@ -13,11 +14,11 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly FirstPassModifier MODIFIER_2PC = (_) => (Element.PYRO, 0.15);
 
-        static readonly FirstPassModifier MODIFIER_4PC_PASSIVE = (_) => new KeyedPercentBonus<Reaction>(
-            (Reaction.OVERLOADED, 40),
-            (Reaction.BURNING, 40),
-            (Reaction.MELT, 15),
-            (Reaction.VAPORIZE, 15)
+        static readonly FirstPassModifier MODIFIER_4PC_PASSIVE = (_) => new KeyedPercentBonus<int>(
+            (Reaction.OVERLOADED, 0.4),
+            (Reaction.BURNING, 0.4),
+            (Reaction.MELT, 0.15),
+            (Reaction.VAPORIZE, 0.15)
         );
 
         static readonly FirstPassModifier MODIFIER_4PC_STACK = (_) => (Element.PYRO, 0.075);

@@ -16,7 +16,7 @@ namespace Tcc.Enemy
             this.gauge = gauge ?? new Gauge();
         }
 
-        public double takeDamage (Timestamp timestamp, Element element, Types type, StatsPage stats_of_unit, Unit unit, int mvIndex, double reaction = Reaction.NONE, bool? isHeavy = false)
+        public double takeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage stats_of_unit, Unit unit, int mvIndex, int reaction = Reaction.NONE, bool? isHeavy = false)
         {
             var unitAbilityStats = unit.GetAbilityStats(stats_of_unit, type, this, timestamp);
             
@@ -48,7 +48,7 @@ namespace Tcc.Enemy
 
         private double DefenceCalculator (Timestamp timestamp, Element element, Types type, StatsPage stats_of_unit)
         {
-            return (stats_of_unit.Level + 100)/((1 - stats_of_unit.DEFReduction) * (stats.Level + 100) + stats_of_unit.Level + 100);
+            return (stats_of_unit.Level + 100)/((1/* TODO - stats_of_unit.DEFReduction*/) * (stats.Level + 100) + stats_of_unit.Level + 100);
         }
         
         public bool HasAura(Aura aura) => throw new NotImplementedException();

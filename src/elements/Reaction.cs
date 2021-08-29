@@ -2,23 +2,23 @@ namespace Tcc.Elements
 {
     public static class Reaction
     {
-        public const double MELT = 1;
-        public const double VAPORIZE = 2;
-        public const double OVERLOADED = -1;
-        public const double FREEZE = -2;
-        public const double ELECTROCHARGED = -3;
-        public const double SUPERCONDUCT = -4;
-        public const double SWIRL_PYRO = -5;
-        public const double SWIRL_HYDRO = -6;
-        public const double SWIRL_CRYO = -7;
-        public const double SWIRL_ELECTRO = -8;
-        public const double CRYSTALIZE_PYRO = -9;
-        public const double CRYSTALIZE_HYDRO = -10;
-        public const double CRYSTALIZE_CRYO = -11;
-        public const double CRYSTALIZE_ELECTRO = -12;
-        public const double BURNING = -13;
-        public const double SHATTERED = -14;
-        public const double NONE = 0;
+        public const int MELT = 1;
+        public const int VAPORIZE = 2;
+        public const int OVERLOADED = -1;
+        public const int FREEZE = -2;
+        public const int ELECTROCHARGED = -3;
+        public const int SUPERCONDUCT = -4;
+        public const int SWIRL_PYRO = -5;
+        public const int SWIRL_HYDRO = -6;
+        public const int SWIRL_CRYO = -7;
+        public const int SWIRL_ELECTRO = -8;
+        public const int CRYSTALIZE_PYRO = -9;
+        public const int CRYSTALIZE_HYDRO = -10;
+        public const int CRYSTALIZE_CRYO = -11;
+        public const int CRYSTALIZE_ELECTRO = -12;
+        public const int BURNING = -13;
+        public const int SHATTERED = -14;
+        public const int NONE = 0;
 
         public static double ReactionMultiplier (double reaction)
         {

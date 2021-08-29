@@ -6,6 +6,7 @@ using Tcc.Stats;
 using Tcc.Units;
 using Tcc.Enemy;
 using Tcc.Elements;
+using Tcc.Buffs.Artifacts;
 
 namespace Tcc
 {
@@ -16,11 +17,11 @@ namespace Tcc
             //System.Console.WriteLine("\n\nSimulating Xiangling's elmental skill (Guoba) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
             //Simulate_Xiangling_Guoba_With_Bennett_Snapshot();
 
-            //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental burst buff from her elemental skill (Eye of Stormy Judgement)");
-            //Simulate_Xiangling_Burst_With_Shogun_Snapshot();
+            System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental burst buff from her elemental skill (Eye of Stormy Judgement)");
+            Simulate_Xiangling_Burst_With_Shogun_Snapshot();
 
-            System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental skill buff from her lemental skill (Eye of Stormy Judgement) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
-            Simulate_Xiangling_burst_with_Shogun_And_Bennett_Snapshot();
+            //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental skill buff from her lemental skill (Eye of Stormy Judgement) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
+            //Simulate_Xiangling_burst_with_Shogun_And_Bennett_Snapshot();
         }
 
         static void Simulate_Xiangling_Burst_With_Shogun_Snapshot()
@@ -33,6 +34,10 @@ namespace Tcc
 
             World world = new World(enemies);
             world.SetUnits(shogun, xiangling, null, null);
+
+            var crimsonWitch = new CrimsonWitch();
+            crimsonWitch.Add2pc(world, xiangling);
+            crimsonWitch.Add4pc(world, xiangling);
 
             //Use Shogun skill
             world.AddCharacterEvent(new Timestamp(0), shogun.Skill);
@@ -47,7 +52,7 @@ namespace Tcc
     
             //Buff Shogun
             world.AddCharacterEvent(new Timestamp(4), (timestamp) => new List<WorldEvent> {
-                new WorldEvent(timestamp, (world) => world.AddBuff(timestamp, shogun, new BasicBuffFromUnit(new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), new Stats.Stats(energyRecharge: 0.5)), "test buff"))
+                new WorldEvent(timestamp, (world) => shogun.AddBuff(new PermanentBuff<FirstPassModifier>(new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), (_) => new GeneralStats(energyRecharge: 0.5))))
             });
 
             //Xiangling burst hit while off-field and post shogun buff

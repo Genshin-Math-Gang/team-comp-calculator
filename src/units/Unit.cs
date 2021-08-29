@@ -9,7 +9,7 @@ using Tcc.Weapons;
 
 namespace Tcc.Units
 {
-    public class Unit
+    public abstract class Unit
     {
         protected readonly int constellationLevel;
         protected readonly int burstEnergyCost;
@@ -32,7 +32,7 @@ namespace Tcc.Units
         // Hooks
         public event EventHandler<Timestamp> skillActivatedHook;
         public event EventHandler<Timestamp> burstActivatedHook;
-        public event EventHandler<(Timestamp timestamp, Reaction reaction)> triggeredReactionHook; // TODO Not fired by anything
+        public event EventHandler<(Timestamp timestamp, int reaction)> triggeredReactionHook; // TODO Not fired by anything
         public event EventHandler<(Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
 
         protected Unit(
@@ -77,15 +77,15 @@ namespace Tcc.Units
             return firstPassBuffs.Aggregate(new StatsPage(capacityStats), (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, capacityStats)));
         }
 
-        public StatsPage GetStatsPage(Timestamp timestamp)
+        public SecondPassStatsPage GetStatsPage(Timestamp timestamp)
         {
-            var firstPassStats = GetFirstPassStats(timestamp);
+            var stats = new SecondPassStatsPage(GetFirstPassStats(timestamp));
             secondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
-            return secondPassBuffs.Aggregate(firstPassStats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, firstPassStats)));
+            return secondPassBuffs.Aggregate(stats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
         }
 
-        public AbilityStats GetAbilityStats(StatsPage statsFromUnit, Types type, Enemy.Enemy enemy, Timestamp timestamp)
+        public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Enemy.Enemy enemy, Timestamp timestamp)
         {
             enemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -94,12 +94,12 @@ namespace Tcc.Units
 
             if (enemy != null)
             {
-                foreach (var buff in enemyBasedBuffs) result += buff.GetModifier((this, timestamp, enemy));
+                foreach (var buff in enemyBasedBuffs) result += buff.GetModifier((this, timestamp, enemy, statsFromUnit.firstPassStats));
             }
 
             if (abilityBuffs.TryGetValue(type, out var abilityBuffList))
             {
-                foreach (var buff in abilityBuffList) result += buff.GetModifier((this, timestamp));
+                foreach (var buff in abilityBuffList) result += buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats));
             }
 
             return result;
@@ -159,7 +159,7 @@ namespace Tcc.Units
             return new WorldEvent(timestamp, (world) => burstActivatedHook?.Invoke(this, timestamp));
         }
 
-        protected WorldEvent TriggeredReaction(Timestamp timestamp, Reaction reaction)
+        protected WorldEvent TriggeredReaction(Timestamp timestamp, int reaction)
         {
             return new WorldEvent(timestamp, (world) => triggeredReactionHook?.Invoke(this, (timestamp, reaction)));
         }
@@ -168,5 +168,7 @@ namespace Tcc.Units
         {
             return new WorldEvent(timestamp, (world) => particleCollectedHook?.Invoke(this, (timestamp, element)));
         }
+
+        public abstract Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents();
     }
 }

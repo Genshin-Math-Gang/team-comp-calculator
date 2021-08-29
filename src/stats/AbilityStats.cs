@@ -8,11 +8,14 @@ namespace Tcc.Stats
         readonly GeneralStats generalStats;
         readonly double[] motionValues;
 
-        public AbilityStats(GeneralStats generalStats = null, double[] motionValues = null)
+        public AbilityStats(GeneralStats generalStats = null, double[] motionValues = null, Timestamp icd = null)
         {
             this.generalStats = generalStats ?? new GeneralStats();
             this.motionValues = motionValues;
+            this.Icd = icd ?? new Timestamp(0);
         }
+
+        public Timestamp Icd { get; }
 
         public double CalculateHitDamage(int mvIndex, Element element)
         {
@@ -20,6 +23,8 @@ namespace Tcc.Stats
 
             return motionValues[mvIndex] * stats.Attack * stats.DamagePercent * (1 + stats.CritRate * stats.CritDamage) * stats.IndependentMultiplier;
         }
+
+        public double GetMotionValue(int mvIndex) => motionValues[mvIndex];
 
         public static AbilityStats operator +(AbilityStats first, AbilityStats second)
         {

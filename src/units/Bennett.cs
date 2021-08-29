@@ -52,10 +52,10 @@ namespace Tcc.Units
                 var startTime = timestamp + tick * BUFF_FREQUENCY;
 
                 // TODO Self-apply pyro
-                events.Add(new AddBuffOnField(startTime, () => CreateBurstBuff(startTime), "Inspiration Field"));
+                events.Add(new WorldEvent(startTime, (world) => world.OnFieldUnit.AddBuff(CreateBurstBuff(startTime))));
 
                 // Deal burst damage after modifier snapshot and first application,
-                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStats(Types.BURST), this, Types.BURST, false, true, true, 1, "Bennett burst"));
+                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, false, true, true, 1, "Bennett burst"));
             }
 
             return events;
@@ -64,7 +64,7 @@ namespace Tcc.Units
         Buff<SecondPassModifier> CreateBurstBuff(Timestamp startTime)
         {
             var stats = burstBuffSnapshot.GetStats(startTime);
-            var modifier = new Stats.Stats(flatAttack: stats.Attack.Base * stats.MotionValues[2]);
+            var modifier = new GeneralStats(flatAttack: stats.Attack.Base * startingAbilityStats[Types.BURST].GetMotionValue(2));
 
             return new RefreshableBuff<SecondPassModifier>(BURST_BUFF_ID, startTime + BUFF_DURATION, (_) => modifier);
         }
@@ -72,6 +72,14 @@ namespace Tcc.Units
         public override string ToString()
         {
             return "Bennett";
+        }
+
+        public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        {
+            var dict = new Dictionary<string, Func<Timestamp, List<WorldEvent>>>();
+            dict.Add("Burst", Burst);
+
+            return dict;
         }
     }
 }

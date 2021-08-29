@@ -13,7 +13,7 @@ namespace Tcc.Stats
             this.generalStats = new GeneralStats();
         }
 
-        StatsPage(CapacityStats capacityStats, GeneralStats generalStats)
+        protected StatsPage(CapacityStats capacityStats, GeneralStats generalStats)
         {
             this.capacityStats = capacityStats;
             this.generalStats = generalStats;

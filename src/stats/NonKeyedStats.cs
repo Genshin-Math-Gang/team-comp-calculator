@@ -85,7 +85,7 @@ namespace Tcc.Stats
                 cdReduction: first.CdReduction + second.CdReduction,
                 shieldStrength: first.ShieldStrength + second.ShieldStrength,
                 damagePercent: first.DamagePercent + second.DamagePercent,
-                independentMultiplier: first.IndependentMultiplier + second.IndependentMultiplier
+                independentMultiplier: first.IndependentMultiplier * second.IndependentMultiplier
             );
         }
     }

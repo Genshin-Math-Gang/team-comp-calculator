@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Tcc.Elements;
 using Tcc.Events;
@@ -28,7 +29,7 @@ namespace Tcc.Units
             charged: new AbilityStats(motionValues: new double[] {2.4055}),
             plunge: new AbilityStats(motionValues: new double[] {1.2638,2.527,3.1564}),
             skill: new AbilityStats(motionValues: new double[] {2.003}),
-            burst: new AbilityStats(motionValues: new double[] {1.296,1.584,1.9728,2.016}, new Timestamp(0))
+            burst: new AbilityStats(motionValues: new double[] {1.296,1.584,1.9728,2.016}, icd: new Timestamp(0))
         ) {
             this.skillSnapshot = new SnapshottedStats(this, Types.SKILL);
             this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
@@ -38,9 +39,9 @@ namespace Tcc.Units
         {
             return new List<WorldEvent> {
                 BurstActivated(timestamp),
-                new Hit(timestamp, Element.PYRO, 0, GetStats(Types.BURST), this, Types.BURST, false, true, true, 1, "nado initial 1st hit"),
-                new Hit(timestamp + 0.5, Element.PYRO, 1, GetStats(Types.BURST), this, Types.BURST, false, true, true, 1, "nado initial 2nd hit"),
-                new Hit(timestamp + 1, Element.PYRO, 2, GetStats(Types.BURST), this, Types.BURST, false, true, true, 1, "nado initial 3rd hit"),
+                new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, false, true, true, 1, "nado initial 1st hit"),
+                new Hit(timestamp + 0.5, Element.PYRO, 1, GetStatsPage, this, Types.BURST, false, true, true, 1, "nado initial 2nd hit"),
+                new Hit(timestamp + 1, Element.PYRO, 2, GetStatsPage, this, Types.BURST, false, true, true, 1, "nado initial 3rd hit"),
                 burstSnapshot.Snapshot(timestamp + 1)
             };
         }
@@ -65,6 +66,16 @@ namespace Tcc.Units
         public override string ToString()
         {
             return "Xiangling";
+        }
+
+        public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        {
+            var dict = new Dictionary<string, Func<Timestamp, List<WorldEvent>>>();
+            dict.Add("Initial Burst", InitialBurst);
+            dict.Add("Burst Hit", BurstHit);
+            dict.Add("Skill", Skill);
+
+            return dict;
         }
     }
 }

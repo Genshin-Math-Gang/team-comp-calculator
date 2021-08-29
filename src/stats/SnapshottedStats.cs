@@ -8,7 +8,7 @@ namespace Tcc.Stats
         readonly Unit unit;
         readonly Types type;
 
-        StatsPage stats;
+        SecondPassStatsPage stats;
 
         public SnapshottedStats(Unit unit, Types type)
         {
@@ -16,7 +16,7 @@ namespace Tcc.Stats
             this.type = type;
         }
 
-        public StatsPage GetStats(Timestamp _) => stats;
+        public SecondPassStatsPage GetStats(Timestamp _) => stats;
 
         public WorldEvent Snapshot(Timestamp timestamp)
         {

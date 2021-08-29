@@ -80,5 +80,13 @@ namespace Tcc.Units
         {
             return "Shogun";
         }
+
+        public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        {
+            var dict = new Dictionary<string, Func<Timestamp, List<WorldEvent>>>();
+            dict.Add("Skill", Skill);
+
+            return dict;
+        }
     }
 }
