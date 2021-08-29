@@ -12,7 +12,6 @@ namespace Tcc
 {
     public class World
     {
-        Unit onFieldUnit;
         List<Unit> units;
         List<CharacterEvent> characterEvents;
         List<WorldEvent> queuedWorldEvents;
@@ -29,9 +28,11 @@ namespace Tcc
             this.enemies = enemies;
         }
 
+        public Unit OnFieldUnit { get; private set; }
+
         public void SetUnits(Unit onFieldUnit, Unit unit2, Unit unit3, Unit unit4)
         {
-            this.onFieldUnit = onFieldUnit;
+            this.OnFieldUnit = onFieldUnit;
             this.units = new List<Unit> { onFieldUnit, unit2, unit3, unit4 };
         }
 
@@ -47,14 +48,14 @@ namespace Tcc
             characterEvents.Add(new CharacterEvent(timestamp, characterAction));
         }
 
-        public void SwitchUnit(Timestamp timestamp, Units.Unit unit)
+        public void SwitchUnit(Timestamp timestamp, Unit unit)
         {
-            unitSwapped?.Invoke(this, (onFieldUnit, unit, timestamp));
-            this.onFieldUnit = unit;
+            unitSwapped?.Invoke(this, (OnFieldUnit, unit, timestamp));
+            OnFieldUnit = unit;
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }
 
-        public void Hit(Timestamp timestamp, Elements.Element element, int mvIndex, Stats.Stats stats, Units.Unit unit, Types type, double reaction = Reaction.NONE, bool isHeavy = false, bool applyElement = true, bool isAoe = true, int bounces = 1, string description = "")
+        public void Hit(Timestamp timestamp, Element element, int mvIndex, StatsPage stats, Units.Unit unit, Types type, double reaction = Reaction.NONE, bool isHeavy = false, bool applyElement = true, bool isAoe = true, int bounces = 1, string description = "")
         {
             double result = Reaction.NONE;
             double final_damage = 0;
@@ -98,32 +99,32 @@ namespace Tcc
             }
         }
 
-        public void AddBuff(Timestamp timestamp, Units.Unit unit, BuffFromUnit buff, string description)
-        {
-            unit.AddBuff(buff);
+        //public void AddBuff(Timestamp timestamp, Units.Unit unit, BuffFromUnit buff, string description)
+        //{
+        //    unit.AddBuff(buff);
 
-            if (description == "") Console.WriteLine($"Buff added to {unit} at {timestamp}");
-            else Console.WriteLine($"Buff added by {description} to {unit} at {timestamp}");
-        }
+        //    if (description == "") Console.WriteLine($"Buff added to {unit} at {timestamp}");
+        //    else Console.WriteLine($"Buff added by {description} to {unit} at {timestamp}");
+        //}
 
-        public void AddBuffOnField(Timestamp timestamp, BuffFromUnit buff, string description)
-        {
-            this.onFieldUnit.AddBuff(buff);
+        //public void AddBuffOnField(Timestamp timestamp, BuffFromUnit buff, string description)
+        //{
+        //    this.onFieldUnit.AddBuff(buff);
 
-            if (description == "") Console.WriteLine($"Buff added to {this.onFieldUnit} at {timestamp}");
-            else Console.WriteLine($"Buff added by {description} to {this.onFieldUnit} at {timestamp}");
-        }
+        //    if (description == "") Console.WriteLine($"Buff added to {this.onFieldUnit} at {timestamp}");
+        //    else Console.WriteLine($"Buff added by {description} to {this.onFieldUnit} at {timestamp}");
+        //}
 
-        public void AddBuffGlobal(Timestamp timestamp, BuffFromUnit buff, string description)
-        {
-            foreach(Unit x in units)
-            {
-                if (x != null) x.AddBuff(buff);
-            }
+        //public void AddBuffGlobal(Timestamp timestamp, BuffFromUnit buff, string description)
+        //{
+        //    foreach(Unit x in units)
+        //    {
+        //        if (x != null) x.AddBuff(buff);
+        //    }
 
-            if (description == "") Console.WriteLine($"Buff added at {timestamp}");
-            else Console.WriteLine($"Buff added by {description} at {timestamp}");
-        }
+        //    if (description == "") Console.WriteLine($"Buff added at {timestamp}");
+        //    else Console.WriteLine($"Buff added by {description} at {timestamp}");
+        //}
 
         public void Simulate()
         {

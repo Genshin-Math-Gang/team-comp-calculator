@@ -1,4 +1,3 @@
-using System;
 using Tcc.Elements;
 using Tcc.Stats;
 
@@ -7,7 +6,7 @@ namespace Tcc.Events
     public class Overload: WorldEvent
     {
         public Overload(
-            Timestamp timestamp, Stats.Stats stats, Units.Unit unit): 
+            Timestamp timestamp, StatsPage stats, Units.Unit unit): 
             base(
             timestamp,
 

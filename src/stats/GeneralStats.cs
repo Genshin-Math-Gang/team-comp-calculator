@@ -14,19 +14,21 @@ namespace Tcc.Stats
         // Attributes not listed on stats page
         public KeyedPercentBonus<Reaction> ReactionBonus { get; }
 
-        public GeneralStats (
+        public GeneralStats(
+            int level = 0,
             double baseAttack = 0, double flatAttack = 0, double attackPercent = 0,
             double baseDefence = 0, double flatDefence = 0, double defencePercent = 0,
             double elementalMastery = 0,
             double critRate = 0, double critDamage = 0,
             double healingBonus = 0, double incomingHealingBonus = 0,
             double energyRecharge = 0, double cdReduction = 0, double shieldStrength = 0,
-            double damagePercent = 0, double independentMultiplier = 0,
+            double damagePercent = 0, double independentMultiplier = 1,
             KeyedStatBonus<Element> elementalBonus = null,
             KeyedPercentBonus<Element> elementalResistance = null,
             KeyedPercentBonus<Reaction> reactionBonus = null
         ): this(
             nonKeyedStats: new NonKeyedStats(
+                level: level,
                 baseAttack: baseAttack,
                 flatAttack: flatAttack,
                 attackPercent: attackPercent,
@@ -71,6 +73,7 @@ namespace Tcc.Stats
             );
         }
 
+        public int Level => NonKeyedStats.Level;
         public MultipliableStat Attack => NonKeyedStats.Attack;
         public MultipliableStat Defence => NonKeyedStats.Defence;
         public double ElementalMastery => NonKeyedStats.ElementalMastery;

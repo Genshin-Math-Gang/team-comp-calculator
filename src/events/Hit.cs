@@ -7,7 +7,7 @@ namespace Tcc.Events
     public class Hit: WorldEvent
     {
         public Hit(
-            Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, Stats.Stats> stats,
+            Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, StatsPage> stats,
              Units.Unit unit, Types type, bool isHeavy = false, bool applyElement = false,
               bool isAoe = true, int bounces = 1, string description = ""): 
             base(

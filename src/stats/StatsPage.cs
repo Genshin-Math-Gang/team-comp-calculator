@@ -4,8 +4,8 @@ namespace Tcc.Stats
 {
     public class StatsPage
     {
-        readonly CapacityStats capacityStats;
-        readonly GeneralStats generalStats;
+        public readonly CapacityStats capacityStats;
+        public readonly GeneralStats generalStats;
 
         public StatsPage(CapacityStats capacityStats)
         {
@@ -22,6 +22,7 @@ namespace Tcc.Stats
         public MultipliableStat MaxHp => capacityStats.Hp;
         public int MaxEnergy => capacityStats.Energy;
 
+        public int Level => generalStats.Level;
         public MultipliableStat Attack => generalStats.Attack;
         public MultipliableStat Defence => generalStats.Defence;
         public double ElementalMastery => generalStats.ElementalMastery;

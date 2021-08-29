@@ -3,6 +3,7 @@ namespace Tcc.Stats
     public class NonKeyedStats
     {
         // "Base" stats
+        public int Level { get; } // Inclusion debatable, might eventually be buffable
         public MultipliableStat Attack { get; }
         public MultipliableStat Defence { get; }
         public double ElementalMastery { get; }
@@ -21,6 +22,7 @@ namespace Tcc.Stats
         public double IndependentMultiplier { get; }
 
         public NonKeyedStats(
+            int level = 0,
             double baseAttack = 0, double flatAttack = 0, double attackPercent = 0,
             double baseDefence = 0, double flatDefence = 0, double defencePercent = 0,
             double elementalMastery = 0,
@@ -29,6 +31,7 @@ namespace Tcc.Stats
             double energyRecharge = 0, double cdReduction = 0, double shieldStrength = 0,
             double damagePercent = 0, double independentMultiplier = 1
         ): this(
+            level: level,
             attack: new MultipliableStat(baseValue: baseAttack, flatBonus: flatAttack, percentBonus: attackPercent),
             defence: new MultipliableStat(baseValue: baseDefence, flatBonus: flatDefence, percentBonus: defencePercent),
             elementalMastery: elementalMastery,
@@ -45,12 +48,14 @@ namespace Tcc.Stats
         }
 
         NonKeyedStats(
+            int level,
             MultipliableStat attack, MultipliableStat defence, double elementalMastery,
             double critRate, double critDamage,
             double healingBonus, double incomingHealingBonus,
             double energyRecharge, double cdReduction, double shieldStrength,
             double damagePercent, double independentMultiplier
         ) {
+            this.Level = level;
             this.Attack = attack;
             this.Defence = defence;
             this.ElementalMastery = elementalMastery;
@@ -68,6 +73,7 @@ namespace Tcc.Stats
         public static NonKeyedStats operator +(NonKeyedStats first, NonKeyedStats second)
         {
             return new NonKeyedStats(
+                level: first.Level + second.Level,
                 attack: first.Attack + second.Attack,
                 defence: first.Defence + second.Defence,
                 elementalMastery: first.ElementalMastery + second.ElementalMastery,

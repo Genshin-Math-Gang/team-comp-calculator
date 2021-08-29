@@ -4,7 +4,6 @@ using Tcc.Buffs;
 using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
-using Tcc.Elements;
 
 namespace Tcc.Units
 {
@@ -63,7 +62,7 @@ namespace Tcc.Units
             }));
 
             events.Add(new WorldEvent(expiryTime, (world) => world.unitSwapped -= newBuffListener));
-            events.Add(new Hit(timestamp, Elements.Element.ELECTRO, 0, this.GetStats(Types.SKILL), this, Types.SKILL, false, true, true, 1, "shogun E"));
+            events.Add(new Hit(timestamp, Element.ELECTRO, 0, GetStatsPage, this, Types.SKILL, false, true, true, 1, "shogun E"));
 
             return events;
         }
@@ -73,7 +72,7 @@ namespace Tcc.Units
             return new RefreshableBuff<AbilityModifier>(
                 SKILL_BUFF_ID,
                 expiryTime: expiryTime,
-                (data) => new AbilityStats(damagePercentBonus: GetFirstPassStats(data.timestamp).EnergyRecharge * 0.3) // TODO Will become part of burst MVs
+                (data) => new GeneralStats(damagePercent: GetFirstPassStats(data.timestamp).EnergyRecharge * 0.3) // TODO Will become part of burst MVs
             );
         }
 

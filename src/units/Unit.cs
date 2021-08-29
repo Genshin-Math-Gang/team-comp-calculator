@@ -20,12 +20,13 @@ namespace Tcc.Units
         protected readonly GeneralStats startingGeneralStats;
         protected readonly Dictionary<Types, AbilityStats> startingAbilityStats;
 
-        // Buffs
+        // Snapshottable buffs
         protected readonly List<Buff<CapacityModifier>> capacityBuffs = new List<Buff<CapacityModifier>>();
         protected readonly List<Buff<FirstPassModifier>> firstPassBuffs = new List<Buff<FirstPassModifier>>();
         protected readonly List<Buff<SecondPassModifier>> secondPassBuffs = new List<Buff<SecondPassModifier>>();
-        protected readonly List<Buff<EnemyBasedModifier>> enemyBasedBuffs = new List<Buff<EnemyBasedModifier>>();
 
+        // Unsnapshottable buffs
+        protected readonly List<Buff<EnemyBasedModifier>> enemyBasedBuffs = new List<Buff<EnemyBasedModifier>>();
         protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> abilityBuffs = new Dictionary<Types, List<Buff<AbilityModifier>>>();
 
         // Hooks
@@ -68,7 +69,7 @@ namespace Tcc.Units
 
         public CapacityStats CapacityStats => capacityBuffs.Aggregate(startingCapacityStats, (total, buff) => total + buff.GetModifier());
 
-        protected StatsPage GetFirstPassStats(Timestamp timestamp)
+        public StatsPage GetFirstPassStats(Timestamp timestamp)
         {
             var capacityStats = CapacityStats;
             firstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -76,7 +77,7 @@ namespace Tcc.Units
             return firstPassBuffs.Aggregate(new StatsPage(capacityStats), (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, capacityStats)));
         }
 
-        protected StatsPage GetSecondPassStats(Timestamp timestamp)
+        public StatsPage GetStatsPage(Timestamp timestamp)
         {
             var firstPassStats = GetFirstPassStats(timestamp);
             secondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -84,73 +85,25 @@ namespace Tcc.Units
             return secondPassBuffs.Aggregate(firstPassStats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, firstPassStats)));
         }
 
-        //public Stats.Stats GetStats(Types type, Enemy.Enemy enemy, Timestamp timestamp)
-        //{
-        //    var result = GetStatsFromUnit(type, timestamp);
-        //    result = AddStatsFromEnemy(result, type, enemy, timestamp);
+        public AbilityStats GetAbilityStats(StatsPage statsFromUnit, Types type, Enemy.Enemy enemy, Timestamp timestamp)
+        {
+            enemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
-        //    return result;
-        //}
+            AbilityStats result = statsFromUnit.generalStats;
 
-        //public Stats.Stats GetStatsFromUnitWithoutScaled(Types type, Timestamp timestamp)
-        //{
-        //    buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
+            if (enemy != null)
+            {
+                foreach (var buff in enemyBasedBuffs) result += buff.GetModifier((this, timestamp, enemy));
+            }
 
-        //    var firstPassStats = modifiers[type] + stats;
-        //    foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
+            if (abilityBuffs.TryGetValue(type, out var abilityBuffList))
+            {
+                foreach (var buff in abilityBuffList) result += buff.GetModifier((this, timestamp));
+            }
 
-        //    return firstPassStats;
-        //}
-
-        //public Stats.Stats GetStatsFromUnit(Types type, Timestamp timestamp)
-        //{
-        //    buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
-        //    buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
-
-        //    var firstPassStats = modifiers[type] + stats;
-        //    foreach(var buff in buffsFromUnit) firstPassStats += buff.GetModifier(this, type);
-
-        //    var result = firstPassStats;
-        //    foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, timestamp, type);
-
-        //    return result;
-        //}
-
-        //public Stats.Stats SnapshotStats(Timestamp timestamp)
-        //{
-        //    buffsFromUnit.RemoveAll((buff) => buff.HasExpired(timestamp));
-        //    buffsFromStats.RemoveAll((buff) => buff.HasExpired(timestamp));
-
-        //    var firstPassStats = stats;
-        //    foreach(var buff in buffsFromUnit) 
-        //    {
-        //        firstPassStats += buff.GetModifier(this, Types.GENERIC);
-        //    }
-
-        //    var result = firstPassStats;
-        //    foreach(var buff in buffsFromStats) result += buff.GetModifier(this, firstPassStats, timestamp, Types.GENERIC);
-
-        //    return result;
-        //}
-
-        //public Stats.Stats AddStatsFromEnemy(Stats.Stats statsFromUnit, Types type, Enemy.Enemy enemy, Timestamp timestamp)
-        //{
-        //    buffsFromEnemy.RemoveAll((buff) => buff.HasExpired(timestamp));
-
-        //    var result = statsFromUnit;
-
-        //    if(enemy != null)
-        //    {
-        //        foreach(var buff in buffsFromEnemy) result += buff.GetModifier(enemy, type);
-        //    }
-
-        //    return result;
-        //}
-
-        //protected Func<Enemy.Enemy, Timestamp, Stats.Stats> GetStats(Types type)
-        //{
-        //    return (enemy, timestamp) => GetStats(type, enemy, timestamp);
-        //}
+            return result;
+        }
 
         public void AddBuff(Buff<CapacityModifier> buff) => buff.AddToList(capacityBuffs);
         public void AddBuff(Buff<FirstPassModifier> buff) => buff.AddToList(firstPassBuffs);
