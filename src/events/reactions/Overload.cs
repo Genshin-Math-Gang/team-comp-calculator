@@ -13,7 +13,7 @@ namespace Tcc.Events
 
             (world) => world.Hit(
                 timestamp, Element.PYRO, 0, stats, 
-                unit, Types.TRANSFORMATIVE, Reaction.OVERLOADED, true, true, false, 1, "overload")
+                unit, Types.TRANSFORMATIVE, Reaction.OVERLOADED, true, false, true, 1, "overload")
         ) {
         }
     }

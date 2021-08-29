@@ -18,8 +18,7 @@ namespace Tcc.Elements
         private Timestamp FreezeDuration = new Timestamp(0);
         private Timestamp FreezeAura = new Timestamp(0);
 
-        public Gauge()
-        {        }
+        public Gauge() {}
         
         public double ElementApplied(Timestamp timestamp, Element elementType, Units.Unit unit, Types type, bool isHeavy=false)
         {

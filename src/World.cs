@@ -64,7 +64,7 @@ namespace Tcc
                         {
                             result = enemy.gauge.ElementApplied(timestamp, element, unit, type, isHeavy);
                         }
-                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy);
+                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy) * (result > 0 ? result : 1);
                     }
                 }
                 else
@@ -76,7 +76,7 @@ namespace Tcc
                         {
                             result = enemy.gauge.ElementApplied(timestamp, element, unit, type, isHeavy);
                         }
-                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy);
+                        final_damage += enemy.takeDamage(timestamp, element, type, stats, unit, mvIndex, reaction, isHeavy) * (result > 0 ? result : 1);
                         i++;
                     }
                 }
