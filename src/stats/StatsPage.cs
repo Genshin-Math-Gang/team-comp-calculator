@@ -32,7 +32,9 @@ namespace Tcc.Stats
         public double EnergyRecharge => generalStats.EnergyRecharge;
         public double CdReduction => generalStats.CdReduction;
         public double ShieldStrength => generalStats.ShieldStrength;
-        public KeyedPercentBonus<Element> ElementalBonus => generalStats.ElementalBonus;
+        public double DamagePercent => generalStats.DamagePercent;
+        public double IndependentMultiplier => generalStats.IndependentMultiplier;
+        public KeyedStatBonus<Element> ElementalBonus => generalStats.ElementalBonus;
         public KeyedPercentBonus<Element> ElementalResistance => generalStats.ElementalResistance;
 
         public static StatsPage operator +(StatsPage page, GeneralStats generalStats)

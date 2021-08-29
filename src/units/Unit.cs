@@ -13,7 +13,7 @@ namespace Tcc.Units
     {
         protected readonly int constellationLevel;
         protected readonly int burstEnergyCost;
-        protected readonly Element element;
+        public readonly Element element;
 
         // Base stats
         protected readonly CapacityStats startingCapacityStats;
@@ -26,9 +26,7 @@ namespace Tcc.Units
         protected readonly List<Buff<SecondPassModifier>> secondPassBuffs = new List<Buff<SecondPassModifier>>();
         protected readonly List<Buff<EnemyBasedModifier>> enemyBasedBuffs = new List<Buff<EnemyBasedModifier>>();
 
-        protected readonly Dictionary<Element, List<Buff<ElementModifier>>> elementBuffs = new Dictionary<Element, List<Buff<ElementModifier>>>();
         protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> abilityBuffs = new Dictionary<Types, List<Buff<AbilityModifier>>>();
-        protected readonly Dictionary<Reaction, List<Buff<ReactionPercentModifier>>> reactionPercentBuffs = new Dictionary<Reaction, List<Buff<ReactionPercentModifier>>>();
 
         // Hooks
         public event EventHandler<Timestamp> skillActivatedHook;
@@ -159,23 +157,6 @@ namespace Tcc.Units
         public void AddBuff(Buff<SecondPassModifier> buff) => buff.AddToList(secondPassBuffs);
         public void AddBuff(Buff<EnemyBasedModifier> buff) => buff.AddToList(enemyBasedBuffs);
 
-        public void AddBuff(Buff<ElementModifier> buff, params Element[] elements)
-        {
-            foreach (var element in elements)
-            {
-                if (elementBuffs.TryGetValue(element, out var list))
-                {
-                    buff.AddToList(list);
-                }
-                else
-                {
-                    list = new List<Buff<ElementModifier>>();
-                    buff.AddToList(list);
-                    elementBuffs.Add(element, list);
-                }
-            }
-        }
-
         public void AddBuff(Buff<AbilityModifier> buff, params Types[] abilityTypes)
         {
             foreach (var abilityType in abilityTypes)
@@ -193,32 +174,13 @@ namespace Tcc.Units
             }
         }
 
-        public void AddBuff(Buff<ReactionPercentModifier> buff, params Reaction[] reactions)
-        {
-            foreach (var reaction in reactions)
-            {
-                if (reactionPercentBuffs.TryGetValue(reaction, out var list))
-                {
-                    buff.AddToList(list);
-                }
-                else
-                {
-                    list = new List<Buff<ReactionPercentModifier>>();
-                    buff.AddToList(list);
-                    reactionPercentBuffs.Add(reaction, list);
-                }
-            }
-        }
-
         public int GetBuffCount(Guid id)
         {
             return capacityBuffs.Count((buff) => buff.id == id)
                 + firstPassBuffs.Count((buff) => buff.id == id)
                 + secondPassBuffs.Count((buff) => buff.id == id)
                 + enemyBasedBuffs.Count((buff) => buff.id == id)
-                + elementBuffs.Values.SelectMany((list) => list).Distinct().Count((buff) => buff.id == id)
-                + abilityBuffs.Values.SelectMany((list) => list).Distinct().Count((buff) => buff.id == id)
-                + reactionPercentBuffs.Values.SelectMany((list) => list).Distinct().Count((buff) => buff.id == id);
+                + abilityBuffs.Values.SelectMany((list) => list).Distinct().Count((buff) => buff.id == id);
         }
 
         public void RemoveAllBuffs(Guid id)
@@ -228,9 +190,7 @@ namespace Tcc.Units
             secondPassBuffs.RemoveAll((buff) => buff.id == id);
             enemyBasedBuffs.RemoveAll((buff) => buff.id == id);
 
-            foreach (var list in elementBuffs.Values) list.RemoveAll((buff) => buff.id == id);
             foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.id == id);
-            foreach (var list in reactionPercentBuffs.Values) list.RemoveAll((buff) => buff.id == id);
         }
 
         public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, CapacityStats.Energy);

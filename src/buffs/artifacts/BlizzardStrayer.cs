@@ -8,19 +8,18 @@ namespace Tcc.Buffs.Artifacts
     public class BlizzardStrayer: ArtifactSet
     {
         static readonly Guid ID_2PC = new Guid("9da2cd66-4823-49ba-911e-49cb3e84a2f3");
-        static readonly Guid ID_4PC_IF_CRYO = new Guid("b995f2bd-99be-4abe-8ea9-3d2c8eedea4a");
-        static readonly Guid ID_4PC_IF_FROZEN = new Guid("a9490516-9222-4071-a2d8-82fd2e14c72a");
+        static readonly Guid ID_4PC = new Guid("b995f2bd-99be-4abe-8ea9-3d2c8eedea4a");
 
-        static readonly Stats.Stats MODIFIER_2PC = new KeyedPercentBonus<Element>(Element.CRYO, 0.15);
-        static readonly Stats.Stats MODIFIER_4PC_IF_CRYO = new Stats.Stats(critRate: 0.2);
-        static readonly Stats.Stats MODIFIER_4PC_IF_FROZEN = new Stats.Stats(critRate: 0.2);
+        static readonly FirstPassModifier MODIFIER_2PC = (_) => (Element.CRYO, 0.15);
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new BasicBuffFromUnit(ID_2PC, MODIFIER_2PC));
-
-        public override void Add4pc(World world, Unit unit)
+        static readonly EnemyBasedModifier MODIFIER_4PC = (data) =>
         {
-            unit.AddBuff(new BasicBuffFromEnemy(ID_4PC_IF_CRYO, (enemy) => enemy.HasAura(Aura.CRYO), MODIFIER_4PC_IF_CRYO));
-            unit.AddBuff(new BasicBuffFromEnemy(ID_4PC_IF_FROZEN, (enemy) => enemy.HasAura(Aura.FROZEN), MODIFIER_4PC_IF_FROZEN));
-        }
+            if (data.enemy.HasAura(Aura.FROZEN)) return new GeneralStats(critRate: 0.4);
+            if (data.enemy.HasAura(Aura.CRYO)) return new GeneralStats(critRate: 0.2);
+            return new GeneralStats();
+        };
+
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));
+        public override void Add4pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<EnemyBasedModifier>(ID_4PC, MODIFIER_4PC));
     }
 }
