@@ -22,7 +22,7 @@ namespace Tcc.Stats
         {
             var stats = generalStats.NonKeyedStats + generalStats.ElementalBonus.GetStatBonus(element);
 
-            return motionValues[mvIndex] * stats.Attack * stats.DamagePercent * (1 + stats.CritRate * stats.CritDamage) * stats.IndependentMultiplier;
+            return motionValues[mvIndex] * stats.Attack * (1 + stats.DamagePercent) * (1 + stats.CritRate * stats.CritDamage) * stats.IndependentMultiplier;
         }
 
         public double GetMotionValue(int mvIndex) => motionValues[mvIndex];

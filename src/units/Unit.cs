@@ -74,7 +74,7 @@ namespace Tcc.Units
             var capacityStats = CapacityStats;
             firstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
-            return firstPassBuffs.Aggregate(new StatsPage(capacityStats), (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, capacityStats)));
+            return firstPassBuffs.Aggregate(new StatsPage(capacityStats, startingGeneralStats), (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, capacityStats)));
         }
 
         public SecondPassStatsPage GetStatsPage(Timestamp timestamp)
@@ -91,6 +91,8 @@ namespace Tcc.Units
             foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
             AbilityStats result = statsFromUnit.generalStats;
+
+            if (startingAbilityStats.TryGetValue(type, out var startingStats)) result += startingStats;
 
             if (enemy != null)
             {

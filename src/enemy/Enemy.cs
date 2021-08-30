@@ -49,7 +49,7 @@ namespace Tcc.Enemy
 
         private double DefenceCalculator (Timestamp timestamp, Element element, Types type, StatsPage stats_of_unit)
         {
-            return (stats_of_unit.Level + 100)/((1/* TODO - stats_of_unit.DEFReduction*/) * (stats.Level + 100) + stats_of_unit.Level + 100);
+            return (stats_of_unit.Level + 100d)/((1/* TODO - stats_of_unit.DEFReduction*/) * (stats.Level + 100) + stats_of_unit.Level + 100);
         }
         
         public bool HasAura(Aura aura) => throw new NotImplementedException();

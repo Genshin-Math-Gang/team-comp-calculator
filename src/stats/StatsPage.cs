@@ -7,13 +7,7 @@ namespace Tcc.Stats
         public readonly CapacityStats capacityStats;
         public readonly GeneralStats generalStats;
 
-        public StatsPage(CapacityStats capacityStats)
-        {
-            this.capacityStats = capacityStats;
-            this.generalStats = new GeneralStats();
-        }
-
-        protected StatsPage(CapacityStats capacityStats, GeneralStats generalStats)
+        public StatsPage(CapacityStats capacityStats, GeneralStats generalStats)
         {
             this.capacityStats = capacityStats;
             this.generalStats = generalStats;

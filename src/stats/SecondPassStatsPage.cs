@@ -5,7 +5,7 @@ namespace Tcc.Stats
         public readonly StatsPage firstPassStats;
 
         public SecondPassStatsPage(StatsPage firstPassStats)
-            : base(firstPassStats.capacityStats)
+            : base(firstPassStats.capacityStats, firstPassStats.generalStats)
         {
             this.firstPassStats = firstPassStats;
         }
