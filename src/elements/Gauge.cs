@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Tcc.Stats;
+using Tcc.Events;
 
 namespace Tcc.Elements
 {
@@ -7,62 +9,72 @@ namespace Tcc.Elements
     // electro and hydro can coexist, frozen is weird 
     // for now i'm just going to assume valid constructions are given
     public class Gauge
-    {
-        
-        private Dictionary<Element, GaugeElement> gaugeDict;
-        private double LastChecked { get; set; }
+    {        
+        private Dictionary<Element, GaugeElement> gaugeDict = new Dictionary<Element, GaugeElement>();
+        private Timestamp LastChecked = new Timestamp(0);
+        private Dictionary<Tuple<Units.Unit, Types>, ICD> ICDtimer = new Dictionary<Tuple<Units.Unit, Types>, ICD>();
         private Aura aura = Aura.NONE;
-        private double FreezeDuration = 0;
-        private double FreezeAura = 0;
-        private double FreezeDecay = 1;
+        private Timestamp FreezeDuration = new Timestamp(0);
+        private Timestamp FreezeAura = new Timestamp(0);
 
-        public Gauge(double timestamp)
+        public Gauge() {}
+        
+        public double ElementApplied(Timestamp timestamp, Element elementType, World world, double GaugeStrength, Units.Unit unit, SecondPassStatsPage statsPage, Types type, bool isHeavy=false, 
+        int icdOveride = 0)
         {
-            this.gaugeDict = new Dictionary<Element, GaugeElement> { };
-            this.LastChecked = timestamp;
+            if (type == Types.TRANSFORMATIVE) return Reaction.NONE;  
 
-        }
-        
-        
-        // change return type later
-        public void ElementApplied(double timestamp, Element elementType, double gaugeStrength, bool isHeavy=false)
-        {
-            TimeDecay(timestamp);
+            Tuple<Units.Unit, Types> key = new Tuple<Units.Unit, Types>(unit, type);
+            if (!ICDtimer.ContainsKey(key)) ICDtimer.Add(key, new ICD(timestamp));
+            else if (!ICDtimer[key].checkICD(timestamp, icdOveride)) return Reaction.NONE;
+            
+
+            if (aura == Aura.NONE) 
+            {
+                gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
+                LastChecked = timestamp; 
+                this.aura = ElementToAura(elementType);
+                return Reaction.NONE;
+            } 
+            else TimeDecay(timestamp);
+
             if (isHeavy && aura == Aura.FROZEN)
             {
                 RemoveFrozen();
             }
             if (aura == ElementToAura(elementType))
             {
-                gaugeDict[elementType].UpdateGauge(gaugeStrength);
-                return;
+                gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                return Reaction.NONE;
             } 
             if (elementType == Element.PHYSICAL)
             {
-                return;
+                return Reaction.NONE;
             }
-            // garbage code ensues
-            var strength = gaugeStrength * 1.25;
+
+            var strength = GaugeStrength * 1.25;
             // need to do something else regarding damage but for now i just want to track aura properly
             // swirl is terrifying 
             // frozen is weird
+
             switch (aura)
             {
                 case Aura.NONE:
-                    gaugeDict[elementType] = new GaugeElement(elementType, gaugeStrength);
+                    gaugeDict[elementType] = new GaugeElement(elementType, GaugeStrength);
                     aura = ElementToAura(elementType);
-                    break;
+                    return Reaction.NONE;
                 case Aura.PYRO:
                     switch (elementType)
                     {
                         case Element.HYDRO:
                             strength *= 2;
-                            break;
+                            return 2 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
                         case Element.CRYO:
                             strength /= 2;
-                            break;
+                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.MELT));
                         case Element.ELECTRO:
-                            break;
+                            world.AddWorldEvents(new Overload(timestamp, statsPage, unit));
+                            return Reaction.OVERLOADED;
                         case Element.ANEMO:
                             strength /= 2;
                             break;
@@ -77,7 +89,7 @@ namespace Tcc.Elements
                     {
                         case Element.PYRO:
                             strength /= 2;
-                            break;
+                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
                         case Element.CRYO:
                             SetFrozen(gaugeDict[Element.HYDRO].GaugeValue, strength);
                             break;
@@ -100,7 +112,7 @@ namespace Tcc.Elements
                     {
                         case Element.PYRO:
                             strength *= 2;
-                            break;
+                            return 2 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.MELT));
                         case Element.HYDRO:
                             SetFrozen(gaugeDict[Element.CRYO].GaugeValue, strength);
                             break;
@@ -142,37 +154,22 @@ namespace Tcc.Elements
                         case Element.PYRO:
                             DecreaseElement(Element.HYDRO, 2 * strength);
                             DecreaseElement(Element.ELECTRO, strength);
-                            return;
+                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
                         case Element.HYDRO:
-                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.CRYO:
                             break;
                         case Element.ELECTRO:
-                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.ANEMO:
                             strength /= 2;
-                            if (gaugeDict[Element.ELECTRO].GaugeValue > strength)
-                            {
-                                // swirl electro
-                                DecreaseElement(Element.ELECTRO, strength);
-                            }
-                            else
-                            {
-                                // swirl both 
-                                DecreaseElement(Element.ELECTRO, strength);
-                                DecreaseElement(Element.HYDRO, strength);
-                            }
-
-                            strength = 0;
                             break;
                         case Element.GEO:
-                            // always reacts with electro
-                            DecreaseElement(Element.ELECTRO, strength / 2);
-                            strength = 0;
+                            strength /= 2;
                             break;
                     }
                     DecreaseElement(Element.HYDRO, strength);
@@ -186,34 +183,20 @@ namespace Tcc.Elements
                             strength *= 2;
                             break;
                         case Element.HYDRO:
-                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.CRYO:
-                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.ELECTRO:
                             break;
                         case Element.ANEMO:
                             strength /= 2;
-                            if (!gaugeDict.ContainsKey(Element.HYDRO))
-                            {
-                                // swirl cryo
-                            }
-                            else if (gaugeDict[Element.HYDRO].GaugeValue > strength)
-                            {
-                                // swirl hydro
-                                DecreaseElement(Element.HYDRO, strength);
-                            }
-                            else
-                            {
-                                //swirl both
-                                DecreaseElement(Element.HYDRO, strength);
-                            }
                             break;
                         case Element.GEO:
-                            // geo should always be a heavy hit so this should never trigger
+                            strength /= 2;
                             break;
                     }
                     DecreaseFrozen(strength);
@@ -222,31 +205,39 @@ namespace Tcc.Elements
                         // if a frozen enemy has an underlying cryo aura that also has gauge consumed on reaction
                         DecreaseElement(Element.CRYO, strength);
                     }
+                    // swirl and geo can cause double reaction if they are strong enough to fully consume the frozen
+                    // this is kinda ugly but it should work
+                    if (aura != Aura.FROZEN && gaugeDict.ContainsKey(Element.HYDRO) && 
+                        elementType is Element.GEO or Element.ANEMO)
+                    {
+                        goto case Aura.HYDRO;
+                    }
                     break;
             }
-            
-            
+            System.Console.WriteLine("Something weird happened");
+            return Reaction.NONE;
         }
 
-        private void TimeDecay(double timestamp)
+        private void TimeDecay(Timestamp timestamp)
         {
             if (timestamp < LastChecked)
             {
-                throw new ArgumentException("time input before last checked time");
+                throw new ArgumentException("Time input before last checked, cannot go back in time");
             }
 
-            double timeSince = timestamp - LastChecked;
+            Timestamp timeSince = timestamp - LastChecked;
             LastChecked = timestamp;
+
             // this is pretty scuffed but it should work
             // also i'm just ignoring how hit lag can change EC slightly because that is a mess
             if (aura == Aura.ELECTROCHARGED)
             {
-                int timer = 0;
+                Timestamp timer = new Timestamp(0);
                 while (timer < timeSince)
                 {
                     timer += 1;
-                    gaugeDict[Element.ELECTRO].TimeDecay(1);
-                    gaugeDict[Element.HYDRO].TimeDecay(1);
+                    gaugeDict[Element.ELECTRO].TimeDecay(new Timestamp(1));
+                    gaugeDict[Element.HYDRO].TimeDecay(new Timestamp(1));
                     DecreaseElement(Element.ELECTRO, 0.4);
                     DecreaseElement(Element.HYDRO, 0.4);
                     // trigger EC here
@@ -273,8 +264,7 @@ namespace Tcc.Elements
             }
             if (aura == Aura.FROZEN)
             {
-                FreezeDuration = Math.Min(0, FreezeDuration - timeSince);
-                FreezeAura = Math.Min(0, FreezeAura - timeSince * FreezeDecay);
+                FreezeDuration = new Timestamp(Math.Min(0, FreezeDuration - timeSince));
                 if (FreezeDuration == 0)
                 {
                     RemoveFrozen();
@@ -311,19 +301,21 @@ namespace Tcc.Elements
             gauge.GaugeValue -= value;
         }
 
-        private Aura ElementToAura(Element element)
+        private Aura ElementToAura (Element element)
         {
-            if ((int) element < 5)
+            switch(element)
             {
-                return (Aura) element;
+                case Element.PYRO: return Aura.PYRO;
+                case Element.CRYO: return Aura.CRYO;
+                case Element.HYDRO: return Aura.HYDRO;
+                case Element.ELECTRO: return Aura.ELECTRO;
             }
-
             return Aura.NONE;
         }
 
         private void RemoveFrozen()
         {
-            FreezeDuration = 0;
+            FreezeDuration = new Timestamp(0);
             if (gaugeDict.ContainsKey(Element.CRYO))
             {
                 aura = Aura.CRYO;
@@ -339,23 +331,21 @@ namespace Tcc.Elements
 
         private void DecreaseFrozen(double strength)
         {
-            FreezeAura = Math.Min(FreezeAura - strength, 0);
+            FreezeAura = new Timestamp(Math.Min(FreezeAura - strength, 0));
             if (FreezeAura == 0)
             {
                 RemoveFrozen();
             }
-            FreezeDuration = FreezeAura / FreezeDecay;
         }
 
         private void SetFrozen(double auraStrength, double triggerStrength)
         {
             aura = Aura.FROZEN;
             triggerStrength *= 0.8;
-            FreezeAura = 2 * Math.Min(auraStrength, triggerStrength);
+            FreezeAura = new Timestamp(2 * Math.Min(auraStrength, triggerStrength));
             // KQM lists the formula as 2*sqrt(5*FreezeStrength+4)-4, however they are also stupid and use aura tax
             // instead of multiplying reactions strengths by 5/4 which makes this formula and other things simpler
-            FreezeDuration = 4 * (Math.Sqrt(FreezeAura) - 1);
-            FreezeDecay = FreezeAura / FreezeDuration;
+            FreezeDuration = new Timestamp(4 * (Math.Sqrt(FreezeAura) - 1));
         }
     }
 }
