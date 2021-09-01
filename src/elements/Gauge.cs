@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Tcc.Stats;
 using Tcc.Events;
+using Tcc.Units;
 
 namespace Tcc.Elements
 {
@@ -18,38 +19,49 @@ namespace Tcc.Elements
         private Timestamp FreezeAura = new Timestamp(0);
 
         public Gauge() {}
-        
-        public double ElementApplied(Timestamp timestamp, Element elementType, World world, double GaugeStrength, Units.Unit unit, SecondPassStatsPage statsPage, Types type, bool isHeavy=false, 
-        int icdOveride = 0)
+
+        private double TransformativeMultiplier(StatsPage stats, Reaction reaction)
         {
-            if (type == Types.TRANSFORMATIVE) return Reaction.NONE;  
-
-            Tuple<Units.Unit, Types> key = new Tuple<Units.Unit, Types>(unit, type);
-            if (!ICDtimer.ContainsKey(key)) ICDtimer.Add(key, new ICD(timestamp));
-            else if (!ICDtimer[key].checkICD(timestamp, icdOveride)) return Reaction.NONE;
+            double em = stats.ElementalMastery;
+            double bonus = stats.generalStats.ReactionBonus.GetPercentBonus(reaction);
+            return 1 + 2.78 * em / (1400 + em) + bonus;
+        }
+        
+        // TODO: i think it makes more sense to return a double with how much damage is dealt, even for transformative
+        // reactions there is still a base damage
+        public double ElementApplied(Timestamp timestamp, Element elementType, World world, double GaugeStrength, 
+            Unit unit, SecondPassStatsPage statsPage, Types type, bool isHeavy=false, int icdOveride = 0)
+        {
             
+            // I'm unclear what this is for
+            if (type == Types.TRANSFORMATIVE) return 1;  
 
-            if (aura == Aura.NONE) 
+            Tuple<Unit, Types> key = new Tuple<Unit, Types>(unit, type);
+            
+            if (!ICDtimer.ContainsKey(key))
             {
-                gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
-                LastChecked = timestamp; 
-                this.aura = ElementToAura(elementType);
-                return Reaction.NONE;
-            } 
-            else TimeDecay(timestamp);
+                ICDtimer.Add(key, new ICD(timestamp));
+            } else if (!ICDtimer[key].checkICD(timestamp, icdOveride))
+            {
+                return 1;
+            }
+            
+            TimeDecay(timestamp, world, statsPage, unit);
+            LastChecked = timestamp;
 
             if (isHeavy && aura == Aura.FROZEN)
             {
+                world.AddWorldEvents(new Shatter(timestamp, statsPage, unit));
                 RemoveFrozen();
             }
             if (aura == ElementToAura(elementType))
             {
                 gaugeDict[elementType].UpdateGauge(GaugeStrength);
-                return Reaction.NONE;
+                return 1;
             } 
             if (elementType == Element.PHYSICAL)
             {
-                return Reaction.NONE;
+                return 1;
             }
 
             var strength = GaugeStrength * 1.25;
@@ -57,25 +69,29 @@ namespace Tcc.Elements
             // swirl is terrifying 
             // frozen is weird
 
+            double damage = 1;
             switch (aura)
             {
                 case Aura.NONE:
-                    gaugeDict[elementType] = new GaugeElement(elementType, GaugeStrength);
+                    gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
                     aura = ElementToAura(elementType);
-                    return Reaction.NONE;
+                    return 1;
                 case Aura.PYRO:
                     switch (elementType)
                     {
                         case Element.HYDRO:
                             strength *= 2;
-                            return 2 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
+                            damage = 2 * TransformativeMultiplier(statsPage, Reaction.VAPORIZE);
+                            break;
                         case Element.CRYO:
                             strength /= 2;
-                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.MELT));
+                            damage =  1.5 * TransformativeMultiplier(statsPage, Reaction.MELT);
+                            break;
                         case Element.ELECTRO:
                             world.AddWorldEvents(new Overload(timestamp, statsPage, unit));
-                            return Reaction.OVERLOADED;
+                            break;
                         case Element.ANEMO:
+                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.PYRO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -83,22 +99,24 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.PYRO, strength);
-                    break;
+                    return damage;
                 case Aura.HYDRO:
                     switch (elementType)
                     {
                         case Element.PYRO:
                             strength /= 2;
-                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
+                            damage =  1.5 * TransformativeMultiplier(statsPage, Reaction.VAPORIZE);
+                            break;
                         case Element.CRYO:
                             SetFrozen(gaugeDict[Element.HYDRO].GaugeValue, strength);
                             break;
                         case Element.ELECTRO:
                             aura = Aura.ELECTROCHARGED;
                             gaugeDict[elementType] = new GaugeElement(elementType, strength);
-                            strength = 0;
+                            world.AddWorldEvents(new ElectroCharged(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
+                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -106,19 +124,22 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.HYDRO, strength);
-                    break;
+                    return damage;
                 case Aura.CRYO:
                     switch (elementType)
                     {
                         case Element.PYRO:
                             strength *= 2;
-                            return 2 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.MELT));
+                            damage =  2 * TransformativeMultiplier(statsPage, Reaction.MELT);
+                            break;
                         case Element.HYDRO:
                             SetFrozen(gaugeDict[Element.CRYO].GaugeValue, strength);
                             break;
                         case Element.ELECTRO:
+                            world.AddWorldEvents(new Superconduct(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
+                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.CRYO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -126,20 +147,22 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.CRYO, strength);
-                    break;
+                    return damage;
                 case Aura.ELECTRO:
                     switch (elementType)
                     {
                         case Element.PYRO:
+                            world.AddWorldEvents(new Overload(timestamp, statsPage, unit));
                             break;
                         case Element.HYDRO:
                             aura = Aura.ELECTROCHARGED;
                             gaugeDict[elementType] = new GaugeElement(elementType, strength);
-                            strength = 0;
                             break;
                         case Element.CRYO:
+                            world.AddWorldEvents(new Superconduct(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
+                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -147,19 +170,22 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.ELECTRO, strength);
-                    break;
+                    return damage;
                 case Aura.ELECTROCHARGED:
                     switch (elementType)
                     {
                         case Element.PYRO:
                             DecreaseElement(Element.HYDRO, 2 * strength);
                             DecreaseElement(Element.ELECTRO, strength);
-                            return 1.5 * (1 + 2.78 * statsPage.ElementalMastery / (statsPage.ElementalMastery + 1400) + statsPage.generalStats.ReactionBonus.GetPercentBonus(Reaction.VAPORIZE));
+                            damage = 1.5 * TransformativeMultiplier(statsPage, Reaction.VAPORIZE);
+                            strength = 0;
+                            break;
                         case Element.HYDRO:
                             gaugeDict[elementType].UpdateGauge(GaugeStrength);
                             strength = 0;
                             break;
                         case Element.CRYO:
+                            // TODO: i'm not actually sure what happens when you apply cryo to an ec enemy
                             break;
                         case Element.ELECTRO:
                             gaugeDict[elementType].UpdateGauge(GaugeStrength);
@@ -167,20 +193,36 @@ namespace Tcc.Elements
                             break;
                         case Element.ANEMO:
                             strength /= 2;
+                            if (gaugeDict[Element.ELECTRO].GaugeValue > strength)
+                            {
+                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
+                                DecreaseElement(Element.ELECTRO, strength);
+                            }
+                            else
+                            {
+                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
+                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
+                                DecreaseElement(Element.ELECTRO, strength);
+                                DecreaseElement(Element.HYDRO, strength);
+                            }
+                            strength = 0;
                             break;
                         case Element.GEO:
-                            strength /= 2;
+                            // always reacts with electro
+                            DecreaseElement(Element.ELECTRO, strength / 2);
+                            strength = 0;
                             break;
                     }
-                    DecreaseElement(Element.HYDRO, strength);
-                    DecreaseElement(Element.ELECTRO, strength);
-                    break;
+                    /* DecreaseElement(Element.HYDRO, strength);
+                    DecreaseElement(Element.ELECTRO, strength); */
+                    return damage;
                 case Aura.FROZEN:
                     // frozen may be a bit inaccurate because it is very convoluted 
                     switch (elementType)
                     {
                         case Element.PYRO:
                             strength *= 2;
+                            damage = 2 * TransformativeMultiplier(statsPage, Reaction.MELT);
                             break;
                         case Element.HYDRO:
                             gaugeDict[elementType].UpdateGauge(GaugeStrength);
@@ -191,12 +233,30 @@ namespace Tcc.Elements
                             strength = 0;
                             break;
                         case Element.ELECTRO:
+                            world.AddWorldEvents(new Superconduct(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
                             strength /= 2;
+                            if (!gaugeDict.ContainsKey(Element.HYDRO))
+                            {
+                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.CRYO));
+                            }
+                            else if (gaugeDict[Element.HYDRO].GaugeValue > strength)
+                            {
+                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
+                                DecreaseElement(Element.HYDRO, strength);
+                            }
+                            else
+                            {
+                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
+                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.CRYO));
+                                DecreaseElement(Element.HYDRO, strength);
+                            }
+
+                            strength = 0;
                             break;
                         case Element.GEO:
-                            strength /= 2;
+                            Console.WriteLine("crystallize shouldn't be able to occur on frozen enemy");
                             break;
                     }
                     DecreaseFrozen(strength);
@@ -205,20 +265,14 @@ namespace Tcc.Elements
                         // if a frozen enemy has an underlying cryo aura that also has gauge consumed on reaction
                         DecreaseElement(Element.CRYO, strength);
                     }
-                    // swirl and geo can cause double reaction if they are strong enough to fully consume the frozen
-                    // this is kinda ugly but it should work
-                    if (aura != Aura.FROZEN && gaugeDict.ContainsKey(Element.HYDRO) && 
-                        elementType is Element.GEO or Element.ANEMO)
-                    {
-                        goto case Aura.HYDRO;
-                    }
-                    break;
+
+                    return damage;
             }
             System.Console.WriteLine("Something weird happened");
-            return Reaction.NONE;
+            return 1;
         }
 
-        private void TimeDecay(Timestamp timestamp)
+        private void TimeDecay(Timestamp timestamp, World world, SecondPassStatsPage statsPage, Unit unit)
         {
             if (timestamp < LastChecked)
             {
@@ -241,6 +295,7 @@ namespace Tcc.Elements
                     DecreaseElement(Element.ELECTRO, 0.4);
                     DecreaseElement(Element.HYDRO, 0.4);
                     // trigger EC here
+                    world.AddWorldEvents(new ElectroCharged(timestamp, statsPage, unit));
                     if (aura != Aura.ELECTROCHARGED)
                     {
                         timeSince -= timer;

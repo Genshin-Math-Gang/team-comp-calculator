@@ -1,5 +1,8 @@
+using System;
+
 namespace Tcc.Elements
 {
+    [Flags]
     public enum Element
     {
         PHYSICAL = 0b1,

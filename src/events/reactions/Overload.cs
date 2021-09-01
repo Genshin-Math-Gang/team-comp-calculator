@@ -10,7 +10,8 @@ namespace Tcc.Events
             base(
             timestamp,
 
-            (world) => world.CalculateDamage(timestamp, Element.PYRO, 0, stats, unit, Types.TRANSFORMATIVE, Reaction.OVERLOADED, true, true, 1, -1)
+            (world) => world.CalculateDamage(timestamp, Element.PYRO, 0, stats, unit, 
+                Types.TRANSFORMATIVE, Reaction.OVERLOADED, true, true, 1, -1)
         ) {
         }
     }

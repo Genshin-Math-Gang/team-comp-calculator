@@ -16,18 +16,25 @@ namespace Tcc.Enemy
             this.gauge = gauge ?? new Gauge();
         }
 
-        public double takeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage stats_of_unit, 
-        Unit unit, int mvIndex = 0, int reaction = Reaction.NONE, bool isHeavy = false)
+        // TODO: i think enemy and attacker stats are swapped from what they should be in a lot of this code
+        public double TakeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage stats_of_unit, 
+        Unit unit, int mvIndex = 0, Reaction reaction = Reaction.NONE, bool isHeavy = false)
         {
             var unitAbilityStats = unit.GetAbilityStats(stats_of_unit, type, this, timestamp);
             
             if (type != Types.TRANSFORMATIVE)
             {
-                return unitAbilityStats.CalculateHitDamage(mvIndex, element) * DefenceCalculator(timestamp, element, type, stats_of_unit) * ResistanceCalculation(timestamp, element, type, stats_of_unit);
+                return unitAbilityStats.CalculateHitDamage(mvIndex, element) * 
+                       DefenceCalculator(timestamp, element, type, stats_of_unit) * 
+                       ResistanceCalculation(timestamp, element, type, stats_of_unit);
             }
             else
             {
-                return Reaction.ReactionMultiplier(reaction) * 16 * (1 + (stats.ElementalMastery/(stats.ElementalMastery + 2000)) + stats.ReactionBonus.GetPercentBonus(reaction)) * TransformativeScaling.damage[stats.Level] * ResistanceCalculation(timestamp, element, type, stats_of_unit);
+                return TransformativeScaling.ReactionMultiplier(reaction) * 
+                       (TransformativeScaling.EmScaling(stats.ElementalMastery) + 
+                        stats.ReactionBonus.GetPercentBonus(reaction))
+                       * TransformativeScaling.damage[stats.Level] * 
+                       ResistanceCalculation(timestamp, element, type, stats_of_unit);
             }
         }
 

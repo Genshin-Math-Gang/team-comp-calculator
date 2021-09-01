@@ -11,7 +11,7 @@ namespace Tcc.Stats
         public KeyedPercentBonus<Element> ElementalResistance { get; }
 
         // Attributes not listed on stats page
-        public KeyedPercentBonus<int> ReactionBonus { get; }
+        public KeyedPercentBonus<Reaction> ReactionBonus { get; }
 
         public GeneralStats(
             int level = 1,
@@ -24,7 +24,7 @@ namespace Tcc.Stats
             double damagePercent = 0, double independentMultiplier = 1,
             KeyedStatBonus<Element> elementalBonus = null,
             KeyedPercentBonus<Element> elementalResistance = null,
-            KeyedPercentBonus<int> reactionBonus = null
+            KeyedPercentBonus<Reaction> reactionBonus = null
         ): this(
             nonKeyedStats: new NonKeyedStats(
                 level: level,
@@ -54,12 +54,12 @@ namespace Tcc.Stats
         GeneralStats(
             NonKeyedStats nonKeyedStats,
             KeyedStatBonus<Element> elementalBonus, KeyedPercentBonus<Element> elementalResistance,
-            KeyedPercentBonus<int> reactionBonus
+            KeyedPercentBonus<Reaction> reactionBonus
         ) {
             this.NonKeyedStats = nonKeyedStats;
             this.ElementalBonus = elementalBonus ?? new KeyedStatBonus<Element>();
             this.ElementalResistance = elementalResistance ?? new KeyedPercentBonus<Element>();
-            this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<int>();
+            this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<Reaction>();
         }
 
         public static GeneralStats operator +(GeneralStats first, GeneralStats second)
@@ -89,6 +89,6 @@ namespace Tcc.Stats
         public static implicit operator GeneralStats((Element element, double damagePercent) bonus)
             => new GeneralStats(elementalBonus: new KeyedStatBonus<Element>((bonus.element, new NonKeyedStats(damagePercent: bonus.damagePercent))));
 
-        public static implicit operator GeneralStats(KeyedPercentBonus<int> reactionBonus) => new GeneralStats(reactionBonus: reactionBonus);
+        public static implicit operator GeneralStats(KeyedPercentBonus<Reaction> reactionBonus) => new GeneralStats(reactionBonus: reactionBonus);
     }
 }

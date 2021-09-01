@@ -4,6 +4,29 @@ namespace Tcc.Elements
 {
     class TransformativeScaling
     {
+        public static double ReactionMultiplier (Reaction reaction)
+        {
+            switch (reaction)
+            {
+                case Reaction.BURNING: return 0.25;
+                case Reaction.ELECTROCHARGED: return 1.2;
+                case Reaction.SUPERCONDUCT: return 0.5;
+                case Reaction.SHATTERED: return 1.5;
+                case Reaction.OVERLOADED: return 2;
+                case Reaction.SWIRL_CRYO: return 0.6;
+                case Reaction.SWIRL_PYRO: return 0.6;
+                case Reaction.SWIRL_HYDRO: return 0.6;
+                case Reaction.SWIRL_ELECTRO: return 0.6;
+            }
+
+            return 0;
+        }
+
+        public static double EmScaling(double em)
+        {
+            return 1 + 16 * em / (2000 + em);
+        }
+        
         public static Dictionary<int, double> damage = new Dictionary<int, double>() {
         {1, 17.2}, 
         {2, 18.5}, 
@@ -107,4 +130,5 @@ namespace Tcc.Elements
         {100, 2030.1}, 
         };
     }
+    
 }

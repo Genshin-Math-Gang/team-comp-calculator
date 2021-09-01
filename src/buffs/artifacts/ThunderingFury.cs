@@ -12,7 +12,7 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly FirstPassModifier MODIFIER_2PC = (_) => (Element.ELECTRO, 0.15);
 
-        static readonly FirstPassModifier MODIFIER_4PC = (_) => new GeneralStats(reactionBonus: new KeyedPercentBonus<int>(
+        static readonly FirstPassModifier MODIFIER_4PC = (_) => new GeneralStats(reactionBonus: new KeyedPercentBonus<Reaction>(
             (Reaction.OVERLOADED, 0.4),
             (Reaction.ELECTROCHARGED, 0.4),
             (Reaction.SUPERCONDUCT, 0.4)

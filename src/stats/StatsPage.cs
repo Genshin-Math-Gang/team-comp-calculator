@@ -32,6 +32,8 @@ namespace Tcc.Stats
         public KeyedStatBonus<Element> ElementalBonus => generalStats.ElementalBonus;
         public KeyedPercentBonus<Element> ElementalResistance => generalStats.ElementalResistance;
 
+        public KeyedPercentBonus<Reaction> ReactionBonus => generalStats.ReactionBonus;
+
         public static StatsPage operator +(StatsPage page, GeneralStats generalStats)
         {
             return new StatsPage(

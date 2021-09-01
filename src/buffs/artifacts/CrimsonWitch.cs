@@ -14,7 +14,7 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly FirstPassModifier MODIFIER_2PC = (_) => (Element.PYRO, 0.15);
 
-        static readonly FirstPassModifier MODIFIER_4PC_PASSIVE = (_) => new KeyedPercentBonus<int>(
+        static readonly FirstPassModifier MODIFIER_4PC_PASSIVE = (_) => new KeyedPercentBonus<Reaction>(
             (Reaction.OVERLOADED, 0.4),
             (Reaction.BURNING, 0.4),
             (Reaction.MELT, 0.15),
