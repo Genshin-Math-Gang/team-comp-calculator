@@ -7,12 +7,12 @@ namespace Tcc.Events
     {
         public ElectroCharged(
             Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit): 
-            // TODO: change damage type since idk what it is
+            // TODO: check how many times it bounces
             base(
                 timestamp,
                 
-                (world) => world.CalculateDamage(timestamp, Element.PYRO, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, Reaction.ELECTROCHARGED, false,true, 1, -1)
+                (world) => world.CalculateDamage(timestamp, Element.ELECTRO, 0, stats, unit, 
+                    Types.TRANSFORMATIVE, Reaction.ELECTROCHARGED, false,true, 3, -1, "Electrocharged")
             ) {
         }
     }

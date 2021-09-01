@@ -15,8 +15,7 @@ namespace Tcc.Enemy
             this.stats = stats ?? new GeneralStats();
             this.gauge = gauge ?? new Gauge();
         }
-
-        // TODO: i think enemy and attacker stats are swapped from what they should be in a lot of this code
+        
         public double TakeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage stats_of_unit, 
         Unit unit, int mvIndex = 0, Reaction reaction = Reaction.NONE, bool isHeavy = false)
         {
@@ -31,9 +30,9 @@ namespace Tcc.Enemy
             else
             {
                 return TransformativeScaling.ReactionMultiplier(reaction) * 
-                       (TransformativeScaling.EmScaling(stats.ElementalMastery) + 
-                        stats.ReactionBonus.GetPercentBonus(reaction))
-                       * TransformativeScaling.damage[stats.Level] * 
+                       (TransformativeScaling.EmScaling(stats_of_unit.ElementalMastery) + 
+                        stats_of_unit.ReactionBonus.GetPercentBonus(reaction))
+                       * TransformativeScaling.damage[stats_of_unit.Level] * 
                        ResistanceCalculation(timestamp, element, type, stats_of_unit);
             }
         }

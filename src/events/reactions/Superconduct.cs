@@ -10,8 +10,10 @@ namespace Tcc.Events
             base(
                 timestamp,
                 (world) => world.CalculateDamage(timestamp, Element.CRYO, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, Reaction.SUPERCONDUCT, false,true, 1, -1)
+                    Types.TRANSFORMATIVE, Reaction.SUPERCONDUCT, false,true, 1, -1, "Superconduct")
             ) {
+            
+            // debuff enemy res
         }
     }
 }

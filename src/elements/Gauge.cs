@@ -20,15 +20,13 @@ namespace Tcc.Elements
 
         public Gauge() {}
 
-        private double TransformativeMultiplier(StatsPage stats, Reaction reaction)
+        private double MultiplicativeMultiplier (StatsPage stats, Reaction reaction)
         {
             double em = stats.ElementalMastery;
             double bonus = stats.generalStats.ReactionBonus.GetPercentBonus(reaction);
             return 1 + 2.78 * em / (1400 + em) + bonus;
         }
         
-        // TODO: i think it makes more sense to return a double with how much damage is dealt, even for transformative
-        // reactions there is still a base damage
         public double ElementApplied(Timestamp timestamp, Element elementType, World world, double GaugeStrength, 
             Unit unit, SecondPassStatsPage statsPage, Types type, bool isHeavy=false, int icdOveride = 0)
         {
@@ -69,7 +67,7 @@ namespace Tcc.Elements
             // swirl is terrifying 
             // frozen is weird
 
-            double damage = 1;
+            double multiplier = 1;
             switch (aura)
             {
                 case Aura.NONE:
@@ -81,11 +79,11 @@ namespace Tcc.Elements
                     {
                         case Element.HYDRO:
                             strength *= 2;
-                            damage = 2 * TransformativeMultiplier(statsPage, Reaction.VAPORIZE);
+                            multiplier = 2 * MultiplicativeMultiplier (statsPage, Reaction.VAPORIZE);
                             break;
                         case Element.CRYO:
                             strength /= 2;
-                            damage =  1.5 * TransformativeMultiplier(statsPage, Reaction.MELT);
+                            multiplier =  1.5 * MultiplicativeMultiplier (statsPage, Reaction.MELT);
                             break;
                         case Element.ELECTRO:
                             world.AddWorldEvents(new Overload(timestamp, statsPage, unit));
@@ -99,13 +97,13 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.PYRO, strength);
-                    return damage;
+                    return multiplier;
                 case Aura.HYDRO:
                     switch (elementType)
                     {
                         case Element.PYRO:
                             strength /= 2;
-                            damage =  1.5 * TransformativeMultiplier(statsPage, Reaction.VAPORIZE);
+                            multiplier =  1.5 * MultiplicativeMultiplier (statsPage, Reaction.VAPORIZE);
                             break;
                         case Element.CRYO:
                             SetFrozen(gaugeDict[Element.HYDRO].GaugeValue, strength);
@@ -124,13 +122,13 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.HYDRO, strength);
-                    return damage;
+                    return multiplier;
                 case Aura.CRYO:
                     switch (elementType)
                     {
                         case Element.PYRO:
                             strength *= 2;
-                            damage =  2 * TransformativeMultiplier(statsPage, Reaction.MELT);
+                            multiplier =  2 * MultiplicativeMultiplier (statsPage, Reaction.MELT);
                             break;
                         case Element.HYDRO:
                             SetFrozen(gaugeDict[Element.CRYO].GaugeValue, strength);
@@ -147,7 +145,7 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.CRYO, strength);
-                    return damage;
+                    return multiplier;
                 case Aura.ELECTRO:
                     switch (elementType)
                     {
@@ -170,14 +168,14 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.ELECTRO, strength);
-                    return damage;
+                    return multiplier;
                 case Aura.ELECTROCHARGED:
                     switch (elementType)
                     {
                         case Element.PYRO:
                             DecreaseElement(Element.HYDRO, 2 * strength);
                             DecreaseElement(Element.ELECTRO, strength);
-                            damage = 1.5 * TransformativeMultiplier(statsPage, Reaction.VAPORIZE);
+                            multiplier = 1.5 * MultiplicativeMultiplier (statsPage, Reaction.VAPORIZE);
                             strength = 0;
                             break;
                         case Element.HYDRO:
@@ -215,14 +213,14 @@ namespace Tcc.Elements
                     }
                     /* DecreaseElement(Element.HYDRO, strength);
                     DecreaseElement(Element.ELECTRO, strength); */
-                    return damage;
+                    return multiplier;
                 case Aura.FROZEN:
                     // frozen may be a bit inaccurate because it is very convoluted 
                     switch (elementType)
                     {
                         case Element.PYRO:
                             strength *= 2;
-                            damage = 2 * TransformativeMultiplier(statsPage, Reaction.MELT);
+                            multiplier = 2 * MultiplicativeMultiplier (statsPage, Reaction.MELT);
                             break;
                         case Element.HYDRO:
                             gaugeDict[elementType].UpdateGauge(GaugeStrength);
@@ -266,7 +264,7 @@ namespace Tcc.Elements
                         DecreaseElement(Element.CRYO, strength);
                     }
 
-                    return damage;
+                    return multiplier;
             }
             System.Console.WriteLine("Something weird happened");
             return 1;
@@ -295,6 +293,7 @@ namespace Tcc.Elements
                     DecreaseElement(Element.ELECTRO, 0.4);
                     DecreaseElement(Element.HYDRO, 0.4);
                     // trigger EC here
+                    // TODO: make electrocharged reactions happen at different times and think about how swirl can mess it up
                     world.AddWorldEvents(new ElectroCharged(timestamp, statsPage, unit));
                     if (aura != Aura.ELECTROCHARGED)
                     {
