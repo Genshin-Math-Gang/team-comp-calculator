@@ -44,6 +44,10 @@ namespace Tcc
             this.enemies.Add(enemy);
         }
 
+        public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> characterAction, params object[] param)
+        {
+            characterEvents.Add(new CharacterEvent(timestamp, characterAction, param));
+        }
         public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, List<WorldEvent>> characterAction)
         {
             characterEvents.Add(new CharacterEvent(timestamp, characterAction));
@@ -62,11 +66,10 @@ namespace Tcc
         {
             double final_damage;
             double result = enemy.gauge.ElementApplied(timestamp, element, this, 
-                unit.GetAbilityStats(statsPage, type, enemy, timestamp).GaugeStrength, 
+                unit.GetAbilityGauge(type), 
                 unit, statsPage, type, isHeavy, icdOveride);
-            if (result > 0) final_damage = enemy.TakeDamage(timestamp, element, type, statsPage, 
+            final_damage = enemy.TakeDamage(timestamp, element, type, statsPage, 
                 unit, mvIndex, reaction, isHeavy) * result;
-            else final_damage = enemy.TakeDamage(timestamp, element, type, statsPage, unit, mvIndex, reaction, isHeavy);
 
             this.TotalDamage[units.IndexOf(unit)] += final_damage;
             if (description != null)

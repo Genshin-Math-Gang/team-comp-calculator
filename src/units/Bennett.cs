@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Tcc.Buffs;
 using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
+using Tcc.Weapons;
 
 namespace Tcc.Units
 {
@@ -20,6 +22,7 @@ namespace Tcc.Units
             constellationLevel: constellationLevel,
             element: Element.PYRO,
             burstEnergyCost: 60,
+            weaponType: WeaponType.SWORD,
             capacityStats: new CapacityStats(
                 baseHp: 10876,
                 energy: 60
@@ -34,8 +37,8 @@ namespace Tcc.Units
             normal: new AbilityStats(motionValues: new double[] {0.8806,0.8449,1.0795,1.11798,1.3209}),
             charged: new AbilityStats(motionValues: new double[] {1.105+1.202}),
             plunge: new AbilityStats(motionValues: new double[] {1.2638,2.527,3.1564}),
-            skill: new AbilityStats(motionValues: new double[] {2.4768,1.512+1.656,1.584+1.728,2.376}),
-            burst: new AbilityStats(motionValues: new double[] {4.1904,0.108,1.008})
+            skill: new AbilityStats(motionValues: new double[] {2.4768,1.512+1.656,1.584+1.728,2.376}, gaugeStrength:2),
+            burst: new AbilityStats(motionValues: new double[] {4.1904,0.108,1.008}, gaugeStrength:2)
         ) {
             this.burstBuffSnapshot = new SnapshottedStats(this, Types.BURST);
         }
@@ -55,7 +58,8 @@ namespace Tcc.Units
                 events.Add(new WorldEvent(startTime, (world) => world.OnFieldUnit.AddBuff(CreateBurstBuff(startTime))));
 
                 // Deal burst damage after modifier snapshot and first application,
-                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, false, true, 1, 1, "burst"));
+                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, 
+                    Types.BURST, false, true, 1, 1, "burst"));
             }
 
             return events;

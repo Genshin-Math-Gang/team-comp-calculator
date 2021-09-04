@@ -19,7 +19,7 @@ namespace Tcc.Buffs.Artifacts
         {
             unit.AddBuff(new PermanentBuff<AbilityModifier>(ID_4PC, (_) =>
             {
-                switch(unit.Weapon.Type)
+                switch(unit.weaponType)
                 {
                     case WeaponType.BOW:
                     case WeaponType.CATALYST:

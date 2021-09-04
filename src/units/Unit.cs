@@ -13,6 +13,7 @@ namespace Tcc.Units
     {
         protected readonly int constellationLevel;
         protected readonly int burstEnergyCost;
+        public readonly WeaponType weaponType;
         public readonly Element element;
 
         // Base stats
@@ -36,12 +37,13 @@ namespace Tcc.Units
         public event EventHandler<(Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
 
         protected Unit(
-            int constellationLevel, Element element, int burstEnergyCost,
-            CapacityStats capacityStats, GeneralStats generalStats,
-            AbilityStats burst, AbilityStats skill, AbilityStats normal, AbilityStats charged, AbilityStats plunge
+            int constellationLevel, Element element, WeaponType weaponType, int burstEnergyCost,
+            CapacityStats capacityStats, GeneralStats generalStats, AbilityStats burst, AbilityStats skill, 
+            AbilityStats normal, AbilityStats charged, AbilityStats plunge 
         ) {
             this.constellationLevel = constellationLevel;
             this.element = element;
+            this.weaponType = weaponType;
 
             this.burstEnergyCost = burstEnergyCost;
             this.CurrentEnergy = burstEnergyCost;
@@ -61,6 +63,11 @@ namespace Tcc.Units
         public double CurrentHp { get; }
         public double CurrentEnergy { get; private set; }
         public bool IsShielded => throw new NotImplementedException();
+
+        public double GetAbilityGauge(Types type)
+        {
+            return startingAbilityStats[type].GaugeStrength;
+        }
 
         public List<WorldEvent> SwitchUnit(Timestamp timestamp)
         {
@@ -106,6 +113,8 @@ namespace Tcc.Units
 
             return result;
         }
+        
+        
 
         public void AddBuff(Buff<CapacityModifier> buff) => buff.AddToList(capacityBuffs);
         public void AddBuff(Buff<FirstPassModifier> buff) => buff.AddToList(firstPassBuffs);

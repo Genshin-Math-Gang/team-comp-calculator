@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
+using Tcc.Weapons;
 
 namespace Tcc.Units
 {
@@ -13,6 +14,7 @@ namespace Tcc.Units
         public Xiangling(int constellationLevel): base(
             constellationLevel: constellationLevel,
             element: Element.PYRO,
+            weaponType: WeaponType.POLEARM,
             burstEnergyCost: 80,
             capacityStats: new CapacityStats(
                 baseHp: 10876,

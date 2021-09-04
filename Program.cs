@@ -17,13 +17,41 @@ namespace Tcc
             //System.Console.WriteLine("\n\nSimulating Xiangling's elmental skill (Guoba) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
             //Simulate_Xiangling_Guoba_With_Bennett_Snapshot();
 
-            System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental burst buff from her elemental skill (Eye of Stormy Judgement)");
-            Simulate_Xiangling_Burst_With_Shogun_Snapshot();
+            //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental burst buff from her elemental skill (Eye of Stormy Judgement)");
+            //Simulate_Xiangling_Burst_With_Shogun_Snapshot();
 
             //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental skill buff from her lemental skill (Eye of Stormy Judgement) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
             //Simulate_Xiangling_burst_with_Shogun_And_Bennett_Snapshot();
+            Ganyu_Test();
         }
 
+        static void Ganyu_Test()
+        {
+            Ganyu ganyu = new Ganyu(0);
+            Bennett benentt = new Bennett(0);
+            
+            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
+            enemies.Add(new Enemy.Enemy());
+            
+            World world = new World(enemies);
+            world.SetUnits(ganyu, benentt, null, null);
+
+            var wanderer = new WanderersTroupe();
+            wanderer.Add2pc(world, ganyu);
+            wanderer.Add4pc(world, ganyu);
+            
+            world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
+            
+            world.SwitchUnit(new Timestamp(1), ganyu);
+            
+            world.AddCharacterEvent(new Timestamp(2), ganyu.ChargedAttack, 3);
+            
+            world.Simulate();
+            
+            Console.WriteLine($"{ganyu} total DMG: {world.TotalDamage[0]}");
+            Console.WriteLine($"{benentt} total DMG: {world.TotalDamage[1]}");
+            
+        }
         static void Simulate_Xiangling_Burst_With_Shogun_Snapshot()
         {
             Shogun shogun = new Shogun(0);

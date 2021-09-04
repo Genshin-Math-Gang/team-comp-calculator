@@ -4,6 +4,7 @@ using Tcc.Buffs;
 using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
+using Tcc.Weapons;
 
 namespace Tcc.Units
 {
@@ -18,6 +19,7 @@ namespace Tcc.Units
             constellationLevel: constellationLevel,
             element: Element.ELECTRO,
             burstEnergyCost: 90,
+            weaponType: WeaponType.POLEARM,
             capacityStats: new CapacityStats(
                 baseHp: 10876,
                 energy: 90

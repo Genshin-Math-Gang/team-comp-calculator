@@ -26,6 +26,9 @@ namespace Tcc.Elements
             GaugeValue = Math.Max(newStrength, GaugeValue);
         }
 
-
+        public override string ToString()
+        {
+            return Element.ToString() + GaugeValue;
+        }
     }
 }
