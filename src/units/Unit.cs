@@ -19,16 +19,17 @@ namespace Tcc.Units
         // Base stats
         protected readonly CapacityStats startingCapacityStats;
         protected readonly GeneralStats startingGeneralStats;
-        protected readonly Dictionary<Types, AbilityStats> startingAbilityStats = new Dictionary<Types, AbilityStats>();
+        protected readonly Dictionary<Types, AbilityStats> startingAbilityStats = new();
 
         // Snapshottable buffs
-        protected readonly List<Buff<CapacityModifier>> capacityBuffs = new List<Buff<CapacityModifier>>();
-        protected readonly List<Buff<FirstPassModifier>> firstPassBuffs = new List<Buff<FirstPassModifier>>();
-        protected readonly List<Buff<SecondPassModifier>> secondPassBuffs = new List<Buff<SecondPassModifier>>();
+        protected readonly List<Buff<CapacityModifier>> capacityBuffs = new();
+        protected readonly List<Buff<FirstPassModifier>> firstPassBuffs = new();
+        protected readonly List<Buff<SecondPassModifier>> secondPassBuffs = new();
 
         // Unsnapshottable buffs
-        protected readonly List<Buff<EnemyBasedModifier>> enemyBasedBuffs = new List<Buff<EnemyBasedModifier>>();
-        protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> abilityBuffs = new Dictionary<Types, List<Buff<AbilityModifier>>>();
+        protected readonly List<Buff<EnemyBasedModifier>> enemyBasedBuffs = new();
+        protected readonly Dictionary<Element, List<Buff<ElementBasedModifier>>> elementBasedBuffs = new();
+        protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> abilityBuffs = new();
 
         // Hooks
         public event EventHandler<Timestamp> skillActivatedHook;
@@ -92,7 +93,7 @@ namespace Tcc.Units
             return secondPassBuffs.Aggregate(stats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
         }
 
-        public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Enemy.Enemy enemy, Timestamp timestamp)
+        public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy.Enemy enemy, Timestamp timestamp)
         {
             enemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -104,6 +105,11 @@ namespace Tcc.Units
             if (enemy != null)
             {
                 foreach (var buff in enemyBasedBuffs) result += buff.GetModifier((this, timestamp, enemy, statsFromUnit.firstPassStats));
+            }
+
+            if (elementBasedBuffs.TryGetValue(element, out var elementBuffList))
+            {
+                foreach (var buff in elementBuffList) result += buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats));
             }
 
             if (abilityBuffs.TryGetValue(type, out var abilityBuffList))

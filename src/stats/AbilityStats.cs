@@ -20,9 +20,9 @@ namespace Tcc.Stats
 
         public double CalculateHitDamage(int mvIndex, Element element)
         {
-            var stats = generalStats.NonKeyedStats + generalStats.ElementalBonus.GetStatBonus(element);
+            var damagePercent = generalStats.DamagePercent + generalStats.ElementalBonus.GetPercentBonus(element);
 
-            return motionValues[mvIndex] * stats.Attack * (1 + stats.DamagePercent) * (1 + stats.CritRate * stats.CritDamage) * stats.IndependentMultiplier;
+            return motionValues[mvIndex] * generalStats.Attack * (1 + damagePercent) * (1 + generalStats.CritRate * generalStats.CritDamage) * generalStats.IndependentMultiplier;
         }
 
         public double GetMotionValue(int mvIndex) => motionValues[mvIndex];
