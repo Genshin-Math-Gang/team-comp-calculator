@@ -284,7 +284,6 @@ namespace Tcc.Elements
 
             Timestamp timeSince = timestamp - LastChecked;
             LastChecked = timestamp;
-
             // this is pretty scuffed but it should work
             // also i'm just ignoring how hit lag can change EC slightly because that is a mess
             if (aura == Aura.ELECTROCHARGED)
@@ -328,15 +327,23 @@ namespace Tcc.Elements
                 {
                     RemoveFrozen();
                 }
-            } 
+            }
             Time:
-                foreach (var pair in gaugeDict)
+            foreach (var pair in gaugeDict)
                 {
-                    GaugeElement element = pair.Value;
-                    element.TimeDecay(timeSince);
+                    Element element = pair.Key;
+                    GaugeElement gaugeElement = pair.Value;
+                    //element.TimeDecay(timeSince);
+                    ElementTimeDecay(element, timeSince);
                 }
         }
 
+        private void ElementTimeDecay(Element element, Timestamp timeSince)
+        {
+            GaugeElement gaugeElement = gaugeDict[element];
+            double decay = timeSince / gaugeElement.DecayRate;
+            DecreaseElement(element, decay);
+        }
         private void DecreaseElement(Element element, double value)
         {
             GaugeElement gauge = gaugeDict[element];

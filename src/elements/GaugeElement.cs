@@ -28,7 +28,7 @@ namespace Tcc.Elements
 
         public override string ToString()
         {
-            return Element.ToString() + GaugeValue;
+            return Element + " " + GaugeValue;
         }
     }
 }

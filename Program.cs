@@ -18,12 +18,12 @@ namespace Tcc
             //Simulate_Xiangling_Guoba_With_Bennett_Snapshot();
 
             //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental burst buff from her elemental skill (Eye of Stormy Judgement)");
-            Simulate_Xiangling_Burst_With_Shogun_Snapshot();
+            //Simulate_Xiangling_Burst_With_Shogun_Snapshot();
 
             //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental skill buff from her lemental skill (Eye of Stormy Judgement) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
             //Simulate_Xiangling_burst_with_Shogun_And_Bennett_Snapshot();
             
-            //Ganyu_Test();
+            Ganyu_Test();
         }
 
         static void Ganyu_Test()
@@ -46,6 +46,7 @@ namespace Tcc
             world.SwitchUnit(new Timestamp(1), ganyu);
             
             world.AddCharacterEvent(new Timestamp(2), ganyu.ChargedAttack, 3);
+            world.AddCharacterEvent(new Timestamp(30), ganyu.ChargedAttack, 3);
             
             world.Simulate();
             
