@@ -85,10 +85,10 @@ namespace Tcc.Units
 
         public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
         {
-            var dict = new Dictionary<string, Func<Timestamp, List<WorldEvent>>>();
-            dict.Add("Skill", Skill);
-
-            return dict;
+            return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
+            {
+                { "Skill", Skill }
+            };
         }
     }
 }

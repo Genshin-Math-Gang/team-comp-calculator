@@ -42,10 +42,10 @@ namespace Tcc.Units
             return new List<WorldEvent> {
                 SkillActivated(timestamp), // Order important: Guoba snapshots CW skill activation buff
                 skillSnapshot.Snapshot(timestamp),
-                new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
-                new Hit(timestamp + 3.5, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
-                new Hit(timestamp + 5, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
-                new Hit(timestamp + 7.5, Element.PYRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "guoba"),
+                new Hit(timestamp, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, 1, "guoba"),
+                new Hit(timestamp + 3.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, 1, "guoba"),
+                new Hit(timestamp + 5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, 1, "guoba"),
+                new Hit(timestamp + 7.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, 1, "guoba"),
             };
         }
 
@@ -62,7 +62,7 @@ namespace Tcc.Units
 
         public List<WorldEvent> BurstHit(Timestamp timestamp)
         {
-            return new List<WorldEvent> { new Hit(timestamp + 1, Element.PYRO, 3, GetStatsPage, this, Types.BURST, false, true, 1, 1, "nado") };
+            return new List<WorldEvent> { new Hit(timestamp + 1, Element.PYRO, 3, burstSnapshot.GetStats, this, Types.BURST, false, true, 1, 1, "nado") };
         }
 
         public override string ToString()
@@ -72,12 +72,12 @@ namespace Tcc.Units
 
         public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
         {
-            var dict = new Dictionary<string, Func<Timestamp, List<WorldEvent>>>();
-            dict.Add("Initial Burst", InitialBurst);
-            dict.Add("Burst Hit", BurstHit);
-            dict.Add("Skill", Skill);
-
-            return dict;
+            return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
+            {
+                { "Initial Burst", InitialBurst },
+                { "Burst Hit", BurstHit },
+                { "Skill", Skill }
+            };
         }
     }
 }
