@@ -52,6 +52,11 @@ namespace Tcc.Elements
                 world.AddWorldEvents(new Shatter(timestamp, statsPage, unit));
                 RemoveFrozen();
             }
+
+            if (GaugeStrength == 0)
+            {
+                return 1;
+            }
             if (aura == ElementToAura(elementType))
             {
                 gaugeDict[elementType].UpdateGauge(GaugeStrength);

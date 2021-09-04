@@ -66,6 +66,11 @@ namespace Tcc.Units
 
         public double GetAbilityGauge(Types type)
         {
+            // this will probably need to be modified later to make it work with swirl 
+            if (type == Types.TRANSFORMATIVE)
+            {
+                return 0;
+            }
             return startingAbilityStats[type].GaugeStrength;
         }
 
