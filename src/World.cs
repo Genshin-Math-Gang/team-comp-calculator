@@ -46,8 +46,15 @@ namespace Tcc
 
         public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> characterAction, params object[] param)
         {
-            characterEvents.Add(new CharacterEvent(timestamp, characterAction, param));
+            object[] p = {this, null};
+            param.CopyTo(p, 1);
+            characterEvents.Add(new CharacterEvent(timestamp, characterAction, p));
         }
+        public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> characterAction)
+        {
+            characterEvents.Add(new CharacterEvent(timestamp, characterAction, this));
+        }
+        
         public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, List<WorldEvent>> characterAction)
         {
             characterEvents.Add(new CharacterEvent(timestamp, characterAction));
@@ -59,17 +66,23 @@ namespace Tcc
             OnFieldUnit = unit;
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }
+        
+        public List<Enemy.Enemy> Enemies
+        {
+            get => enemies;
+        }
 
         public void DealDamage(Timestamp timestamp, Element element, SecondPassStatsPage statsPage, Unit unit, 
             Types type, Enemy.Enemy enemy, int mvIndex, Reaction reaction,
-            bool isHeavy, int icdOveride, string description = null)
+            bool isHeavy, int icdOverride, string description = null)
         {
             double final_damage;
-            double result = enemy.gauge.ElementApplied(timestamp, element, this, 
+            
+            double multiplier = enemy.gauge.ElementApplied(timestamp, element, this, 
                 unit.GetAbilityGauge(type), 
-                unit, statsPage, type, isHeavy, icdOveride);
+                unit, statsPage, type, isHeavy, icdOverride);
             final_damage = enemy.TakeDamage(timestamp, element, type, statsPage, 
-                unit, mvIndex, reaction, isHeavy) * result;
+                unit, mvIndex, reaction, isHeavy) * multiplier;
 
             this.TotalDamage[units.IndexOf(unit)] += final_damage;
             if (description != null)
@@ -93,7 +106,7 @@ namespace Tcc
                     foreach(Enemy.Enemy enemy in enemies) 
                     {
                         DealDamage(timestamp, element, statsPage, unit, type, enemy, 
-                            mvIndex, reaction, isAoe, icdOveride, description);
+                            mvIndex, reaction, isHeavy, icdOveride, description);
                     }
                 }
                 else
@@ -102,7 +115,7 @@ namespace Tcc
                     {
                         if (i > bounces) break;
                         DealDamage(timestamp, element, statsPage, unit, type, enemy, 
-                            mvIndex, reaction, isAoe, icdOveride, description);
+                            mvIndex, reaction, isHeavy, icdOveride, description);
                         i++;
                     }
                 }

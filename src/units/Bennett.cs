@@ -78,12 +78,12 @@ namespace Tcc.Units
             return "Bennett";
         }
 
-        public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        /*public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
         {
             return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
             {
                 { "Burst", Burst }
             };
-        }
+        }*/
     }
 }

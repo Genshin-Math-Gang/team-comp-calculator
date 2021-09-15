@@ -54,17 +54,14 @@ namespace Tcc
             world.AddCharacterEvent(new Timestamp(20), ganyu.ChargedAttack, 3);
             world.AddCharacterEvent(new Timestamp(30), ganyu.ChargedAttack, 3);
             
-            world.SwitchUnit(new Timestamp(41), benentt);
+            world.AddCharacterEvent(new Timestamp(41), benentt.SwitchUnit);
             
             world.AddCharacterEvent(new Timestamp(42), benentt.Burst);
             
-            world.SwitchUnit(new Timestamp(43), ganyu);
+            world.AddCharacterEvent(new Timestamp(43), ganyu.SwitchUnit);
             
             world.AddCharacterEvent(new Timestamp(44), ganyu.BurstCast);
-            world.AddCharacterEvent(new Timestamp(45), ganyu.BurstIcicle);
-            world.AddCharacterEvent(new Timestamp(46), ganyu.BurstIcicle);
-            world.AddCharacterEvent(new Timestamp(50), ganyu.BurstIcicle);
-            
+
             world.Simulate();
             
             Console.WriteLine($"{ganyu} total DMG: {world.TotalDamage[0]}");

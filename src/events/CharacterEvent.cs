@@ -19,7 +19,15 @@ namespace Tcc.Events
         {
             this.Timestamp = timestamp;
             // this is sus as hell but i think it works
-            this.worldEventGenerator = (timestamp, param) => worldEventGenerator(timestamp);
+            this.worldEventGenerator = (t, p) => worldEventGenerator(t);
+        }
+        
+        public CharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> worldEventGenerator, World world)
+        {
+            this.Timestamp = timestamp;
+            param = new[] {world};
+            // this is sus as hell but i think it works
+            this.worldEventGenerator = (t, p) => worldEventGenerator(t, p);
         }
         
 

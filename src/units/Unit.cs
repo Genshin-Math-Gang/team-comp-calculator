@@ -191,6 +191,6 @@ namespace Tcc.Units
             return new WorldEvent(timestamp, (world) => particleCollectedHook?.Invoke(this, (timestamp, element)));
         }
 
-        public abstract Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents();
+        //public abstract Dictionary<string, Delegate> GetCharacterEvents();
     }
 }

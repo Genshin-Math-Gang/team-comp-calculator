@@ -73,7 +73,7 @@ namespace Tcc.Units
             return "Xiangling";
         }
 
-        public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        /*public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
         {
             return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
             {
@@ -81,6 +81,6 @@ namespace Tcc.Units
                 { "Burst Hit", BurstHit },
                 { "Skill", Skill }
             };
-        }
+        }*/
     }
 }
