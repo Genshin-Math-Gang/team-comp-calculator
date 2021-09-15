@@ -38,15 +38,32 @@ namespace Tcc
             world.SetUnits(ganyu, benentt, null, null);
 
             var wanderer = new WanderersTroupe();
-            wanderer.Add2pc(world, ganyu);
-            wanderer.Add4pc(world, ganyu);
+            var shime = new ShimenawasReminiscence();
+            //wanderer.Add2pc(world, ganyu);
+            //wanderer.Add4pc(world, ganyu);
+            shime.Add2pc(world, ganyu);
+            shime.Add4pc(world, ganyu);
             
             world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
             
             world.SwitchUnit(new Timestamp(1), ganyu);
             
+            world.AddCharacterEvent(new Timestamp(1.5), ganyu.Skill);
             world.AddCharacterEvent(new Timestamp(2), ganyu.ChargedAttack, 3);
+            world.AddCharacterEvent(new Timestamp(19), ganyu.Skill);
+            world.AddCharacterEvent(new Timestamp(20), ganyu.ChargedAttack, 3);
             world.AddCharacterEvent(new Timestamp(30), ganyu.ChargedAttack, 3);
+            
+            world.SwitchUnit(new Timestamp(41), benentt);
+            
+            world.AddCharacterEvent(new Timestamp(42), benentt.Burst);
+            
+            world.SwitchUnit(new Timestamp(43), ganyu);
+            
+            world.AddCharacterEvent(new Timestamp(44), ganyu.BurstCast);
+            world.AddCharacterEvent(new Timestamp(45), ganyu.BurstIcicle);
+            world.AddCharacterEvent(new Timestamp(46), ganyu.BurstIcicle);
+            world.AddCharacterEvent(new Timestamp(50), ganyu.BurstIcicle);
             
             world.Simulate();
             

@@ -55,20 +55,29 @@ namespace Tcc.Units
 
         public List<WorldEvent> BurstCast(Timestamp timestamp)
         {
-            return new List<WorldEvent>()
+            //var enemies = (List<Enemy.Enemy>) param[0];
+            var events = new List<WorldEvent>()
             {
                 BurstActivated(timestamp),
                 burstSnapshot.Snapshot(timestamp)
             };
+            
+
+            return events;
         }
 
         public List<WorldEvent> BurstIcicle(Timestamp timestamp)
         {
             return new List<WorldEvent>()
             {
-               new Hit(timestamp, Element.CRYO, 0,GetStatsPage, this, Types.BURST, 
-                   isAoe: true, description: "Icicle hit")
+               Icicle(timestamp)
             };
+        }
+
+        private WorldEvent Icicle(Timestamp timestamp)
+        {
+            return new Hit(timestamp, Element.CRYO, 0, GetStatsPage, this, Types.BURST,
+                isAoe: true,description: "Icicle hit");
         }
 
         public List<WorldEvent> ChargedAttack(Timestamp timestamp, params object[] param)

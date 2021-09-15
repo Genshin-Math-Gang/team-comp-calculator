@@ -8,8 +8,8 @@ namespace Tcc.Events
     {
         public Hit(
             Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
-             Units.Unit unit, Types type, bool isHeavy = false,
-              bool isAoe = true, int bounces = 1, int icdOverride = 0, string description = ""): 
+             Units.Unit unit, Types type, bool isHeavy = false, bool isAoe = true, int bounces = 1, 
+            int icdOverride = 0, string description = "", Enemy.Enemy target = null): 
             base(
             timestamp,
 
