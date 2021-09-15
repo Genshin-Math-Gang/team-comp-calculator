@@ -46,7 +46,7 @@ namespace Tcc
             
             world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
             
-            world.SwitchUnit(new Timestamp(1), ganyu);
+            world.AddCharacterEvent(new Timestamp(1), ganyu.SwitchUnit);
             
             world.AddCharacterEvent(new Timestamp(1.5), ganyu.Skill);
             world.AddCharacterEvent(new Timestamp(2), ganyu.ChargedAttack, 3);

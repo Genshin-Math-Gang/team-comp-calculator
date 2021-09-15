@@ -45,9 +45,9 @@ namespace Tcc.Units
             {
                 SkillActivated(timestamp),
                 skillSnapshot.Snapshot(timestamp),
-                new Hit(timestamp, Element.CRYO, 0, GetStatsPage, this, Types.SKILL, 
+                new Hit(timestamp, Element.CRYO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
                     isAoe: true, description: "Trail of the Qilin cast" ),
-                new Hit(timestamp + 6, Element.CRYO, 0, GetStatsPage, this, Types.SKILL, 
+                new Hit(timestamp + 6, Element.CRYO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
                     isAoe: true, description: "Trail of the Qilin explosion" )
 
             };
@@ -105,12 +105,12 @@ namespace Tcc.Units
         
         public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
         {
-            var dict = new Dictionary<string, Func<Timestamp, List<WorldEvent>>>();
-            dict.Add("Cast", BurstCast);
-            dict.Add("Icicle", BurstIcicle);
-            dict.Add("Skill", Skill);
-
-            return dict;
+            return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
+            {
+                { "Cast", BurstCast },
+                { "Icicle", BurstIcicle },
+                { "Skill", Skill }
+            };
         }
     }
 }

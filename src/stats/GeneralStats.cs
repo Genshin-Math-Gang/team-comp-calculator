@@ -7,7 +7,7 @@ namespace Tcc.Stats
         public NonKeyedStats NonKeyedStats { get; }
 
         // Elemental type
-        public KeyedStatBonus<Element> ElementalBonus { get; }
+        public KeyedPercentBonus<Element> ElementalBonus { get; }
         public KeyedPercentBonus<Element> ElementalResistance { get; }
 
         // Attributes not listed on stats page
@@ -22,7 +22,7 @@ namespace Tcc.Stats
             double healingBonus = 0, double incomingHealingBonus = 0,
             double energyRecharge = 0, double cdReduction = 0, double shieldStrength = 0,
             double damagePercent = 0, double independentMultiplier = 1,
-            KeyedStatBonus<Element> elementalBonus = null,
+            KeyedPercentBonus<Element> elementalBonus = null,
             KeyedPercentBonus<Element> elementalResistance = null,
             KeyedPercentBonus<Reaction> reactionBonus = null
         ): this(
@@ -53,11 +53,11 @@ namespace Tcc.Stats
 
         GeneralStats(
             NonKeyedStats nonKeyedStats,
-            KeyedStatBonus<Element> elementalBonus, KeyedPercentBonus<Element> elementalResistance,
+            KeyedPercentBonus<Element> elementalBonus, KeyedPercentBonus<Element> elementalResistance,
             KeyedPercentBonus<Reaction> reactionBonus
         ) {
             this.NonKeyedStats = nonKeyedStats;
-            this.ElementalBonus = elementalBonus ?? new KeyedStatBonus<Element>();
+            this.ElementalBonus = elementalBonus ?? new KeyedPercentBonus<Element>();
             this.ElementalResistance = elementalResistance ?? new KeyedPercentBonus<Element>();
             this.ReactionBonus = reactionBonus ?? new KeyedPercentBonus<Reaction>();
         }
@@ -87,7 +87,7 @@ namespace Tcc.Stats
         public double IndependentMultiplier => NonKeyedStats.IndependentMultiplier;
 
         public static implicit operator GeneralStats((Element element, double damagePercent) bonus)
-            => new GeneralStats(elementalBonus: new KeyedStatBonus<Element>((bonus.element, new NonKeyedStats(damagePercent: bonus.damagePercent))));
+            => new GeneralStats(elementalBonus: new KeyedPercentBonus<Element>((bonus.element, bonus.damagePercent)));
 
         public static implicit operator GeneralStats(KeyedPercentBonus<Reaction> reactionBonus) => new GeneralStats(reactionBonus: reactionBonus);
     }

@@ -19,7 +19,7 @@ namespace Tcc.Enemy
         public double TakeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage stats_of_unit, 
         Unit unit, int mvIndex = 0, Reaction reaction = Reaction.NONE, bool isHeavy = false)
         {
-            var unitAbilityStats = unit.GetAbilityStats(stats_of_unit, type, this, timestamp);
+            var unitAbilityStats = unit.GetAbilityStats(stats_of_unit, type, element, this, timestamp);
             
             if (type != Types.TRANSFORMATIVE)
             {

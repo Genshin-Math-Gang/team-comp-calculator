@@ -29,7 +29,7 @@ namespace Tcc.Stats
         public double ShieldStrength => generalStats.ShieldStrength;
         public double DamagePercent => generalStats.DamagePercent;
         public double IndependentMultiplier => generalStats.IndependentMultiplier;
-        public KeyedStatBonus<Element> ElementalBonus => generalStats.ElementalBonus;
+        public KeyedPercentBonus<Element> ElementalBonus => generalStats.ElementalBonus;
         public KeyedPercentBonus<Element> ElementalResistance => generalStats.ElementalResistance;
 
         public KeyedPercentBonus<Reaction> ReactionBonus => generalStats.ReactionBonus;
