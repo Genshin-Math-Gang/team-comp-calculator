@@ -26,8 +26,8 @@ namespace Tcc.Units
                 baseAttack: 335,
                 attackPercent: 0.466,
                 flatAttack: 311,
-                critRate: 0.884,
-                critDamage: 1
+                critRate: 0.05,
+                critDamage: 0.884
             ),
             normal: new AbilityStats(motionValues: new double[] {0.6273,0.7038,0.8993,0.8993,0.9537,1.139}),
             charged: new AbilityStats(motionValues: new double[] {0.867,2.232,2.304,3.9168}),
@@ -46,9 +46,9 @@ namespace Tcc.Units
             {
                 SkillActivated(timestamp),
                 skillSnapshot.Snapshot(timestamp),
-                new Hit(timestamp, Element.CRYO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                new Hit(timestamp, element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
                     isAoe: true, description: "Trail of the Qilin cast" ),
-                new Hit(timestamp + 6, Element.CRYO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                new Hit(timestamp + 6, element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
                     isAoe: true, description: "Trail of the Qilin explosion" )
 
             };
@@ -69,7 +69,7 @@ namespace Tcc.Units
                 for (int j = 0; j < num; j++)
                 {
                     time += .3;
-                    events.Add(new Hit(time, Element.CRYO, 0, burstSnapshot.GetStats, this, Types.BURST,
+                    events.Add(new Hit(time, element, 0, burstSnapshot.GetStats, this, Types.BURST,
                         isAoe: true,description: "Icicle hit"));
                 }
             }
@@ -77,6 +77,7 @@ namespace Tcc.Units
             return events;
         }
 
+        // kinda deprecated
         public List<WorldEvent> BurstIcicle(Timestamp timestamp)
         {
             return new List<WorldEvent>()
@@ -87,7 +88,7 @@ namespace Tcc.Units
 
         private WorldEvent Icicle(Timestamp timestamp)
         {
-            return new Hit(timestamp, Element.CRYO, 0, burstSnapshot.GetStats, this, Types.BURST,
+            return new Hit(timestamp, element, 0, burstSnapshot.GetStats, this, Types.BURST,
                 isAoe: true,description: "Icicle hit");
         }
 
