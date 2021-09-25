@@ -12,6 +12,7 @@ namespace Tcc.Units
     public class Bennett: Unit
     {
         static readonly Guid BURST_BUFF_ID = new Guid("c1a23bde-db12-4589-9baf-d25b76ccb989");
+        private static readonly ICDCreator AutoICD = new ICDCreator("4c77095b-9d2d-4e3d-8568-1697b60b7503");
         const int N_BURST_TICKS = 12;
         static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
         static readonly Timestamp BUFF_DURATION = new Timestamp(2);
@@ -59,7 +60,7 @@ namespace Tcc.Units
 
                 // Deal burst damage after modifier snapshot and first application,
                 if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, 
-                    Types.BURST, false, true, 1, 1, "burst"));
+                    Types.BURST, false, true, 1, "Bennett Burst", creator: AutoICD));
             }
 
             return events;

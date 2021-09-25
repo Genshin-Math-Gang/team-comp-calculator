@@ -11,6 +11,7 @@ namespace Tcc.Units
     public class Ganyu: Unit
     {
         SnapshottedStats skillSnapshot, burstSnapshot;
+        private static readonly ICDCreator BurstICD = new ICDCreator("c6de4351-963c-4775-bbe8-4b0b38bc5a9d");
 
         public Ganyu(int constellationLevel) : base(
             constellationLevel: constellationLevel,
@@ -70,7 +71,7 @@ namespace Tcc.Units
                 {
                     time += .3;
                     events.Add(new Hit(time, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                        isAoe: true,description: "Icicle hit"));
+                        isAoe: true,description: "Icicle hit", creator: BurstICD));
                 }
             }
 
@@ -105,7 +106,7 @@ namespace Tcc.Units
                 3 => new List<WorldEvent>(){new Hit(timestamp, Element.CRYO, 2,GetStatsPage, this, 
                     Types.CHARGED, isAoe: false, description: "Frostlake Arrow"),
                     new Hit(timestamp+.3, Element.CRYO, 3,GetStatsPage, this, 
-                        Types.CHARGED, isAoe: true, description: "Frostlake Arrow bloom", icdOverride:1)
+                        Types.CHARGED, isAoe: true, description: "Frostlake Arrow bloom")
                 }
             };
         }

@@ -28,57 +28,68 @@ namespace Tcc.Elements
             return 1 + 2.78 * em / (1400 + em) + bonus;
         }
         
-        public double ElementApplied(Timestamp timestamp, Element elementType, World world, double GaugeStrength, 
-            Unit unit, SecondPassStatsPage statsPage, Types type, bool isHeavy=false, int icdOveride = 0)
+        public (double, List<WorldEvent>) ElementApplied(Timestamp timestamp, Element elementType, double GaugeStrength, 
+            Unit unit, SecondPassStatsPage statsPage, Types type, ICD icd, bool isHeavy=false)
         {
             
             // I'm unclear what this is for
-            if (type == Types.TRANSFORMATIVE) return 1;  
+            if (type == Types.TRANSFORMATIVE) return (1, null);  
 
+            // what is this
             Tuple<Unit, Types> key = new Tuple<Unit, Types>(unit, type);
             
-            if (!ICDtimer.ContainsKey(key))
+            /*if (!ICDtimer.ContainsKey(key))
             {
                 ICDtimer.Add(key, new ICD(timestamp));
             } else if (!ICDtimer[key].checkICD(timestamp, icdOveride))
             {
                 return 1;
-            }
-            TimeDecay(timestamp, world, statsPage, unit);
+            }*/
+            
+            List<WorldEvent> transformativeReactions = TimeDecay(timestamp, statsPage, unit);
             LastChecked = timestamp;
-
-            if (isHeavy && aura == Aura.FROZEN)
+            
+            if (icd.checkICD(timestamp))
             {
-                world.AddWorldEvents(new Shatter(timestamp, statsPage, unit));
-                RemoveFrozen();
+                return (1, transformativeReactions);
             }
 
             if (GaugeStrength == 0)
             {
-                return 1;
+                return (1, null);
             }
-            if (aura == ElementToAura(elementType))
+
+            // scuffed but this fixed a bug with anemo and geo damage
+            if (elementType == Element.GEO || elementType == Element.ANEMO) {}
+            else if (aura == ElementToAura(elementType))
             {
                 gaugeDict[elementType].UpdateGauge(GaugeStrength);
-                return 1;
+                return (1, null);
             } 
+            
             if (elementType == Element.PHYSICAL)
             {
-                return 1;
+                return (1, null);
             }
 
             var strength = GaugeStrength * 1.25;
             // need to do something else regarding damage but for now i just want to track aura properly
             // swirl is terrifying 
             // frozen is weird
-
+            
             double multiplier = 1;
+            if (isHeavy && aura == Aura.FROZEN)
+            {
+                transformativeReactions.Add(new Shatter(timestamp, statsPage, unit));
+                RemoveFrozen();
+            }
+
             switch (aura)
             {
                 case Aura.NONE:
                     gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
                     aura = ElementToAura(elementType);
-                    return 1;
+                    return (1, null);
                 case Aura.PYRO:
                     switch (elementType)
                     {
@@ -91,10 +102,10 @@ namespace Tcc.Elements
                             multiplier =  1.5 * MultiplicativeMultiplier (statsPage, Reaction.MELT);
                             break;
                         case Element.ELECTRO:
-                            world.AddWorldEvents(new Overload(timestamp, statsPage, unit));
+                            transformativeReactions.Add(new Overload(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
-                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.PYRO));
+                            transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.PYRO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -102,7 +113,7 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.PYRO, strength);
-                    return multiplier;
+                    return (multiplier, transformativeReactions);
                 case Aura.HYDRO:
                     switch (elementType)
                     {
@@ -116,10 +127,10 @@ namespace Tcc.Elements
                         case Element.ELECTRO:
                             aura = Aura.ELECTROCHARGED;
                             gaugeDict[elementType] = new GaugeElement(elementType, strength);
-                            world.AddWorldEvents(new ElectroCharged(timestamp, statsPage, unit));
+                            transformativeReactions.Add(new ElectroCharged(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
-                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
+                            transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -127,7 +138,7 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.HYDRO, strength);
-                    return multiplier;
+                    return (multiplier, transformativeReactions);
                 case Aura.CRYO:
                     switch (elementType)
                     {
@@ -139,10 +150,10 @@ namespace Tcc.Elements
                             SetFrozen(gaugeDict[Element.CRYO].GaugeValue, strength);
                             break;
                         case Element.ELECTRO:
-                            world.AddWorldEvents(new Superconduct(timestamp, statsPage, unit));
+                            transformativeReactions.Add(new Superconduct(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
-                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.CRYO));
+                            transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.CRYO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -150,22 +161,22 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.CRYO, strength);
-                    return multiplier;
+                    return (multiplier, transformativeReactions);
                 case Aura.ELECTRO:
                     switch (elementType)
                     {
                         case Element.PYRO:
-                            world.AddWorldEvents(new Overload(timestamp, statsPage, unit));
+                            transformativeReactions.Add(new Overload(timestamp, statsPage, unit));
                             break;
                         case Element.HYDRO:
                             aura = Aura.ELECTROCHARGED;
                             gaugeDict[elementType] = new GaugeElement(elementType, strength);
                             break;
                         case Element.CRYO:
-                            world.AddWorldEvents(new Superconduct(timestamp, statsPage, unit));
+                            transformativeReactions.Add(new Superconduct(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
-                            world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
+                            transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
                             strength /= 2;
                             break;
                         case Element.GEO:
@@ -173,7 +184,7 @@ namespace Tcc.Elements
                             break;
                     }
                     DecreaseElement(Element.ELECTRO, strength);
-                    return multiplier;
+                    return (multiplier, transformativeReactions);
                 case Aura.ELECTROCHARGED:
                     switch (elementType)
                     {
@@ -198,13 +209,14 @@ namespace Tcc.Elements
                             strength /= 2;
                             if (gaugeDict[Element.ELECTRO].GaugeValue > strength)
                             {
-                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
+                                transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
                                 DecreaseElement(Element.ELECTRO, strength);
                             }
                             else
                             {
-                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
-                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
+                                // is there an order in which these occur in game
+                                transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
+                                transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.ELECTRO));
                                 DecreaseElement(Element.ELECTRO, strength);
                                 DecreaseElement(Element.HYDRO, strength);
                             }
@@ -218,7 +230,7 @@ namespace Tcc.Elements
                     }
                     /* DecreaseElement(Element.HYDRO, strength);
                     DecreaseElement(Element.ELECTRO, strength); */
-                    return multiplier;
+                    return (multiplier, transformativeReactions);
                 case Aura.FROZEN:
                     // frozen may be a bit inaccurate because it is very convoluted 
                     switch (elementType)
@@ -236,23 +248,23 @@ namespace Tcc.Elements
                             strength = 0;
                             break;
                         case Element.ELECTRO:
-                            world.AddWorldEvents(new Superconduct(timestamp, statsPage, unit));
+                            transformativeReactions.Add(new Superconduct(timestamp, statsPage, unit));
                             break;
                         case Element.ANEMO:
                             strength /= 2;
                             if (!gaugeDict.ContainsKey(Element.HYDRO))
                             {
-                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.CRYO));
+                                transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.CRYO));
                             }
                             else if (gaugeDict[Element.HYDRO].GaugeValue > strength)
                             {
-                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
+                                transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
                                 DecreaseElement(Element.HYDRO, strength);
                             }
                             else
                             {
-                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
-                                world.AddWorldEvents(new Swirl(timestamp, statsPage, unit,Element.CRYO));
+                                transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.HYDRO));
+                                transformativeReactions.Add(new Swirl(timestamp, statsPage, unit,Element.CRYO));
                                 DecreaseElement(Element.HYDRO, strength);
                             }
 
@@ -269,13 +281,13 @@ namespace Tcc.Elements
                         DecreaseElement(Element.CRYO, strength);
                     }
 
-                    return multiplier;
+                    return (multiplier, transformativeReactions);
             }
-            System.Console.WriteLine("Something weird happened");
-            return 1;
+            Console.WriteLine("Something weird happened");
+            return (1, transformativeReactions);
         }
 
-        private void TimeDecay(Timestamp timestamp, World world, SecondPassStatsPage statsPage, Unit unit)
+        private List<WorldEvent> TimeDecay(Timestamp timestamp, SecondPassStatsPage statsPage, Unit unit)
         {
             if (timestamp < LastChecked)
             {
@@ -284,6 +296,8 @@ namespace Tcc.Elements
 
             Timestamp timeSince = timestamp - LastChecked;
             LastChecked = timestamp;
+            List<WorldEvent> ecTicks = new List<WorldEvent>();
+            
             // this is pretty scuffed but it should work
             // also i'm just ignoring how hit lag can change EC slightly because that is a mess
             if (aura == Aura.ELECTROCHARGED)
@@ -298,7 +312,7 @@ namespace Tcc.Elements
                     DecreaseElement(Element.HYDRO, 0.4);
                     // trigger EC here
                     // TODO: make electrocharged reactions happen at different times and think about how swirl can mess it up
-                    world.AddWorldEvents(new ElectroCharged(timestamp, statsPage, unit));
+                    ecTicks.Add(new ElectroCharged(timestamp, statsPage, unit));
                     if (aura != Aura.ELECTROCHARGED)
                     {
                         timeSince -= timer;
@@ -314,7 +328,7 @@ namespace Tcc.Elements
                 }
                 gaugeDict[Element.ELECTRO].TimeDecay(timeSince);
                 gaugeDict[Element.HYDRO].TimeDecay(timeSince);
-                if (gaugeDict[Element.ELECTRO].GaugeValue == 0 || gaugeDict[Element.ELECTRO].GaugeValue == 0)
+                if (gaugeDict[Element.ELECTRO].GaugeValue == 0 || gaugeDict[Element.HYDRO].GaugeValue == 0)
                 {
                     // trigger EC here
                 }
@@ -336,6 +350,8 @@ namespace Tcc.Elements
                     //element.TimeDecay(timeSince);
                     ElementTimeDecay(element, timeSince);
                 }
+
+            return ecTicks;
         }
 
         private void ElementTimeDecay(Element element, Timestamp timeSince)

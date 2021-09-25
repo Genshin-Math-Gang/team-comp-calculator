@@ -11,7 +11,7 @@ namespace Tcc.Events
                 timestamp,
                 
                 (world) => world.CalculateDamage(timestamp, Element.PHYSICAL, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, Reaction.SHATTERED, false,false, 1, -1, "Shatter")
+                    Types.TRANSFORMATIVE, Reaction.SHATTERED, false,false, 1, "Shatter")
             ) {
         }
     }

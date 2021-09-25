@@ -9,11 +9,12 @@ namespace Tcc.Events
         public Swirl(
             Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit, Element element): 
             // TODO: dumb double swirl and chain swirl 
+            // TODO: figure out ICD bullshit for transformative reactions
             base(
                 timestamp,
                 
                 (world) => world.CalculateDamage(timestamp, element, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, SwirlType(element), false,true, 2, -1, "Swirl")
+                    Types.TRANSFORMATIVE, SwirlType(element), false,true, 2, "Swirl")
             ) {
             
         }

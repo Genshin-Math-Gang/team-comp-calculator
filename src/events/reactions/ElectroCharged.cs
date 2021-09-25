@@ -12,7 +12,7 @@ namespace Tcc.Events
                 timestamp,
                 
                 (world) => world.CalculateDamage(timestamp, Element.ELECTRO, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, Reaction.ELECTROCHARGED, false,true, 3, -1, "Electrocharged")
+                    Types.TRANSFORMATIVE, Reaction.ELECTROCHARGED, false,true, 3, "Electrocharged")
             ) {
         }
     }

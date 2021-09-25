@@ -74,17 +74,19 @@ namespace Tcc
 
         public void DealDamage(Timestamp timestamp, Element element, SecondPassStatsPage statsPage, Unit unit, 
             Types type, Enemy.Enemy enemy, int mvIndex, Reaction reaction,
-            bool isHeavy, int icdOverride, string description = null)
+            bool isHeavy, string description = null, ICDCreator creator = null)
         {
-            double final_damage;
-            
-            double multiplier = enemy.gauge.ElementApplied(timestamp, element, this, 
-                unit.GetAbilityGauge(type), 
-                unit, statsPage, type, isHeavy, icdOverride);
-            final_damage = enemy.TakeDamage(timestamp, element, type, statsPage, 
-                unit, mvIndex, reaction, isHeavy) * multiplier;
 
-            this.TotalDamage[units.IndexOf(unit)] += final_damage;
+            var results = enemy.TakeDamage(timestamp, element, type, statsPage, unit, mvIndex,
+                reaction, isHeavy, creator);
+            double final_damage = results.Item1;
+            List<WorldEvent> events = results.Item2;
+            // scuffed
+            foreach (var e in events)
+            {
+                AddWorldEvents(e);
+            }
+            TotalDamage[units.IndexOf(unit)] += final_damage;
             if (description != null)
             {
                 Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage}");
@@ -95,9 +97,11 @@ namespace Tcc
             }
         }
 
+        
+        // TODO: swirl can self bounce which is bad
         public void CalculateDamage(Timestamp timestamp, Element element, int mvIndex, SecondPassStatsPage statsPage, 
             Units.Unit unit, Types type, Reaction reaction = Reaction.NONE, bool isHeavy = false, bool isAoe = true, 
-            int bounces = 1, int icdOveride = 0, string description = null)
+            int bounces = 1, string description = null, ICDCreator creator = null)
         {
             for (int i = 0; i < bounces; i++)
             {
@@ -106,7 +110,7 @@ namespace Tcc
                     foreach(Enemy.Enemy enemy in enemies) 
                     {
                         DealDamage(timestamp, element, statsPage, unit, type, enemy, 
-                            mvIndex, reaction, isHeavy, icdOveride, description);
+                            mvIndex, reaction, isHeavy, description, creator);
                     }
                 }
                 else
@@ -115,7 +119,7 @@ namespace Tcc
                     {
                         if (i > bounces) break;
                         DealDamage(timestamp, element, statsPage, unit, type, enemy, 
-                            mvIndex, reaction, isHeavy, icdOveride, description);
+                            mvIndex, reaction, isHeavy, description, creator);
                         i++;
                     }
                 }

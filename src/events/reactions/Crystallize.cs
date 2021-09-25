@@ -13,7 +13,7 @@ namespace Tcc.Events
                 timestamp,
                 
                 (world) => world.CalculateDamage(timestamp, element, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, CrystalType(element), false,true, 1, -1)
+                    Types.TRANSFORMATIVE, CrystalType(element), false,true, 1)
             ) {
         }
 

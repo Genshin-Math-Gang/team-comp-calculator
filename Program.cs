@@ -23,9 +23,37 @@ namespace Tcc
             //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental skill buff from her lemental skill (Eye of Stormy Judgement) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
             //Simulate_Xiangling_burst_with_Shogun_And_Bennett_Snapshot();
             
-            Ganyu_Test();
+            //Ganyu_Test();
+            
+            Sucrose_Test();
         }
 
+        static void Sucrose_Test()
+        {
+            Sucrose sucrose = new Sucrose(0);
+            Bennett benentt = new Bennett(0);
+            
+            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
+            enemies.Add(new Enemy.Enemy());
+            //enemies.Add(new Enemy.Enemy());
+            
+            World world = new World(enemies);
+            world.SetUnits(sucrose, benentt, null, null);
+
+            var vv = new ViridescentVenerer();
+            vv.Add2pc(world, sucrose);
+            vv.Add4pc(world, sucrose);
+            
+            world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
+            world.AddCharacterEvent(new Timestamp(1), sucrose.Skill);
+            
+            world.Simulate();
+            
+            Console.WriteLine($"{sucrose} total DMG: {world.TotalDamage[0]}");
+            Console.WriteLine($"{benentt} total DMG: {world.TotalDamage[1]}");
+
+
+        }
         static void Ganyu_Test()
         {
             Ganyu ganyu = new Ganyu(0);

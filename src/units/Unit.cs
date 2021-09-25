@@ -169,7 +169,7 @@ namespace Tcc.Units
         }
 
         public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, CapacityStats.Energy);
-        public void LoseEnergy(int energy) => CurrentEnergy = Math.Max(CurrentEnergy - energy, 0);
+          public void LoseEnergy(int energy) => CurrentEnergy = Math.Max(CurrentEnergy - energy, 0);
 
         protected WorldEvent SkillActivated(Timestamp timestamp)
         {

@@ -12,6 +12,8 @@ namespace Tcc.Units
     {
         static readonly Guid SKILL_BUFF_ID = new Guid("0e88cab3-e1d1-4592-9059-b36e6595e25d");
         static readonly Timestamp BUFF_DURATION = new Timestamp(25);
+        // raiden will need more ICD stuff but i need to find that
+        private static readonly ICDCreator SkillICD = new ICDCreator("4c77095b-9d2d-4e3d-8568-1697b60b7503");
 
         EventHandler<(Unit from, Unit to, Timestamp)> currentBuffListener = null;
 
@@ -64,7 +66,8 @@ namespace Tcc.Units
             }));
 
             events.Add(new WorldEvent(expiryTime, (world) => world.unitSwapped -= newBuffListener));
-            events.Add(new Hit(timestamp, Element.ELECTRO, 0, GetStatsPage, this, Types.SKILL, false, true, 1, 1, "skill"));
+            events.Add(new Hit(timestamp, Element.ELECTRO, 0, GetStatsPage, this, Types.SKILL, 
+                false, true, 1, "skill", creator: SkillICD));
 
             return events;
         }
@@ -74,7 +77,8 @@ namespace Tcc.Units
             return new RefreshableBuff<AbilityModifier>(
                 SKILL_BUFF_ID,
                 expiryTime: expiryTime,
-                (data) => new GeneralStats(damagePercent: GetFirstPassStats(data.timestamp).EnergyRecharge * 0.3) // TODO Will become part of burst MVs
+                (data) => new GeneralStats(damagePercent: GetFirstPassStats(data.timestamp).EnergyRecharge * 0.3) 
+                // TODO Will become part of burst MVs
             );
         }
 

@@ -12,6 +12,7 @@ namespace Tcc.Units
     {
         
         SnapshottedStats burstSnapshot;
+        private static readonly ICDCreator NormalICD = new ICDCreator("39dc65e1-8235-4c67-ac5c-591a19d87131");
         
         public Sucrose(int constellationLevel) : base(
             constellationLevel: constellationLevel,
@@ -49,7 +50,7 @@ namespace Tcc.Units
             {
                 // i think sucrose autos have aoe, will check later
                 new Hit(timestamp, element, normalIndex, GetStatsPage, this, Types.NORMAL, 
-                    isAoe: true, description: $"Wind Spirit Creation {normalIndex}"),
+                    isAoe: true, description: $"Wind Spirit Creation {normalIndex}", creator: NormalICD),
 
             };
         }
@@ -99,6 +100,11 @@ namespace Tcc.Units
             }
 
             return events;
+        }
+        
+        public override string ToString()
+        {
+            return "Sucrose";
         }
     }
     
