@@ -8,9 +8,8 @@ namespace Tcc.Events
         public Superconduct(
             Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit):
             base(
-                timestamp,
-                (world) => world.CalculateDamage(timestamp, Element.CRYO, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, Reaction.SUPERCONDUCT, false,true, 1, "Superconduct")
+                timestamp, (world) => world.CalculateDamage(timestamp, Element.CRYO, 0, stats, unit, Types.TRANSFORMATIVE, 
+                    new HitType(true, 1, false, false, Reaction.SUPERCONDUCT), "Superconduct")
             ) {
             
             // debuff enemy res

@@ -13,22 +13,27 @@ namespace Tcc.Enemy
         public Gauge gauge;
         private Dictionary<Guid, ICD> icdDict;
         private readonly ICD noICD = new (new Timestamp(0), 0);
+        // dumb swirl hackery 
+        private Dictionary<Reaction, int> swirlHitCounter;
+        private Timestamp swirlLastChecked;
 
         public Enemy(GeneralStats stats = null, Gauge gauge = null)
         {
             this.stats = stats ?? new GeneralStats();
             this.gauge = gauge ?? new Gauge();
             this.icdDict = new Dictionary<Guid, ICD>();
+            this.swirlHitCounter = new Dictionary<Reaction, int>();
+            this.swirlLastChecked = new Timestamp(0);
         }
         
         
         // TODO: make transformative reactions not terrible tomorrow 
-        public (double, List<WorldEvent>) TakeDamage (Timestamp timestamp, Element element, Types type, SecondPassStatsPage statsOfUnit, 
-        Unit unit, int mvIndex = 0, Reaction reaction = Reaction.NONE, bool isHeavy = false, ICDCreator creator = null)
+        public (double, List<WorldEvent>) TakeDamage (Timestamp timestamp, Element element, Types type, 
+            SecondPassStatsPage statsOfUnit, Unit unit, HitType hitType, int mvIndex = 0)
         {
             var unitAbilityStats = unit.GetAbilityStats(statsOfUnit, type, element, this, timestamp);
             ICD icd;
-
+            ICDCreator creator = hitType.Creator;
             if (creator is null)
             {
                 icd = noICD;
@@ -43,18 +48,39 @@ namespace Tcc.Enemy
             }
 
             var results = this.gauge.ElementApplied(timestamp, element, unit.GetAbilityGauge(type),
-                unit, statsOfUnit, type, icd, isHeavy);
+                unit, statsOfUnit, type, icd, hitType.IsHeavy);
             double reactionMultiplier = results.Item1;
             List<WorldEvent> events = results.Item2;
-            
+            Reaction reaction = hitType.ReactionType;
             if (type != Types.TRANSFORMATIVE)
             {
                 return (reactionMultiplier * unitAbilityStats.CalculateHitDamage(mvIndex, element) * 
                        DefenceCalculator(timestamp, element, type, statsOfUnit) * 
                        ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
             }
-            else // need a better way of handling transformative reactions
+            else// need a better way of handling transformative reactions
             {
+                var reactionType = hitType.ReactionType;
+                if (ReactionTypes.IsSwirl(reactionType))
+                {
+                    if (timestamp != swirlLastChecked)
+                    {
+                        // reset dictionary if time is different from last occurence of swirl hit
+                        swirlLastChecked = timestamp;
+                        swirlHitCounter = new Dictionary<Reaction, int>();
+                    }
+
+                    // add reaction to dict if it doesn't exist or increment if it does
+                    if (!swirlHitCounter.TryAdd(reactionType, 1))
+                    {
+                        swirlHitCounter[reactionType] += 1;
+                    }
+
+                    if (swirlHitCounter[reactionType] > 2)
+                    {
+                        return (-1, null);
+                    }
+                }
                 return (TransformativeScaling.ReactionMultiplier(reaction) * 
                        (TransformativeScaling.EmScaling(statsOfUnit.ElementalMastery) + 
                         statsOfUnit.ReactionBonus.GetPercentBonus(reaction))

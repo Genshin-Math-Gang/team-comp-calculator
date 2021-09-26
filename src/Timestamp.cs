@@ -55,6 +55,7 @@ namespace Tcc
             return this.time.CompareTo(other.time);
         }
 
-        public override string ToString() => $"t = {time}";
+        public override string ToString() => $"t = {time:F2}";
+        
     }
 }

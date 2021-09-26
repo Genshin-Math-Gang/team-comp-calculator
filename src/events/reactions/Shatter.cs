@@ -8,11 +8,10 @@ namespace Tcc.Events
         public Shatter(
             Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit):
             base(
-                timestamp,
-                
-                (world) => world.CalculateDamage(timestamp, Element.PHYSICAL, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, Reaction.SHATTERED, false,false, 1, "Shatter")
+                timestamp, (world) => world.CalculateDamage(timestamp, Element.PHYSICAL, 0, stats, unit, Types.TRANSFORMATIVE, 
+                    new HitType(false, 1, false, false, Reaction.SHATTERED), "Shatter")
             ) {
+            
         }
     }
 }

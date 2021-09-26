@@ -50,7 +50,7 @@ namespace Tcc.Units
             {
                 // i think sucrose autos have aoe, will check later
                 new Hit(timestamp, element, normalIndex, GetStatsPage, this, Types.NORMAL, 
-                    isAoe: true, description: $"Wind Spirit Creation {normalIndex}", creator: NormalICD),
+                    new HitType(false, 1, false, icd: NormalICD), $"Wind Spirit Creation {normalIndex}"),
 
             };
         }
@@ -62,7 +62,7 @@ namespace Tcc.Units
             {
                 // i think sucrose autos have aoe, will check later
                 new Hit(timestamp, element, normalIndex, GetStatsPage, this, Types.NORMAL, 
-                    isAoe: true, description: "Wind Spirit Creation CA" ),
+                    new HitType(true, 1, false, false), "Wind Spirit Creation CA" ),
 
             };
         }
@@ -73,7 +73,7 @@ namespace Tcc.Units
             {
                 SkillActivated(timestamp),
                 new Hit(timestamp, element, 0, GetStatsPage, this, Types.SKILL, 
-                    isAoe: true, description: "Astable Anemohypostasis Creation-6308" ),
+                    new HitType(true, 1, false, false), "Astable Anemohypostasis Creation-6308" ),
 
             };
         }
@@ -87,16 +87,16 @@ namespace Tcc.Units
             {
                 BurstActivated(timestamp),
                 new Hit(timestamp + 1 + 7 / 60, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    isAoe: true, description: "Forbidden Creation-Isomer 75/Type II"),
+                    new HitType(true, 1, false, false), "Forbidden Creation-Isomer 75/Type II"),
                 new Hit(timestamp + 3 +7 / 60, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    isAoe: true, description: "Forbidden Creation-Isomer 75/Type II"),
+                    new HitType(true, 1, false, false), "Forbidden Creation-Isomer 75/Type II"),
                 new Hit(timestamp + 5 + 7 / 60, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    isAoe: true, description: "Forbidden Creation-Isomer 75/Type II")
+                    new HitType(true, 1, false, false), "Forbidden Creation-Isomer 75/Type II")
             };
             if (constellationLevel >= 2)
             {
                 events.Add(new Hit(timestamp + 7 + 7 / 60, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    isAoe: true, description: "Forbidden Creation-Isomer 75/Type II"));
+                    new HitType(true, 1, false, false), "Forbidden Creation-Isomer 75/Type II"));
             }
 
             return events;

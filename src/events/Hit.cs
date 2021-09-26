@@ -8,9 +8,8 @@ namespace Tcc.Events
     {
         public Hit(
             Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
-             Units.Unit unit, Types type, bool isHeavy = false, bool isAoe = true, int bounces = 1, 
-            string description = "", Enemy.Enemy target = null, 
-            ICDCreator creator = null): 
+             Units.Unit unit, Types type, HitType hitType, 
+            string description = "", Enemy.Enemy target = null): 
             base(
             timestamp,
 
@@ -18,7 +17,7 @@ namespace Tcc.Events
             // TODO reaction is scuffed and only used for transformative reactions so i want to remove it
             (world) => world.CalculateDamage(
                 timestamp, element, mvIndex, stats(timestamp), 
-                unit, type, Reaction.NONE, isHeavy, isAoe, bounces, description, creator)
+                unit, type, hitType, description)
         ) {
         }
     }

@@ -8,11 +8,10 @@ namespace Tcc.Events
         public ElectroCharged(
             Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit): 
             // TODO: check how many times it bounces
+            // Does EC apply electro to nearby enemies
             base(
-                timestamp,
-                
-                (world) => world.CalculateDamage(timestamp, Element.ELECTRO, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, Reaction.ELECTROCHARGED, false,true, 3, "Electrocharged")
+                timestamp, (world) => world.CalculateDamage(timestamp, Element.ELECTRO, 0, stats, unit, Types.TRANSFORMATIVE, 
+                    new HitType(false, 3, false, false, Reaction.ELECTROCHARGED), "Electrocharged")
             ) {
         }
     }

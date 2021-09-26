@@ -48,9 +48,9 @@ namespace Tcc.Units
                 SkillActivated(timestamp),
                 skillSnapshot.Snapshot(timestamp),
                 new Hit(timestamp, element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
-                    isAoe: true, description: "Trail of the Qilin cast" ),
+                   new HitType(true, 1, false, false), "Trail of the Qilin cast" ),
                 new Hit(timestamp + 6, element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
-                    isAoe: true, description: "Trail of the Qilin explosion" )
+                    new HitType(true, 1, false, false),  "Trail of the Qilin explosion" )
 
             };
         }
@@ -71,7 +71,7 @@ namespace Tcc.Units
                 {
                     time += .3;
                     events.Add(new Hit(time, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                        isAoe: true,description: "Icicle hit", creator: BurstICD));
+                        new HitType(true, 1, false, icd: BurstICD),"Icicle hit"));
                 }
             }
 
@@ -90,7 +90,7 @@ namespace Tcc.Units
         private WorldEvent Icicle(Timestamp timestamp)
         {
             return new Hit(timestamp, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                isAoe: true,description: "Icicle hit");
+                new HitType(true, 1, false, false),"Icicle hit");
         }
 
         public List<WorldEvent> ChargedAttack(Timestamp timestamp, params object[] param)
@@ -100,13 +100,13 @@ namespace Tcc.Units
             return chargeLevel switch
             {
                 1 => new List<WorldEvent>(){new Hit(timestamp, Element.PHYSICAL, 0,GetStatsPage, this, 
-                    Types.CHARGED, isAoe: false, description: "Charged Attack")},
+                    Types.CHARGED, new HitType(false, 1, false, false), "Charged Attack")},
                 2 => new List<WorldEvent>(){new Hit(timestamp, Element.CRYO, 1,GetStatsPage, this, 
-                    Types.CHARGED, isAoe: false, description: "Fully Aimed charged shot")},
+                    Types.CHARGED, new HitType(false, 1, false, false), "Fully Aimed charged shot")},
                 3 => new List<WorldEvent>(){new Hit(timestamp, Element.CRYO, 2,GetStatsPage, this, 
-                    Types.CHARGED, isAoe: false, description: "Frostlake Arrow"),
+                    Types.CHARGED, new HitType(false, 1, false, false), "Frostlake Arrow"),
                     new Hit(timestamp+.3, Element.CRYO, 3,GetStatsPage, this, 
-                        Types.CHARGED, isAoe: true, description: "Frostlake Arrow bloom")
+                        Types.CHARGED, new HitType(true, 1, false, false), "Frostlake Arrow bloom")
                 }
             };
         }

@@ -73,54 +73,60 @@ namespace Tcc
         }
 
         public void DealDamage(Timestamp timestamp, Element element, SecondPassStatsPage statsPage, Unit unit, 
-            Types type, Enemy.Enemy enemy, int mvIndex, Reaction reaction,
-            bool isHeavy, string description = null, ICDCreator creator = null)
+            Types type, Enemy.Enemy enemy, int mvIndex, HitType hitType, string description = null)
         {
 
-            var results = enemy.TakeDamage(timestamp, element, type, statsPage, unit, mvIndex,
-                reaction, isHeavy, creator);
+            var results = enemy.TakeDamage(timestamp, element, type, statsPage, unit, hitType, 
+                mvIndex);
             double final_damage = results.Item1;
-            List<WorldEvent> events = results.Item2;
+            List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
             // scuffed
             foreach (var e in events)
             {
                 AddWorldEvents(e);
             }
             TotalDamage[units.IndexOf(unit)] += final_damage;
+            // hack to exit early 
+            if (final_damage < 0) { return;}
             if (description != null)
             {
-                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage}");
+                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage} to {enemy}");
             }
             else
             {
-                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage}");
+                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage} to {enemy}");
             }
         }
 
         
-        // TODO: swirl can self bounce which is bad
         public void CalculateDamage(Timestamp timestamp, Element element, int mvIndex, SecondPassStatsPage statsPage, 
-            Units.Unit unit, Types type, Reaction reaction = Reaction.NONE, bool isHeavy = false, bool isAoe = true, 
-            int bounces = 1, string description = null, ICDCreator creator = null)
+            Unit unit, Types type, HitType hitType, string description = null)
         {
-            for (int i = 0; i < bounces; i++)
+            
+            for (int i = 0; i < hitType.Bounces; i++)
             {
-                if (isAoe)
+                // might be better to iterate over enemies randomly to be more realistic 
+                if (hitType.IsAoe)
                 {
                     foreach(Enemy.Enemy enemy in enemies) 
                     {
                         DealDamage(timestamp, element, statsPage, unit, type, enemy, 
-                            mvIndex, reaction, isHeavy, description, creator);
+                            mvIndex, hitType, description);
                     }
                 }
                 else
                 {
                     foreach(Enemy.Enemy enemy in enemies)
                     {
-                        if (i > bounces) break;
+                        if (i > hitType.Bounces) break;
                         DealDamage(timestamp, element, statsPage, unit, type, enemy, 
-                            mvIndex, reaction, isHeavy, description, creator);
+                            mvIndex, hitType, description);
                         i++;
+                    }
+                    
+                    if (!hitType.SelfBounce)
+                    {
+                        break;
                     }
                 }
             }

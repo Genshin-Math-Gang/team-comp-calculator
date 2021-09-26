@@ -35,8 +35,9 @@ namespace Tcc
             
             List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
             enemies.Add(new Enemy.Enemy());
-            //enemies.Add(new Enemy.Enemy());
-            
+            enemies.Add(new Enemy.Enemy());
+            enemies.Add(new Enemy.Enemy());
+
             World world = new World(enemies);
             world.SetUnits(sucrose, benentt, null, null);
 
@@ -46,6 +47,7 @@ namespace Tcc
             
             world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
             world.AddCharacterEvent(new Timestamp(1), sucrose.Skill);
+            world.AddCharacterEvent(new Timestamp(1.5), sucrose.Skill);
             
             world.Simulate();
             

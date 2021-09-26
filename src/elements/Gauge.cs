@@ -49,7 +49,7 @@ namespace Tcc.Elements
             List<WorldEvent> transformativeReactions = TimeDecay(timestamp, statsPage, unit);
             LastChecked = timestamp;
             
-            if (icd.checkICD(timestamp))
+            if (!icd.checkICD(timestamp))
             {
                 return (1, transformativeReactions);
             }
@@ -61,16 +61,15 @@ namespace Tcc.Elements
 
             // scuffed but this fixed a bug with anemo and geo damage
             if (elementType == Element.GEO || elementType == Element.ANEMO) {}
-            else if (aura == ElementToAura(elementType))
+            else if (elementType == Element.PHYSICAL)
+            {
+                return (1, null);
+            } else if (aura == ElementToAura(elementType))
             {
                 gaugeDict[elementType].UpdateGauge(GaugeStrength);
                 return (1, null);
             } 
             
-            if (elementType == Element.PHYSICAL)
-            {
-                return (1, null);
-            }
 
             var strength = GaugeStrength * 1.25;
             // need to do something else regarding damage but for now i just want to track aura properly

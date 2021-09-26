@@ -67,7 +67,7 @@ namespace Tcc.Units
 
             events.Add(new WorldEvent(expiryTime, (world) => world.unitSwapped -= newBuffListener));
             events.Add(new Hit(timestamp, Element.ELECTRO, 0, GetStatsPage, this, Types.SKILL, 
-                false, true, 1, "skill", creator: SkillICD));
+                new HitType(true, 1, false, icd: SkillICD)));
 
             return events;
         }

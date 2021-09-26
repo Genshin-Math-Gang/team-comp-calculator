@@ -43,10 +43,14 @@ namespace Tcc.Units
             return new List<WorldEvent> {
                 SkillActivated(timestamp), // Order important: Guoba snapshots CW skill activation buff
                 skillSnapshot.Snapshot(timestamp),
-                new Hit(timestamp, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, "guoba"),
-                new Hit(timestamp + 3.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, "guoba"),
-                new Hit(timestamp + 5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, "guoba"),
-                new Hit(timestamp + 7.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, false, true, 1, "guoba"),
+                new Hit(timestamp, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL,
+                    new HitType(true, 1, false, false), "guoba"),
+                new Hit(timestamp + 3.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL,
+                    new HitType(true, 1, false, false), "guoba"),
+                new Hit(timestamp + 5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                    new HitType(true, 1, false, false), "guoba"),
+                new Hit(timestamp + 7.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                    new HitType(true, 1, false, false), "guoba"),
             };
         }
 
@@ -54,19 +58,20 @@ namespace Tcc.Units
         {
             return new List<WorldEvent> {
                 BurstActivated(timestamp),
-                new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, false, 
-                    true, 1, "nado initial 1st hit", creator: BurstInitialICD),
+                new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, 
+                    new HitType(false, 1, false, icd: BurstInitialICD), "nado initial 1st hit"),
                 new Hit(timestamp + 0.5, Element.PYRO, 1, GetStatsPage, this, Types.BURST, 
-                    false, true, 1, "nado initial 2nd hit", creator: BurstInitialICD),
+                    new HitType(false, 1, false, icd: BurstInitialICD), "nado initial 2nd hit"),
                 new Hit(timestamp + 1, Element.PYRO, 2, GetStatsPage, this, Types.BURST, 
-                    false, true, 1, "nado initial 3rd hit", creator: BurstInitialICD),
+                    new HitType(false, 1, false, icd: BurstInitialICD), "nado initial 3rd hit"),
                 burstSnapshot.Snapshot(timestamp + 1)
             };
         }
 
         public List<WorldEvent> BurstHit(Timestamp timestamp)
         {
-            return new List<WorldEvent> { new Hit(timestamp + 1, Element.PYRO, 3, burstSnapshot.GetStats, this, Types.BURST, false, true, 1, "nado") };
+            return new List<WorldEvent> { new Hit(timestamp + 1, Element.PYRO, 3, burstSnapshot.GetStats, 
+                this, Types.BURST, new HitType(false, 1, false, false), "nado") };
         }
 
         public override string ToString()
