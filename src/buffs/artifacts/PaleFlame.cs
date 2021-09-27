@@ -13,7 +13,7 @@ namespace Tcc.Buffs.Artifacts
 
         static readonly FirstPassModifier MODIFIER_2PC = (_) => (Element.PHYSICAL, 0.25);
         static readonly FirstPassModifier MODIFIER_4PC_STACK = (_) => new GeneralStats(attackPercent: 0.09);
-        static readonly FirstPassModifier MODIFIER_4PC_CONDITIONAL = (data) => data.unit.GetBuffCount(ID_4PC_STACK) == 2 ? (Element.PHYSICAL, 0.25) : new GeneralStats();
+        static readonly FirstPassModifier MODIFIER_4PC_CONDITIONAL = (data) => data.st.GetBuffCount(ID_4PC_STACK) == 2 ? (Element.PHYSICAL, 0.25) : new GeneralStats();
 
         Timestamp cooldown4pcUntil;
 

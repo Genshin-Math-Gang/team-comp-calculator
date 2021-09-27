@@ -11,11 +11,13 @@ namespace Tcc.Stats
         {
             this.damagePercentBonuses = damagePercentBonuses;
         }
+        
 
         public KeyedPercentBonus(params (KeyT key, double damagePercent)[] bonuses)
         {
             this.damagePercentBonuses = bonuses.ToDictionary((bonus) => bonus.key, (bonus) => bonus.damagePercent);
         }
+        
 
         public KeyedPercentBonus(KeyT key, double damagePercent): this((key, damagePercent))
         {
@@ -25,6 +27,8 @@ namespace Tcc.Stats
         {
             return damagePercentBonuses.TryGetValue(key, out var damagePercent) ? damagePercent : 0;
         }
+
+        public double this[KeyT key] => GetPercentBonus(key);
 
         public static KeyedPercentBonus<KeyT> operator +(KeyedPercentBonus<KeyT> bonus1, KeyedPercentBonus<KeyT> bonus2)
         {

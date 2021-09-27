@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Tcc.Buffs;
 using Tcc.Stats;
 using Tcc.Elements;
 using Tcc.Events;
@@ -7,24 +9,26 @@ using Tcc.Units;
 
 namespace Tcc.Enemy
 {
-    public class Enemy
+    public class Enemy: StatObject
     {
-        private GeneralStats stats;
+
         public Gauge gauge;
         private Dictionary<Guid, ICD> icdDict;
         private readonly ICD noICD = new (new Timestamp(0), 0);
+
         // dumb swirl hackery 
         private Dictionary<Reaction, int> swirlHitCounter;
         private Timestamp swirlLastChecked;
 
-        public Enemy(GeneralStats stats = null, Gauge gauge = null)
+        public Enemy(GeneralStats stats = null, Gauge gauge = null): base(stats)
         {
-            this.stats = stats ?? new GeneralStats();
             this.gauge = gauge ?? new Gauge();
             this.icdDict = new Dictionary<Guid, ICD>();
             this.swirlHitCounter = new Dictionary<Reaction, int>();
             this.swirlLastChecked = new Timestamp(0);
         }
+        
+        public void AddBuff(Buff<FirstPassModifier> buff) => buff.AddToList(firstPassBuffs);
         
         
         // TODO: make transformative reactions not terrible tomorrow 
@@ -50,7 +54,7 @@ namespace Tcc.Enemy
             var results = this.gauge.ElementApplied(timestamp, element, unit.GetAbilityGauge(type),
                 unit, statsOfUnit, type, icd, hitType.IsHeavy);
             double reactionMultiplier = results.Item1;
-            List<WorldEvent> events = results.Item2;
+            List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
             Reaction reaction = hitType.ReactionType;
             if (type != Types.TRANSFORMATIVE)
             {
@@ -80,18 +84,23 @@ namespace Tcc.Enemy
                     {
                         return (-1, null);
                     }
+
+                    events.Add(unit.TriggeredSwirl(timestamp, reaction, this));
                 }
                 return (TransformativeScaling.ReactionMultiplier(reaction) * 
                        (TransformativeScaling.EmScaling(statsOfUnit.ElementalMastery) + 
                         statsOfUnit.ReactionBonus.GetPercentBonus(reaction))
                        * TransformativeScaling.damage[statsOfUnit.Level] * 
-                       ResistanceCalculation(timestamp, element, type, statsOfUnit), null);
+                       ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
             }
         }
+        
+        
 
         private double ResistanceCalculation (Timestamp timestamp, Element element, Types type, StatsPage statsOfUnit)
         {
-            var resistance = stats.ElementalResistance.GetPercentBonus(element);
+            // idk if this is the correct function
+            var resistance = GetFirstPassStats(timestamp).ElementalResistance[element];
 
             if (resistance < 0)
             {
@@ -107,7 +116,7 @@ namespace Tcc.Enemy
 
         private double DefenceCalculator (Timestamp timestamp, Element element, Types type, StatsPage statsOfUnit)
         {
-            return (statsOfUnit.Level + 100d)/((1/* TODO - statsOfUnit.DEFReduction*/) * (stats.Level + 100) + statsOfUnit.Level + 100);
+            return (statsOfUnit.Level + 100d)/((1/* TODO - statsOfUnit.DEFReduction*/) * (startingGeneralStats.Level + 100) + statsOfUnit.Level + 100);
         }
         
         public bool HasAura(Aura aura) => throw new NotImplementedException();

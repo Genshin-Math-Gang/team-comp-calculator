@@ -69,6 +69,7 @@ namespace Tcc.Units
 
         public List<WorldEvent> Skill(Timestamp timestamp)
         {
+            
             return new List<WorldEvent>()
             {
                 SkillActivated(timestamp),

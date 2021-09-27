@@ -15,5 +15,11 @@ namespace Tcc.Events
         public Timestamp Timestamp { get; }
 
         public void Apply(World world) => effect(world);
+
+        public override string ToString()
+        {
+            return $"{effect.Method} at {Timestamp}";
+        }
     }
+    
 }

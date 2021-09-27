@@ -110,7 +110,7 @@ namespace Tcc
                 {
                     foreach(Enemy.Enemy enemy in enemies) 
                     {
-                        DealDamage(timestamp, element, statsPage, unit, type, enemy, 
+                        DealDamage(timestamp+i*hitType.Delay, element, statsPage, unit, type, enemy, 
                             mvIndex, hitType, description);
                     }
                 }
@@ -119,7 +119,7 @@ namespace Tcc
                     foreach(Enemy.Enemy enemy in enemies)
                     {
                         if (i > hitType.Bounces) break;
-                        DealDamage(timestamp, element, statsPage, unit, type, enemy, 
+                        DealDamage(timestamp+i*hitType.Delay, element, statsPage, unit, type, enemy, 
                             mvIndex, hitType, description);
                         i++;
                     }
@@ -133,6 +133,7 @@ namespace Tcc
         }
         public void Simulate()
         {
+            // minor order changes needed to make this work properly
             queuedWorldEvents = characterEvents
                 .SelectMany((characterEvent) => characterEvent.GetWorldEvents())
                 .OrderBy((worldEvent) => worldEvent.Timestamp)

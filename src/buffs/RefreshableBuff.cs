@@ -21,7 +21,7 @@ namespace Tcc.Buffs
 
             var existingStacks = buffs.Where((buff) => buff.id == this.id);
 
-            if(existingStacks.Count() > maxStacks)
+            if (existingStacks.Count() > maxStacks)
             {
                 var toRemove = existingStacks
                     .Cast<RefreshableBuff<ModifierT>>()

@@ -9,7 +9,7 @@ using Tcc.Weapons;
 
 namespace Tcc.Units
 {
-    public abstract class Unit
+    public abstract class Unit: StatObject
     {
         protected readonly int constellationLevel;
         protected readonly int burstEnergyCost;
@@ -37,11 +37,13 @@ namespace Tcc.Units
         public event EventHandler<(Timestamp timestamp, int reaction)> triggeredReactionHook; // TODO Not fired by anything
         public event EventHandler<(Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
 
+        public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)> swirlTriggeredHook;
+
         protected Unit(
             int constellationLevel, Element element, WeaponType weaponType, int burstEnergyCost,
             CapacityStats capacityStats, GeneralStats generalStats, AbilityStats burst, AbilityStats skill, 
             AbilityStats normal, AbilityStats charged, AbilityStats plunge 
-        ) {
+        ): base(generalStats) {
             this.constellationLevel = constellationLevel;
             this.element = element;
             this.weaponType = weaponType;
@@ -50,7 +52,6 @@ namespace Tcc.Units
             this.CurrentEnergy = burstEnergyCost;
 
             this.startingCapacityStats = capacityStats;
-            this.startingGeneralStats = generalStats;
 
             this.startingAbilityStats[Types.NORMAL] = normal;
             this.startingAbilityStats[Types.BURST] = burst;
@@ -60,10 +61,7 @@ namespace Tcc.Units
         }
 
         public Weapon Weapon { get; set; }
-
-        public double CurrentHp { get; }
-        public double CurrentEnergy { get; private set; }
-        public bool IsShielded => throw new NotImplementedException();
+        
 
         public double GetAbilityGauge(Types type)
         {
@@ -75,29 +73,11 @@ namespace Tcc.Units
             return startingAbilityStats[type].GaugeStrength;
         }
 
-        public List<WorldEvent> SwitchUnit(Timestamp timestamp)
+        public List<WorldEvent> SwitchUnit(Timestamp timestamp) 
         {
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
-
-        public CapacityStats CapacityStats => capacityBuffs.Aggregate(startingCapacityStats, (total, buff) => total + buff.GetModifier());
-
-        public StatsPage GetFirstPassStats(Timestamp timestamp)
-        {
-            var capacityStats = CapacityStats;
-            firstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
-
-            return firstPassBuffs.Aggregate(new StatsPage(capacityStats, startingGeneralStats), (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, capacityStats)));
-        }
-
-        public SecondPassStatsPage GetStatsPage(Timestamp timestamp)
-        {
-            var stats = new SecondPassStatsPage(GetFirstPassStats(timestamp));
-            secondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
-
-            return secondPassBuffs.Aggregate(stats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
-        }
-
+        
         public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy.Enemy enemy, Timestamp timestamp)
         {
             enemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -125,51 +105,9 @@ namespace Tcc.Units
             return result;
         }
         
-        
-
-        public void AddBuff(Buff<CapacityModifier> buff) => buff.AddToList(capacityBuffs);
-        public void AddBuff(Buff<FirstPassModifier> buff) => buff.AddToList(firstPassBuffs);
-        public void AddBuff(Buff<SecondPassModifier> buff) => buff.AddToList(secondPassBuffs);
-        public void AddBuff(Buff<EnemyBasedModifier> buff) => buff.AddToList(enemyBasedBuffs);
-
-        public void AddBuff(Buff<AbilityModifier> buff, params Types[] abilityTypes)
-        {
-            foreach (var abilityType in abilityTypes)
-            {
-                if (abilityBuffs.TryGetValue(abilityType, out var list))
-                {
-                    buff.AddToList(list);
-                }
-                else
-                {
-                    list = new List<Buff<AbilityModifier>>();
-                    buff.AddToList(list);
-                    abilityBuffs.Add(abilityType, list);
-                }
-            }
-        }
-
-        public int GetBuffCount(Guid id)
-        {
-            return capacityBuffs.Count((buff) => buff.id == id)
-                + firstPassBuffs.Count((buff) => buff.id == id)
-                + secondPassBuffs.Count((buff) => buff.id == id)
-                + enemyBasedBuffs.Count((buff) => buff.id == id)
-                + abilityBuffs.Values.SelectMany((list) => list).Distinct().Count((buff) => buff.id == id);
-        }
-
-        public void RemoveAllBuffs(Guid id)
-        {
-            capacityBuffs.RemoveAll((buff) => buff.id == id);
-            firstPassBuffs.RemoveAll((buff) => buff.id == id);
-            secondPassBuffs.RemoveAll((buff) => buff.id == id);
-            enemyBasedBuffs.RemoveAll((buff) => buff.id == id);
-
-            foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.id == id);
-        }
 
         public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, CapacityStats.Energy);
-          public void LoseEnergy(int energy) => CurrentEnergy = Math.Max(CurrentEnergy - energy, 0);
+        public void LoseEnergy(int energy) => CurrentEnergy = Math.Max(CurrentEnergy - energy, 0);
 
         protected WorldEvent SkillActivated(Timestamp timestamp)
         {
@@ -189,6 +127,16 @@ namespace Tcc.Units
         protected WorldEvent ParticleCollected(Timestamp timestamp, Element? element)
         {
             return new WorldEvent(timestamp, (world) => particleCollectedHook?.Invoke(this, (timestamp, element)));
+        }
+
+        public WorldEvent TriggeredSwirl(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)
+        {
+            if (!ReactionTypes.IsSwirl(reaction))
+            {
+                // throw some error
+            }
+
+            return new WorldEvent(timestamp, world => swirlTriggeredHook?.Invoke(this, (timestamp, reaction, enemy)));
         }
 
         //public abstract Dictionary<string, Delegate> GetCharacterEvents();
