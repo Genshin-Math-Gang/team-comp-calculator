@@ -12,7 +12,6 @@ namespace Tcc.Events
                     new HitType(true, 1, false, false, Reaction.SUPERCONDUCT), "Superconduct")
             ) {
             
-            // debuff enemy res
         }
     }
 }

@@ -90,11 +90,11 @@ namespace Tcc
             if (final_damage < 0) { return;}
             if (description != null)
             {
-                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage} to {enemy}");
+                Console.WriteLine($"Damage dealt by {description} at {timestamp} is {final_damage:N2} to {enemy}");
             }
             else
             {
-                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage} to {enemy}");
+                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage:N2} to {enemy}");
             }
         }
 

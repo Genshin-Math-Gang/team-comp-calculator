@@ -39,9 +39,7 @@ namespace Tcc.Buffs.Artifacts
         {
             
             unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_4PC, MODIFIER_4PC_PASSIVE));
-
-            /*unit.skillActivatedHook += (_, timestamp)
-                => unit.AddBuff(new RefreshableBuff<FirstPassModifier>(ID_4PC_STACK, timestamp + 10, MODIFIER_4PC_STACK, maxStacks: 3));*/
+            
 
             
             unit.swirlTriggeredHook += (_, param)

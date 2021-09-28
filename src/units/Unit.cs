@@ -38,6 +38,7 @@ namespace Tcc.Units
         public event EventHandler<(Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
 
         public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)> swirlTriggeredHook;
+        
 
         protected Unit(
             int constellationLevel, Element element, WeaponType weaponType, int burstEnergyCost,

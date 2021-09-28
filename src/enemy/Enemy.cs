@@ -15,6 +15,10 @@ namespace Tcc.Enemy
         public Gauge gauge;
         private Dictionary<Guid, ICD> icdDict;
         private readonly ICD noICD = new (new Timestamp(0), 0);
+        private static Guid superconductID = new ("fb1fd9b8-6096-4dea-9e9a-5f3fa18976b8");
+
+        private static GeneralStats superconductDebuff =
+            new GeneralStats(elementalResistance: new KeyedPercentBonus<Element>(Element.PHYSICAL, -0.4));
 
         // dumb swirl hackery 
         private Dictionary<Reaction, int> swirlHitCounter;
@@ -32,7 +36,7 @@ namespace Tcc.Enemy
         
         
         // TODO: make transformative reactions not terrible tomorrow 
-        public (double, List<WorldEvent>) TakeDamage (Timestamp timestamp, Element element, Types type, 
+        public (double, List<WorldEvent>) TakeDamage(Timestamp timestamp, Element element, Types type,
             SecondPassStatsPage statsOfUnit, Unit unit, HitType hitType, int mvIndex = 0)
         {
             var unitAbilityStats = unit.GetAbilityStats(statsOfUnit, type, element, this, timestamp);
@@ -41,10 +45,12 @@ namespace Tcc.Enemy
             if (creator is null)
             {
                 icd = noICD;
-            } else if (icdDict.ContainsKey(creator.Guid))
+            }
+            else if (icdDict.ContainsKey(creator.Guid))
             {
                 icd = icdDict[creator.Guid];
-            } else
+            }
+            else
             {
                 ICD temp = creator.CreateICD();
                 icdDict[creator.Guid] = temp;
@@ -58,11 +64,11 @@ namespace Tcc.Enemy
             Reaction reaction = hitType.ReactionType;
             if (type != Types.TRANSFORMATIVE)
             {
-                return (reactionMultiplier * unitAbilityStats.CalculateHitDamage(mvIndex, element) * 
-                       DefenceCalculator(timestamp, element, type, statsOfUnit) * 
-                       ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
+                return (reactionMultiplier * unitAbilityStats.CalculateHitDamage(mvIndex, element) *
+                        DefenceCalculator(timestamp, element, type, statsOfUnit) *
+                        ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
             }
-            else// need a better way of handling transformative reactions
+            else // need a better way of handling transformative reactions
             {
                 var reactionType = hitType.ReactionType;
                 if (ReactionTypes.IsSwirl(reactionType))
@@ -87,11 +93,18 @@ namespace Tcc.Enemy
 
                     events.Add(unit.TriggeredSwirl(timestamp, reaction, this));
                 }
-                return (TransformativeScaling.ReactionMultiplier(reaction) * 
-                       (TransformativeScaling.EmScaling(statsOfUnit.ElementalMastery) + 
-                        statsOfUnit.ReactionBonus.GetPercentBonus(reaction))
-                       * TransformativeScaling.damage[statsOfUnit.Level] * 
-                       ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
+                else if (reactionType == Reaction.SUPERCONDUCT)
+                {
+                    // superconduct resist shred
+                    events.Add(new AddBuff<FirstPassModifier>(timestamp, 
+                        new RefreshableBuff<FirstPassModifier>(superconductID, timestamp + 10, _ => superconductDebuff), this));
+                }
+
+                return (TransformativeScaling.ReactionMultiplier(reaction) *
+                        (TransformativeScaling.EmScaling(statsOfUnit.ElementalMastery) +
+                         statsOfUnit.ReactionBonus.GetPercentBonus(reaction))
+                        * TransformativeScaling.damage[statsOfUnit.Level] *
+                        ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
             }
         }
         
