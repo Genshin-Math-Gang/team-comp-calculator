@@ -15,7 +15,7 @@ namespace Tcc
     {
         List<Unit> units;
         List<CharacterEvent> characterEvents;
-        List<WorldEvent> queuedWorldEvents;
+        private WorldEventQueue queuedWorldEvents;
         List<Enemy.Enemy> enemies;
         public double[] TotalDamage;
 
@@ -72,6 +72,12 @@ namespace Tcc
             get => enemies;
         }
 
+        public void EnemyDeath(Timestamp timestamp, Enemy.Enemy enemy)
+        {
+            enemies.Remove(enemy);
+            Console.WriteLine($"Enemy {enemy} died at {timestamp}");
+        }
+
         public void DealDamage(Timestamp timestamp, Element element, SecondPassStatsPage statsPage, Unit unit, 
             Types type, Enemy.Enemy enemy, int mvIndex, HitType hitType, string description = null)
         {
@@ -81,10 +87,7 @@ namespace Tcc
             double final_damage = results.Item1;
             List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
             // scuffed
-            foreach (var e in events)
-            {
-                AddWorldEvents(e);
-            }
+            AddWorldEvents(events);
             TotalDamage[units.IndexOf(unit)] += final_damage;
             // hack to exit early 
             if (final_damage < 0) { return;}
@@ -134,27 +137,31 @@ namespace Tcc
         public void Simulate()
         {
             // minor order changes needed to make this work properly
-            queuedWorldEvents = characterEvents
-                .SelectMany((characterEvent) => characterEvent.GetWorldEvents())
-                .OrderBy((worldEvent) => worldEvent.Timestamp)
-                .ToList();
+            queuedWorldEvents = new(characterEvents);
 
-            while(queuedWorldEvents.Any())
+
+            while(queuedWorldEvents.IsEmpty())
             {
-                var nextEvent = queuedWorldEvents[0];
-
-                queuedWorldEvents.RemoveAt(0);
+                var nextEvent = queuedWorldEvents.DeQueue();
                 nextEvent.Apply(this);
             }
         }
 
-        public void AddWorldEvents(params WorldEvent[] events)
+        /*public void AddWorldEvents(params WorldEvent[] events)
         {
             queuedWorldEvents.AddRange(events);
 
             queuedWorldEvents = queuedWorldEvents
                 .OrderBy((worldEvent) => worldEvent.Timestamp)
                 .ToList();
+        }*/
+        
+        public void AddWorldEvents(List<WorldEvent> worldEvents)
+        {
+            foreach (var worldEvent in worldEvents)
+            {
+                queuedWorldEvents.Add(worldEvent);
+            }
         }
     }
 }

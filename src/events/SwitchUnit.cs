@@ -7,7 +7,7 @@ namespace Tcc.Events
     {
         public SwitchUnit(Timestamp timestamp, Units.Unit unit): base(
             timestamp,
-            (world) => world.SwitchUnit(timestamp, unit)
+            (world) => world.SwitchUnit(timestamp, unit), $"Switched to {unit}"
         ) {
         }
     }

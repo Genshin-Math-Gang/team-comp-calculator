@@ -17,7 +17,7 @@ namespace Tcc.Events
             // TODO reaction is scuffed and only used for transformative reactions so i want to remove it
             (world) => world.CalculateDamage(
                 timestamp, element, mvIndex, stats(timestamp), 
-                unit, type, hitType, description)
+                unit, type, hitType, description), description
         ) {
         }
     }

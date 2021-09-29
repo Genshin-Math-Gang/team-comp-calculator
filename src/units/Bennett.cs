@@ -56,7 +56,9 @@ namespace Tcc.Units
                 var startTime = timestamp + tick * BUFF_FREQUENCY;
 
                 // TODO Self-apply pyro
-                events.Add(new WorldEvent(startTime, (world) => world.OnFieldUnit.AddBuff(CreateBurstBuff(startTime))));
+                // TODO make this use buff world event
+                events.Add(new WorldEvent(startTime, 
+                    (world) => world.OnFieldUnit.AddBuff(CreateBurstBuff(startTime)), "Bennett buff refresh", 1));
 
                 // Deal burst damage after modifier snapshot and first application,
                 if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, 

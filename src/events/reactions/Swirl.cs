@@ -15,8 +15,10 @@ namespace Tcc.Events
             base(
                 timestamp, (world) => world.CalculateDamage(timestamp, element, 0, stats, unit, Types.TRANSFORMATIVE,
                     new HitType(true, 1, false, reaction: SwirlType(element)), "Swirl " + element)
-            ) {
-            
+            )
+        {
+            // bruh
+            Descrption = "Swirl " + element;
         }
 
         public static Reaction SwirlType(Element element)

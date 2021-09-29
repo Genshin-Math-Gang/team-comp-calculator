@@ -112,12 +112,12 @@ namespace Tcc.Units
 
         protected WorldEvent SkillActivated(Timestamp timestamp)
         {
-            return new WorldEvent(timestamp, (world) => skillActivatedHook?.Invoke(this, timestamp));
+            return new WorldEvent(timestamp, (world) => skillActivatedHook?.Invoke(this, timestamp),$"Skill activated by {this}");
         }
 
         protected WorldEvent BurstActivated(Timestamp timestamp)
         {
-            return new WorldEvent(timestamp, (world) => burstActivatedHook?.Invoke(this, timestamp));
+            return new WorldEvent(timestamp, (world) => burstActivatedHook?.Invoke(this, timestamp), $"Burst activated by {this}");
         }
 
         protected WorldEvent TriggeredReaction(Timestamp timestamp, int reaction)
@@ -137,7 +137,8 @@ namespace Tcc.Units
                 // throw some error
             }
 
-            return new WorldEvent(timestamp, world => swirlTriggeredHook?.Invoke(this, (timestamp, reaction, enemy)));
+            return new WorldEvent(timestamp, _ => swirlTriggeredHook?.Invoke(this, (timestamp, reaction, enemy)),
+                $"{this} triggered swirl at {timestamp}", 1);
         }
 
         //public abstract Dictionary<string, Delegate> GetCharacterEvents();

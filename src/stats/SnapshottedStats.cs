@@ -24,7 +24,7 @@ namespace Tcc.Stats
             {
                 stats = unit.GetStatsPage(timestamp);
                 System.Console.WriteLine($"Snapshotted {unit} {type}");
-            });
+            }, priority:1);
         }
     }
 }

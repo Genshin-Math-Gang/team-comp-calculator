@@ -12,19 +12,22 @@ namespace Tcc.Enemy
     public class Enemy: StatObject
     {
 
-        public Gauge gauge;
+        private Gauge gauge;
+
         private Dictionary<Guid, ICD> icdDict;
         private readonly ICD noICD = new (new Timestamp(0), 0);
         private static Guid superconductID = new ("fb1fd9b8-6096-4dea-9e9a-5f3fa18976b8");
 
         private static GeneralStats superconductDebuff =
             new GeneralStats(elementalResistance: new KeyedPercentBonus<Element>(Element.PHYSICAL, -0.4));
+        
+        
 
         // dumb swirl hackery 
         private Dictionary<Reaction, int> swirlHitCounter;
         private Timestamp swirlLastChecked;
 
-        public Enemy(GeneralStats stats = null, Gauge gauge = null): base(stats)
+        public Enemy(GeneralStats stats=null, Gauge gauge=null, CapacityStats hp=null): base(stats, hp)
         {
             this.gauge = gauge ?? new Gauge();
             this.icdDict = new Dictionary<Guid, ICD>();
@@ -62,11 +65,13 @@ namespace Tcc.Enemy
             double reactionMultiplier = results.Item1;
             List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
             Reaction reaction = hitType.ReactionType;
+            double damage;
             if (type != Types.TRANSFORMATIVE)
             {
-                return (reactionMultiplier * unitAbilityStats.CalculateHitDamage(mvIndex, element) *
-                        DefenceCalculator(timestamp, element, type, statsOfUnit) *
-                        ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
+                damage = reactionMultiplier * 
+                         unitAbilityStats.CalculateHitDamage(mvIndex, element) *
+                         DefenceCalculator(timestamp, element, type, statsOfUnit) *
+                         ResistanceCalculation(timestamp, element, type, statsOfUnit);
             }
             else // need a better way of handling transformative reactions
             {
@@ -97,15 +102,18 @@ namespace Tcc.Enemy
                 {
                     // superconduct resist shred
                     events.Add(new AddBuff<FirstPassModifier>(timestamp, 
-                        new RefreshableBuff<FirstPassModifier>(superconductID, timestamp + 10, _ => superconductDebuff), this));
+                        new RefreshableBuff<FirstPassModifier>(superconductID, timestamp + 10, 
+                            _ => superconductDebuff), this));
                 }
 
-                return (TransformativeScaling.ReactionMultiplier(reaction) *
-                        (TransformativeScaling.EmScaling(statsOfUnit.ElementalMastery) +
-                         statsOfUnit.ReactionBonus.GetPercentBonus(reaction))
-                        * TransformativeScaling.damage[statsOfUnit.Level] *
-                        ResistanceCalculation(timestamp, element, type, statsOfUnit), events);
+                damage = TransformativeScaling.ReactionMultiplier(reaction) *
+                         (TransformativeScaling.EmScaling(statsOfUnit.ElementalMastery) +
+                          statsOfUnit.ReactionBonus.GetPercentBonus(reaction))
+                         * TransformativeScaling.damage[statsOfUnit.Level] *
+                         ResistanceCalculation(timestamp, element, type, statsOfUnit);
             }
+            events.AddRange(TakeDamage(timestamp, damage));
+            return (damage, events);
         }
         
         
@@ -133,6 +141,17 @@ namespace Tcc.Enemy
         }
         
         public bool HasAura(Aura aura) => throw new NotImplementedException();
+
+        private List<WorldEvent> TakeDamage(Timestamp timestamp, double damage)
+        {
+            var events = new List<WorldEvent>();
+            if (startingCapacityStats.Hp.ReduceValue(damage))
+            {
+                events.Add(new EnemyDeath(this, timestamp));
+            }
+
+            return events;
+        }
     }
 
     

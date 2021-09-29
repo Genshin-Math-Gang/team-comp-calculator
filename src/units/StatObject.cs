@@ -25,12 +25,15 @@ namespace Tcc.Units
         protected readonly Dictionary<Element, List<Buff<ElementBasedModifier>>> elementBasedBuffs = new();
         protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> abilityBuffs = new();
         
-        protected StatObject(GeneralStats stats)
+        protected StatObject(GeneralStats stats, CapacityStats capacityStats=null)
         {
             startingGeneralStats = stats ?? new GeneralStats();
+            startingCapacityStats = capacityStats ?? new CapacityStats(baseHp:10000);
         }
         
-        public double CurrentHp { get; }
+        public double CurrentHp {
+            get { return CapacityStats.Hp.Current; }
+        }
         public double CurrentEnergy { get; protected set; }
         public bool IsShielded => throw new NotImplementedException();
         
