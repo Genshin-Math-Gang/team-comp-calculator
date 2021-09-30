@@ -21,7 +21,7 @@ namespace Tcc.Events
 
         public int CompareTo(WorldEvent other)
         {
-            int temp = this.Timestamp.CompareTo(other.Timestamp);
+            int temp = Timestamp.CompareTo(other.Timestamp);
             if (temp != 0)
             {
                 return temp;

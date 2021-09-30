@@ -17,11 +17,23 @@ namespace Tcc
                 .ToList();
             _events.Sort();
         }
+        
+        public WorldEventQueue()
+        {
+            _events = new List<WorldEvent>();
+        }
 
         public void Add(WorldEvent worldEvent)
         {
-            int index = Math.Abs(_events.BinarySearch(worldEvent));
-            _events.Insert(index, worldEvent);
+            int index = _events.BinarySearch(worldEvent);
+            if (index < 0)
+            {
+                _events.Insert(-index-1, worldEvent);
+            }
+            else
+            {
+                _events.Insert(index, worldEvent);
+            }
         }
 
         public WorldEvent DeQueue()
