@@ -34,6 +34,8 @@ namespace Tcc.Enemy
             this.swirlHitCounter = new Dictionary<Reaction, int>();
             this.swirlLastChecked = new Timestamp(0);
         }
+
+        public Aura GetAura() => gauge.GetAura();
         
         public void AddBuff(Buff<FirstPassModifier> buff) => buff.AddToList(firstPassBuffs);
         

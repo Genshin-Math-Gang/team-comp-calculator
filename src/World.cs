@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Tcc.Buffs;
 using Tcc.Elements;
@@ -153,10 +154,28 @@ namespace Tcc
             }
         }
 
+        public void InfuseAbility(Timestamp startTime, Timestamp endTime, Anemo unit)
+        {
+            Element element = Element.PHYSICAL;
+            foreach (var enemy in enemies)
+            {
+                var temp = Converter.AuraToElement(enemy.GetAura());
+                if ((int) temp < (int) element)
+                {
+                    element = temp;
+                }
+                
+            }
+
+            unit.Infusion = element;
+            Console.WriteLine($"{unit} had their ability infused with {element} at {startTime}");
+            AddWorldEvent(new WorldEvent(endTime, _ => unit.Infusion=Element.PHYSICAL));
+        }
+        
+
         public void Simulate()
         {
-            // minor order changes needed to make this work properly
-            queuedWorldEvents = new(characterEvents);
+            queuedWorldEvents = new WorldEventQueue(characterEvents);
 
 
             while (queuedWorldEvents.IsEmpty())

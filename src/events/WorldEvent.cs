@@ -6,17 +6,20 @@ namespace Tcc.Events
     public class WorldEvent: IComparable<WorldEvent>
     {
         readonly Action<World> effect;
+        private readonly Action<bool, object[]> condition;
         public String Descrption;
         
         // TODO: maybe this should be its own class but i am lazy rn
         private int priority;
 
-        public WorldEvent(Timestamp timestamp, Action<World> effect, String description=null, int priority=5)
+        public WorldEvent(Timestamp timestamp, Action<World> effect, String description=null, int priority=5, 
+            Action<bool, object[]> condition=null)
         {
             this.Timestamp = timestamp;
             this.effect = effect;
             this.Descrption = description;
             this.priority = priority;
+            
         }
 
         public int CompareTo(WorldEvent other)
@@ -32,7 +35,7 @@ namespace Tcc.Events
 
         public Timestamp Timestamp { get; }
 
-        public void Apply(World world) => effect(world);
+        public virtual void Apply(World world) => effect(world);
 
         public override string ToString()
         {

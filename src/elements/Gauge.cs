@@ -21,6 +21,8 @@ namespace Tcc.Elements
 
         public Gauge() {}
 
+        public Aura GetAura() => aura;
+
         private double MultiplicativeMultiplier (StatsPage stats, Reaction reaction)
         {
             double em = stats.ElementalMastery;
@@ -60,11 +62,11 @@ namespace Tcc.Elements
             }
 
             // scuffed but this fixed a bug with anemo and geo damage
-            if (elementType == Element.GEO || elementType == Element.ANEMO) {}
+            if (elementType is Element.GEO or Element.ANEMO) {}
             else if (elementType == Element.PHYSICAL)
             {
                 return (1, null);
-            } else if (aura == ElementToAura(elementType))
+            } else if (aura == Converter.ElementToAura(elementType))
             {
                 gaugeDict[elementType].UpdateGauge(GaugeStrength);
                 return (1, null);
@@ -87,7 +89,7 @@ namespace Tcc.Elements
             {
                 case Aura.NONE:
                     gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
-                    aura = ElementToAura(elementType);
+                    aura = Converter.ElementToAura(elementType);
                     return (1, null);
                 case Aura.PYRO:
                     switch (elementType)
@@ -343,12 +345,12 @@ namespace Tcc.Elements
             }
             Time:
             foreach (var pair in gaugeDict)
-                {
+            {
                     Element element = pair.Key;
                     GaugeElement gaugeElement = pair.Value;
                     //element.TimeDecay(timeSince);
                     ElementTimeDecay(element, timeSince);
-                }
+            }
 
             return ecTicks;
         }
@@ -381,18 +383,7 @@ namespace Tcc.Elements
             }
             gauge.GaugeValue -= value;
         }
-
-        private Aura ElementToAura (Element element)
-        {
-            switch(element)
-            {
-                case Element.PYRO: return Aura.PYRO;
-                case Element.CRYO: return Aura.CRYO;
-                case Element.HYDRO: return Aura.HYDRO;
-                case Element.ELECTRO: return Aura.ELECTRO;
-            }
-            return Aura.NONE;
-        }
+        
 
         private void RemoveFrozen()
         {
