@@ -4,17 +4,18 @@ namespace Tcc.Events
 {
     public struct HitType
     {
-        public bool IsAoe;
-        public int Bounces;
-        public bool SelfBounce;
-        public bool IsHeavy;
-        public Reaction ReactionType;
-        public ICDCreator Creator;
+        public readonly bool IsAoe;
+        public readonly int Bounces;
+        public readonly bool SelfBounce;
+        public readonly bool IsHeavy;
+        public readonly Reaction ReactionType;
+        public readonly ICDCreator Creator;
         // TODO: need to figure out how long different attacks take to bounce
-        public Timestamp Delay;
+        public readonly Timestamp Delay;
+        public readonly int Gauge;
 
         public HitType(bool aoe, int bounces, bool self, bool heavy=false, Reaction reaction=Reaction.UNKNOWN, 
-            ICDCreator icd=null, Timestamp delay=null)
+            ICDCreator icd=null, Timestamp delay=null, int gauge=1)
         {
             IsAoe = aoe;
             Bounces = bounces;
@@ -23,6 +24,7 @@ namespace Tcc.Events
             ReactionType = reaction;
             Creator = icd;
             Delay = delay ?? new Timestamp(0.1);
+            Gauge = gauge;
         }
     }
 }

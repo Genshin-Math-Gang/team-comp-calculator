@@ -14,7 +14,6 @@ namespace Tcc.Elements
     {        
         private Dictionary<Element, GaugeElement> gaugeDict = new Dictionary<Element, GaugeElement>();
         private Timestamp LastChecked = new Timestamp(0);
-        private Dictionary<Tuple<Units.Unit, Types>, ICD> ICDtimer = new Dictionary<Tuple<Units.Unit, Types>, ICD>();
         private Aura aura = Aura.NONE;
         private Timestamp FreezeDuration = new Timestamp(0);
         private Timestamp FreezeAura = new Timestamp(0);
@@ -40,13 +39,6 @@ namespace Tcc.Elements
             // what is this
             Tuple<Unit, Types> key = new Tuple<Unit, Types>(unit, type);
             
-            /*if (!ICDtimer.ContainsKey(key))
-            {
-                ICDtimer.Add(key, new ICD(timestamp));
-            } else if (!ICDtimer[key].checkICD(timestamp, icdOveride))
-            {
-                return 1;
-            }*/
             
             List<WorldEvent> transformativeReactions = TimeDecay(timestamp, statsPage, unit);
             LastChecked = timestamp;
@@ -66,7 +58,8 @@ namespace Tcc.Elements
             else if (elementType == Element.PHYSICAL)
             {
                 return (1, null);
-            } else if (aura == Converter.ElementToAura(elementType))
+            } else if (aura == Aura.NONE) { } 
+            else if (aura == Converter.ElementToAura(elementType))
             {
                 gaugeDict[elementType].UpdateGauge(GaugeStrength);
                 return (1, null);

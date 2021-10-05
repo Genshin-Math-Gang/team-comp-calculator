@@ -20,5 +20,20 @@ namespace Tcc.Events
                 unit, type, hitType, description), description
         ) {
         }
+        
+        public Hit(
+            Timestamp timestamp, Func<Element> element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
+            Units.Unit unit, Types type, HitType hitType, 
+            string description = "", Enemy.Enemy target = null): 
+            base(
+                timestamp,
+
+                // TODO We'll need to hook in reactions, enemies, multi-target and infusion here
+                // TODO reaction is scuffed and only used for transformative reactions so i want to remove it
+                (world) => world.CalculateDamage(
+                    timestamp, element(), mvIndex, stats(timestamp), 
+                    unit, type, hitType, description), description
+            ) {
+        }
     }
 }

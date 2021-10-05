@@ -62,7 +62,7 @@ namespace Tcc.Units
 
                 // Deal burst damage after modifier snapshot and first application,
                 if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, 
-                    Types.BURST, new HitType(true, 1, false), "Bennett Burst"));
+                    Types.BURST, new HitType(true, 1, false, gauge:2), "Bennett Burst"));
             }
 
             return events;

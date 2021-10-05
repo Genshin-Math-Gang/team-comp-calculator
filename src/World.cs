@@ -156,6 +156,8 @@ namespace Tcc
 
         public void InfuseAbility(Timestamp startTime, Timestamp endTime, Anemo unit)
         {
+            if (unit.Infusion != Element.PHYSICAL) { return;}
+            
             Element element = Element.PHYSICAL;
             foreach (var enemy in enemies)
             {
@@ -163,12 +165,16 @@ namespace Tcc
                 if ((int) temp < (int) element)
                 {
                     element = temp;
+                    if (element == Element.PYRO)
+                    {
+                        break;
+                    }
                 }
                 
             }
 
             unit.Infusion = element;
-            Console.WriteLine($"{unit} had their ability infused with {element} at {startTime}");
+            Console.WriteLine($"{unit} had their ability infused with {unit.Infusion} at {startTime}");
             AddWorldEvent(new WorldEvent(endTime, _ => unit.Infusion=Element.PHYSICAL));
         }
         

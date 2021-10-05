@@ -13,11 +13,11 @@ namespace Tcc.Units
     {
         
         SnapshottedStats burstSnapshot;
-        private static readonly ICDCreator NormalICD = new ICDCreator("39dc65e1-8235-4c67-ac5c-591a19d87131");
-        public Element infusion;
+        private static readonly ICDCreator NormalICD = new ("39dc65e1-8235-4c67-ac5c-591a19d87131");
+        private static readonly ICDCreator BurstICD = new (new Timestamp(0), 0,"67a891f4-8cc8-4684-b627-cff7f11c6fcf");
         private const int UltInterval = 2;
         
-        public Sucrose(int constellationLevel) : base(
+        public Sucrose(int constellationLevel, int level=90) : base(
             constellationLevel: constellationLevel,
             weaponType: WeaponType.CATALYST,
             burstEnergyCost: 80,
@@ -30,7 +30,8 @@ namespace Tcc.Units
                 attackPercent: 0.466,
                 flatAttack: 311,
                 critRate: 0.05,
-                critDamage: 0.5
+                critDamage: 0.5,
+                level: level
             ),
             normal: new AbilityStats(motionValues: new double[] {0.6024,0.5511,0.6921,0.8625}),
             charged: new AbilityStats(motionValues: new double[] {2.1629}),
@@ -39,7 +40,7 @@ namespace Tcc.Units
             burst: new AbilityStats(motionValues: new double[] {2.6624, 0.792})
         )
         {
-            this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
+            burstSnapshot = new SnapshottedStats(this, Types.BURST);
         }
 
 
@@ -92,31 +93,32 @@ namespace Tcc.Units
             var events = new List<WorldEvent>()
             {
                 BurstActivated(timestamp),
-                new AbilityInfusion(firstHit, endTime, this),
+                burstSnapshot.Snapshot(timestamp), 
+                new AbilityInfusion(firstHit - .1, endTime, this),
                 new Hit(firstHit, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    new HitType(true, 1, false), "Forbidden Creation-Isomer 75/Type II"),
-                new ConditionalHit(firstHit, infusion, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    new HitType(true, 1, false), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
-                new AbilityInfusion(firstHit + UltInterval, endTime, this),
+                    new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"),
+                new ConditionalHit(firstHit, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
+                    new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
+                new AbilityInfusion(firstHit + UltInterval - .1, endTime, this),
                 new Hit(firstHit + UltInterval, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    new HitType(true, 1, false), "Forbidden Creation-Isomer 75/Type II"),
-                new ConditionalHit(firstHit + UltInterval, infusion, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    new HitType(true, 1, false), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
-                new AbilityInfusion(firstHit + 2 * UltInterval, endTime, this),
+                    new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"),
+                new ConditionalHit(firstHit + UltInterval, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
+                    new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
+                new AbilityInfusion(firstHit + 2 * UltInterval - .1, endTime, this),
                 new Hit(firstHit + 2*UltInterval, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    new HitType(true, 1, false), "Forbidden Creation-Isomer 75/Type II"),
-                new ConditionalHit(firstHit + 2*UltInterval, infusion, 0, burstSnapshot.GetStats, this, Types.BURST,
-                    new HitType(true, 1, false), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
+                    new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"),
+                new ConditionalHit(firstHit + 2*UltInterval, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
+                    new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
                 
             };
 
             if (constellationLevel < 2) return events;
             
-            events.Add(new AbilityInfusion(firstHit + 3 * UltInterval, endTime, this));
+            events.Add(new AbilityInfusion(firstHit + 3 * UltInterval - .1, endTime, this));
             events.Add(new Hit(firstHit + 3*UltInterval, element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                new HitType(true, 1, false, false), "Forbidden Creation-Isomer 75/Type II"));
-            events.Add(new ConditionalHit(firstHit + 3*UltInterval, infusion, 0, burstSnapshot.GetStats, this, Types.BURST,
-                new HitType(true, 1, false), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"));
+                new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"));
+            events.Add(new ConditionalHit(firstHit + 3*UltInterval, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
+                new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"));
 
             return events;
         }
@@ -124,7 +126,7 @@ namespace Tcc.Units
         private static bool DoInfusionHit(object[] param)
         {
             var unit = (Sucrose) param[0];
-            return unit.infusion != Element.PHYSICAL;
+            return unit.Infusion != Element.PHYSICAL;
         }
         public override string ToString()
         {

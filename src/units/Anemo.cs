@@ -6,21 +6,26 @@ namespace Tcc.Units
 {
     public abstract class Anemo: Unit
     {
+
+        public Element Infusion = Element.PHYSICAL;
         protected Anemo(int constellationLevel, WeaponType weaponType, int burstEnergyCost,
             CapacityStats capacityStats, GeneralStats generalStats, AbilityStats burst, AbilityStats skill, 
             AbilityStats normal, AbilityStats charged, AbilityStats plunge) : 
             base(constellationLevel, Element.ANEMO, weaponType, burstEnergyCost, 
                 capacityStats, generalStats, burst, skill, normal, charged,plunge)
         {
-            Infusion = Element.PHYSICAL;
         }
         
-        public Element Infusion { get; set; }
+        
 
-        private static bool IsUltInfused(object[] param)
+        public void SetInfusion(Element e)
         {
-            var unit = (Anemo) param[0];
-            return unit.Infusion != Element.PHYSICAL;
+            Infusion = e;
+        }
+
+        public Element GetInfusion()
+        {
+            return Infusion;
         }
     }
 }

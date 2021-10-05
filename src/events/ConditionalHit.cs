@@ -20,6 +20,16 @@ namespace Tcc.Events
             this.param = conditionParam;
         }
         
+        public ConditionalHit(
+            Timestamp timestamp, Func<Element> element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
+            Units.Unit unit, Types type, HitType hitType, Func<object[], bool> condition, object[] conditionParam,
+            string description = "", Enemy.Enemy target = null): 
+            base(timestamp, element, mvIndex, stats, unit, type, hitType, description, target)
+        {
+            this.condition = condition;
+            this.param = conditionParam;
+        }
+        
         public override void Apply(World world)
         {
             if (condition(param))

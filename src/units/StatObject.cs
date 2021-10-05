@@ -28,7 +28,7 @@ namespace Tcc.Units
         protected StatObject(GeneralStats stats, CapacityStats capacityStats=null)
         {
             startingGeneralStats = stats ?? new GeneralStats();
-            startingCapacityStats = capacityStats ?? new CapacityStats(baseHp:10000);
+            startingCapacityStats = capacityStats ?? new CapacityStats(baseHp:100000);
         }
         
         public double CurrentHp {

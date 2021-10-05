@@ -62,10 +62,9 @@ namespace Tcc.Enemy
                 icd = temp;
             }
 
-            var results = this.gauge.ElementApplied(timestamp, element, unit.GetAbilityGauge(type),
+            var (reactionMultiplier, worldEvents) = gauge.ElementApplied(timestamp, element, hitType.Gauge,
                 unit, statsOfUnit, type, icd, hitType.IsHeavy);
-            double reactionMultiplier = results.Item1;
-            List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
+            List<WorldEvent> events = worldEvents ?? new List<WorldEvent>();
             Reaction reaction = hitType.ReactionType;
             double damage;
             if (type != Types.TRANSFORMATIVE)

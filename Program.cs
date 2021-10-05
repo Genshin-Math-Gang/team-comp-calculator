@@ -46,10 +46,9 @@ namespace Tcc
             vv.Add4pc(world, sucrose);
             
             world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
-            world.AddCharacterEvent(new Timestamp(1), sucrose.Skill);
+            world.AddCharacterEvent(new Timestamp(1), sucrose.Burst);
             //world.AddCharacterEvent(new Timestamp(1.5), sucrose.Skill);
-            world.AddCharacterEvent(new Timestamp(2), benentt.Burst);
-            
+
             world.Simulate();
             
             Console.WriteLine($"{sucrose} total DMG: {world.TotalDamage[0]}");

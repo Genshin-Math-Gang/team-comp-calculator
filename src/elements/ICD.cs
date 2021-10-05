@@ -36,7 +36,7 @@ namespace Tcc.Elements
 
             hitCounter += 1;
 
-            if (timestamp - lastHit > timePity)
+            if (timestamp - lastHit >= timePity)
             {
                 lastHit = timestamp;
                 hitCounter = 0;
