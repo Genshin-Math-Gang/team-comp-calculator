@@ -37,7 +37,7 @@ namespace Tcc.Elements
             if (type == Types.TRANSFORMATIVE) return (1, null);  
 
             // what is this
-            Tuple<Unit, Types> key = new Tuple<Unit, Types>(unit, type);
+            //Tuple<Unit, Types> key = new Tuple<Unit, Types>(unit, type);
             
             
             List<WorldEvent> transformativeReactions = TimeDecay(timestamp, statsPage, unit);
@@ -46,24 +46,17 @@ namespace Tcc.Elements
             if (!icd.checkICD(timestamp))
             {
                 return (1, transformativeReactions);
-            }
-
+            } 
             if (GaugeStrength == 0)
             {
                 return (1, null);
             }
-
-            // scuffed but this fixed a bug with anemo and geo damage
-            if (elementType is Element.GEO or Element.ANEMO) {}
-            else if (elementType == Element.PHYSICAL)
+            
+            if (elementType == Element.PHYSICAL)
             {
-                return (1, null);
-            } else if (aura == Aura.NONE) { } 
-            else if (aura == Converter.ElementToAura(elementType))
-            {
-                gaugeDict[elementType].UpdateGauge(GaugeStrength);
                 return (1, null);
             } 
+            
             
 
             var strength = GaugeStrength * 1.25;
@@ -81,12 +74,19 @@ namespace Tcc.Elements
             switch (aura)
             {
                 case Aura.NONE:
+                    if (elementType is Element.GEO or Element.ANEMO)
+                    {
+                        return (1, null);
+                    }
                     gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
                     aura = Converter.ElementToAura(elementType);
                     return (1, null);
                 case Aura.PYRO:
                     switch (elementType)
                     {
+                        case Element.PYRO:
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            return (1, null);
                         case Element.HYDRO:
                             strength *= 2;
                             multiplier = 2 * MultiplicativeMultiplier (statsPage, Reaction.VAPORIZE);
@@ -111,6 +111,9 @@ namespace Tcc.Elements
                 case Aura.HYDRO:
                     switch (elementType)
                     {
+                        case Element.HYDRO:
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            return (1, null);
                         case Element.PYRO:
                             strength /= 2;
                             multiplier =  1.5 * MultiplicativeMultiplier (statsPage, Reaction.VAPORIZE);
@@ -136,6 +139,10 @@ namespace Tcc.Elements
                 case Aura.CRYO:
                     switch (elementType)
                     {
+                        
+                        case Element.CRYO:
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            return (1, null);
                         case Element.PYRO:
                             strength *= 2;
                             multiplier =  2 * MultiplicativeMultiplier (statsPage, Reaction.MELT);
@@ -159,6 +166,10 @@ namespace Tcc.Elements
                 case Aura.ELECTRO:
                     switch (elementType)
                     {
+                        
+                        case Element.ELECTRO:
+                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            return (1, null);
                         case Element.PYRO:
                             transformativeReactions.Add(new Overload(timestamp, statsPage, unit));
                             break;

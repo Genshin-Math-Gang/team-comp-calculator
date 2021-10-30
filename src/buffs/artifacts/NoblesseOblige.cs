@@ -12,13 +12,16 @@ namespace Tcc.Buffs.Artifacts
         static readonly AbilityModifier MODIFIER_2PC = (_) => new GeneralStats(damagePercent: 0.2);
         static readonly FirstPassModifier MODIFIER_4PC = (_) => new GeneralStats(attackPercent: 0.2);
 
-        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<AbilityModifier>(ID_2PC, MODIFIER_2PC), Stats.Types.BURST);
+        public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<AbilityModifier>(ID_2PC, MODIFIER_2PC), Types.BURST);
 
         public override void Add4pc(World world, Unit unit)
         {
             unit.burstActivatedHook += (_, timestamp) =>
             {
-                foreach(var unitInParty in world.GetUnits()) unitInParty.AddBuff(new RefreshableBuff<FirstPassModifier>(ID_4PC, timestamp + 12, MODIFIER_4PC));
+                foreach(var unitInParty in world.GetUnits())
+                {
+                    unitInParty?.AddBuff(new RefreshableBuff<FirstPassModifier>(ID_4PC, timestamp + 12, MODIFIER_4PC));
+                }
             };
         }
     }

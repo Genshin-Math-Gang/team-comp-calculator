@@ -37,6 +37,8 @@ namespace Tcc.Units
             this.skillSnapshot = new SnapshottedStats(this, Types.SKILL);
             this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
         }
+        
+        // TODO: the timing for this is sus
 
         public List<WorldEvent> Skill(Timestamp timestamp)
         {

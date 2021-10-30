@@ -48,12 +48,14 @@ namespace Tcc.Units
         // does there need to be normal attack hook
         public List<WorldEvent> NormalAttack(Timestamp timestamp, params object[] param)
         {
-            var normalIndex = (int) param[0];
+            var normalIndex = (int) param[1];
             return new List<WorldEvent>()
             {
                 // i think sucrose autos have aoe, will check later
                 new Hit(timestamp, element, normalIndex, GetStatsPage, this, Types.NORMAL, 
                     new HitType(false, 1, false, icd: NormalICD), $"Wind Spirit Creation {normalIndex}"),
+                // TODO: find frame data for auto attacks
+                NormalAttackGeneralUsed(timestamp, new Timestamp(0.2))
 
             };
         }

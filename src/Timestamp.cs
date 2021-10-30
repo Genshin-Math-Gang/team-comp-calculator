@@ -34,7 +34,8 @@ namespace Tcc
         public static Timestamp operator -(double seconds, Timestamp time) => new Timestamp(seconds) - time;
 
         public static Timestamp operator -(Timestamp first, Timestamp second) => new Timestamp(first.time - second.time);
-        public static Timestamp operator +(Timestamp time1, Timestamp time2) => time1 == null || time2 == null ? new Timestamp(0) : new Timestamp(time1.time + time2.time);
+        public static Timestamp operator +(Timestamp time1, Timestamp time2) => 
+            time1 == null || time2 == null ? new Timestamp(0) : new Timestamp(time1.time + time2.time);
         public static Timestamp operator *(int scalar, Timestamp time) => new Timestamp(scalar * time.time);
         public static Timestamp operator *(double scalar, Timestamp time) => new Timestamp(scalar * time.time);
         public static Timestamp operator * (Timestamp scalar, Timestamp time) => new Timestamp(scalar.time * time.time);

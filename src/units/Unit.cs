@@ -38,6 +38,25 @@ namespace Tcc.Units
         public event EventHandler<(Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
 
         public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)> swirlTriggeredHook;
+
+        public event EventHandler<NormalAttackArgs> normalAttackHook;
+        
+        
+        // TODO: probably make args class for all of these and  move them somewhere
+        public class NormalAttackArgs: EventArgs
+        {
+            public Timestamp Timestamp { get;}
+            public Timestamp Duration { get;}
+            
+            public World World { get; }
+
+            public NormalAttackArgs(Timestamp timestamp, Timestamp duration, World world)
+            {
+                Timestamp = timestamp;
+                Duration = duration;
+                World = world;
+            }
+        }
         
 
         protected Unit(
@@ -115,6 +134,22 @@ namespace Tcc.Units
         {
             return new WorldEvent(timestamp, (world) => skillActivatedHook?.Invoke(this, timestamp),$"Skill activated by {this}");
         }
+
+        protected WorldEvent NormalAttackUsed(Timestamp timestamp, Timestamp duration)
+        {
+            return new WorldEvent(timestamp, world => normalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world)));
+        }
+        
+        protected WorldEvent NormalAttackGeneralUsed(Timestamp timestamp, Timestamp duration)
+        {
+            return new WorldEvent(timestamp, world => {
+                foreach (var unit in world.GetUnits())
+                {
+                    unit?.normalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world));
+                }
+            });
+        }
+
 
         protected WorldEvent BurstActivated(Timestamp timestamp)
         {

@@ -14,7 +14,7 @@ namespace Tcc.Events
         public readonly Timestamp Delay;
         public readonly int Gauge;
 
-        public HitType(bool aoe, int bounces, bool self, bool heavy=false, Reaction reaction=Reaction.UNKNOWN, 
+        public HitType(bool aoe=true, int bounces=0, bool self=false, bool heavy=false, Reaction reaction=Reaction.UNKNOWN, 
             ICDCreator icd=null, Timestamp delay=null, int gauge=1)
         {
             IsAoe = aoe;

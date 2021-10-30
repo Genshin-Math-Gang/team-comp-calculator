@@ -25,7 +25,30 @@ namespace Tcc
             
             //Ganyu_Test();
             
-            Sucrose_Test();
+            //Sucrose_Test();
+            //Noblesse_Test();
+            Xingqiu_Test();
+        }
+
+        static void Xingqiu_Test()
+        {
+            Xingqiu xq = new Xingqiu(0);
+            Bennett benentt = new Bennett(0);
+            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
+            enemies.Add(new Enemy.Enemy());
+            World world = new World(enemies);
+            world.SetUnits(xq, benentt, null, null);
+            
+            world.AddCharacterEvent(new Timestamp(0), xq.Burst);
+            world.AddCharacterEvent(new Timestamp(1), xq.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(1.5), benentt.SwitchUnit);
+            world.AddCharacterEvent(new Timestamp(2), benentt.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(2.5), benentt.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(3), benentt.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(15), benentt.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(17), benentt.NormalAttack, 0);
+            
+            world.Simulate();
         }
 
         static void Sucrose_Test()
@@ -47,7 +70,7 @@ namespace Tcc
             
             world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
             world.AddCharacterEvent(new Timestamp(1), sucrose.Burst);
-            //world.AddCharacterEvent(new Timestamp(1.5), sucrose.Skill);
+            world.AddCharacterEvent(new Timestamp(1.5), sucrose.Skill);
 
             world.Simulate();
             
@@ -55,6 +78,25 @@ namespace Tcc
             Console.WriteLine($"{benentt} total DMG: {world.TotalDamage[1]}");
 
 
+        }
+
+
+        static void Noblesse_Test()
+        {
+            Sucrose sucrose = new Sucrose(0);
+            Bennett bennett = new Bennett(0);
+            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
+            enemies.Add(new Enemy.Enemy());
+            World world = new World(enemies);
+            world.SetUnits(sucrose, bennett, null, null);
+            var noblesse = new NoblessOblige();
+            noblesse.Add4pc(world, sucrose);
+            
+            world.AddCharacterEvent(new Timestamp(.5), sucrose.Skill);
+            world.AddCharacterEvent(new Timestamp(1), sucrose.Burst);
+            world.AddCharacterEvent(new Timestamp(1.5), sucrose.Skill);
+            
+            world.Simulate();
         }
         static void Ganyu_Test()
         {

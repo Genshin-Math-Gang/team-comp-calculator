@@ -173,6 +173,10 @@ namespace Tcc
                 
             }
 
+            if (element == Element.PHYSICAL)
+            {
+                return;
+            }
             unit.Infusion = element;
             Console.WriteLine($"{unit} had their ability infused with {unit.Infusion} at {startTime}");
             AddWorldEvent(new WorldEvent(endTime, _ => unit.Infusion=Element.PHYSICAL));

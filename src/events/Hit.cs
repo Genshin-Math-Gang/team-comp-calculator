@@ -4,7 +4,8 @@ using Tcc.Stats;
 
 namespace Tcc.Events
 {
-    public class Hit: WorldEvent
+    public class Hit: WorldEvent 
+        // TODO: it might just be better to replace mvIndex with the MV itself
     {
         public Hit(
             Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,

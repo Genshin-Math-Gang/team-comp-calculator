@@ -43,7 +43,20 @@ namespace Tcc.Units
         ) {
             this.burstBuffSnapshot = new SnapshottedStats(this, Types.BURST);
         }
+        
+        public List<WorldEvent> NormalAttack(Timestamp timestamp, params object[] param)
+        {
+            var normalIndex = (int) param[1];
+            return new List<WorldEvent>()
+            {
+                new Hit(timestamp, Element.PHYSICAL, normalIndex, GetStatsPage, this, Types.NORMAL, 
+                    new HitType(false, 1, false, icd: AutoICD), $"bennett normal {normalIndex}"),
+                // TODO: find frame data for auto attacks
+                NormalAttackGeneralUsed(timestamp, new Timestamp(0.2))
 
+            };
+        }
+        
         public List<WorldEvent> Burst(Timestamp timestamp)
         {
             var events = new List<WorldEvent> {
