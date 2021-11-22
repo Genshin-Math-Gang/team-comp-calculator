@@ -8,7 +8,7 @@ using Tcc.Weapons;
 
 namespace Tcc.Units
 {
-    public class Shogun: Unit
+    public class Raiden: Unit
     {
         static readonly Guid SKILL_BUFF_ID = new Guid("0e88cab3-e1d1-4592-9059-b36e6595e25d");
         static readonly Timestamp BUFF_DURATION = new Timestamp(25);
@@ -17,28 +17,9 @@ namespace Tcc.Units
 
         EventHandler<(Unit from, Unit to, Timestamp)> currentBuffListener = null;
 
-        public Shogun(int constellationLevel): base(
-            constellationLevel: constellationLevel,
-            element: Element.ELECTRO,
-            burstEnergyCost: 90,
-            weaponType: WeaponType.POLEARM,
-            capacityStats: new CapacityStats(
-                baseHp: 10876,
-                energy: 90
-            ),
-            generalStats: new GeneralStats(
-                baseAttack: 225,
-                attackPercent: 0.466,
-                flatAttack: 311,
-                critRate: 0.5,
-                critDamage: 1
-            ),
-            normal: new AbilityStats(motionValues: new double[] {0.8806,0.8449,1.0795,1.11798,1.3209}),
-            charged: new AbilityStats(motionValues: new double[] {1.105+1.202}),
-            plunge: new AbilityStats(motionValues: new double[] {1.2638,2.527,3.1564}),
-            skill: new AbilityStats(motionValues: new double[] {2.1096,0.756,0.3}),
-            burst: new AbilityStats(motionValues: new double[] {4.1904,0.108,1.008})
-        ) {
+        public Raiden(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
+            base("raiden", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.ELECTRO, WeaponType.POLEARM) 
+        {
         }
 
         public List<WorldEvent> Skill(Timestamp timestamp)

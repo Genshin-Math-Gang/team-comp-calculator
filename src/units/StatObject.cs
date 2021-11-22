@@ -31,6 +31,12 @@ namespace Tcc.Units
             startingCapacityStats = capacityStats ?? new CapacityStats(baseHp:100000);
         }
         
+        protected StatObject()
+        {
+            startingGeneralStats = new GeneralStats();
+            startingCapacityStats = new CapacityStats();
+        }
+        
         public double CurrentHp {
             get { return CapacityStats.Hp.Current; }
         }

@@ -32,8 +32,8 @@ namespace Tcc
 
         static void Xingqiu_Test()
         {
-            Xingqiu xq = new Xingqiu(0);
-            Bennett benentt = new Bennett(0);
+            Xingqiu xq = new Xingqiu();
+            Bennett benentt = new Bennett();
             List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
             enemies.Add(new Enemy.Enemy());
             World world = new World(enemies);
@@ -45,15 +45,15 @@ namespace Tcc
             world.AddCharacterEvent(new Timestamp(2), benentt.NormalAttack, 0);
             world.AddCharacterEvent(new Timestamp(2.5), benentt.NormalAttack, 0);
             world.AddCharacterEvent(new Timestamp(3), benentt.NormalAttack, 0);
-            world.AddCharacterEvent(new Timestamp(15), benentt.NormalAttack, 0);
-            world.AddCharacterEvent(new Timestamp(17), benentt.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(14), benentt.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(16), benentt.NormalAttack, 0);
             
             world.Simulate();
         }
 
         static void Sucrose_Test()
         {
-            Sucrose sucrose = new Sucrose(0);
+            Sucrose sucrose = new Sucrose();
             Bennett benentt = new Bennett(0);
             
             List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
@@ -142,7 +142,7 @@ namespace Tcc
         }
         static void Simulate_Xiangling_Burst_With_Shogun_Snapshot()
         {
-            Shogun shogun = new Shogun(0);
+            Raiden shogun = new Raiden();
             Xiangling xiangling = new Xiangling(0);
             
             List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
@@ -223,7 +223,7 @@ namespace Tcc
         {
             Xiangling xiangling = new Xiangling(0);
             Bennett bennett = new Bennett(0);
-            Shogun shogun = new Shogun(0);
+            Raiden shogun = new Raiden(0);
 
             List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
             enemies.Add(new Enemy.Enemy());

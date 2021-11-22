@@ -17,28 +17,8 @@ namespace Tcc.Units
         private static readonly ICDCreator BurstICD = new (new Timestamp(0), 0,"67a891f4-8cc8-4684-b627-cff7f11c6fcf");
         private const int UltInterval = 2;
         
-        public Sucrose(int constellationLevel, int level=90) : base(
-            constellationLevel: constellationLevel,
-            weaponType: WeaponType.CATALYST,
-            burstEnergyCost: 80,
-            capacityStats: new CapacityStats(
-                baseHp: 9244,
-                energy: 80
-            ),
-            generalStats: new GeneralStats(
-                baseAttack: 170,
-                attackPercent: 0.466,
-                flatAttack: 311,
-                critRate: 0.05,
-                critDamage: 0.5,
-                level: level
-            ),
-            normal: new AbilityStats(motionValues: new double[] {0.6024,0.5511,0.6921,0.8625}),
-            charged: new AbilityStats(motionValues: new double[] {2.1629}),
-            plunge: new AbilityStats(motionValues: new double[] {1.1234,2.2462,2.8057}),
-            skill: new AbilityStats(motionValues: new double[] {3.8016}),
-            burst: new AbilityStats(motionValues: new double[] {2.6624, 0.792})
-        )
+        public Sucrose(int constellationLevel=0, String level="90" , int autoLevel=6, int skillLevel=6, int burstLevel=6): 
+            base("sucrose", level, constellationLevel, autoLevel, skillLevel, burstLevel, WeaponType.CATALYST)
         {
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
         }

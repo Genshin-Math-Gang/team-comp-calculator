@@ -1,4 +1,9 @@
-﻿using Tcc.Elements;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using Tcc.Buffs;
+using Tcc.Elements;
+using Tcc.Events;
 using Tcc.Stats;
 using Tcc.Weapons;
 
@@ -8,11 +13,8 @@ namespace Tcc.Units
     {
 
         public Element Infusion = Element.PHYSICAL;
-        protected Anemo(int constellationLevel, WeaponType weaponType, int burstEnergyCost,
-            CapacityStats capacityStats, GeneralStats generalStats, AbilityStats burst, AbilityStats skill, 
-            AbilityStats normal, AbilityStats charged, AbilityStats plunge) : 
-            base(constellationLevel, Element.ANEMO, weaponType, burstEnergyCost, 
-                capacityStats, generalStats, burst, skill, normal, charged,plunge)
+        protected Anemo(string name, String level, int constellationLevel, int autoLevel, int skillLevel, int burstLevel, WeaponType weaponType): 
+            base(name, level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.ANEMO, weaponType)
         {
         }
         

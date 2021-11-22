@@ -7,4 +7,10 @@
   <ItemGroup>
     <Compile Remove="src\elements\DecayType.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\units\characterData" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
 </Project>

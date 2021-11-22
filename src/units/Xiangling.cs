@@ -12,28 +12,9 @@ namespace Tcc.Units
         SnapshottedStats skillSnapshot, burstSnapshot;
         private static readonly ICDCreator BurstInitialICD = new("e225e4b3-54e0-450e-9145-6c7e175d8f31");
 
-        public Xiangling(int constellationLevel): base(
-            constellationLevel: constellationLevel,
-            element: Element.PYRO,
-            weaponType: WeaponType.POLEARM,
-            burstEnergyCost: 80,
-            capacityStats: new CapacityStats(
-                baseHp: 10876,
-                energy: 80
-            ),
-            generalStats: new GeneralStats(
-                baseAttack: 225,
-                attackPercent: 0.466,
-                flatAttack: 311,
-                critRate: 0.5,
-                critDamage: 1
-            ),
-            normal: new AbilityStats(motionValues: new double[] {0.8313,0.833,0.5151*2,0.2788*4,1.4062}),
-            charged: new AbilityStats(motionValues: new double[] {2.4055}),
-            plunge: new AbilityStats(motionValues: new double[] {1.2638,2.527,3.1564}),
-            skill: new AbilityStats(motionValues: new double[] {2.003}),
-            burst: new AbilityStats(motionValues: new double[] {1.296,1.584,1.9728,2.016}, icd: new Timestamp(0))
-        ) {
+        public Xiangling(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
+            base("xiangling", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.PYRO, WeaponType.POLEARM)
+        {
             this.skillSnapshot = new SnapshottedStats(this, Types.SKILL);
             this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
         }

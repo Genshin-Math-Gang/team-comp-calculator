@@ -13,32 +13,11 @@ namespace Tcc.Units
         SnapshottedStats skillSnapshot, burstSnapshot;
         private static readonly ICDCreator BurstICD = new ICDCreator("c6de4351-963c-4775-bbe8-4b0b38bc5a9d");
 
-        public Ganyu(int constellationLevel) : base(
-            constellationLevel: constellationLevel,
-            element: Element.CRYO,
-            weaponType: WeaponType.BOW,
-            burstEnergyCost: 60,
-            capacityStats: new CapacityStats(
-                baseHp: 9797,
-                energy: 60
-            ),
-            generalStats: new GeneralStats(
-                // this is definitely sus right now, hopefully artifacts will be implemented soon
-                baseAttack: 335,
-                attackPercent: 0.466,
-                flatAttack: 311,
-                critRate: 0.05,
-                critDamage: 0.884
-            ),
-            normal: new AbilityStats(motionValues: new double[] {0.6273,0.7038,0.8993,0.8993,0.9537,1.139}),
-            charged: new AbilityStats(motionValues: new double[] {0.867,2.232,2.304,3.9168}),
-            plunge: new AbilityStats(motionValues: new double[] {1.1234,2.2462,2.8057}),
-            skill: new AbilityStats(motionValues: new double[] {2.376}),
-            burst: new AbilityStats(motionValues: new double[] {1.2649}, icd: new Timestamp(0))
-        )
+        public Ganyu(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
+            base("ganyu", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.CRYO, WeaponType.BOW)
         {
-            this.skillSnapshot = new SnapshottedStats(this, Types.SKILL);
-            this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
+            skillSnapshot = new SnapshottedStats(this, Types.SKILL);
+            burstSnapshot = new SnapshottedStats(this, Types.BURST);
         }
 
         public List<WorldEvent> Skill(Timestamp timestamp)

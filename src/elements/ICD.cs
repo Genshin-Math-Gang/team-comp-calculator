@@ -31,9 +31,6 @@ namespace Tcc.Elements
 
         public bool checkICD(Timestamp timestamp, int ignoreICD = 0)
         {
-            if (ignoreICD == 1) return true;
-            if (ignoreICD == -1) return false;
-
             hitCounter += 1;
 
             if (timestamp - lastHit >= timePity)

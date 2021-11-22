@@ -10,6 +10,11 @@ namespace Tcc
         {
             this.time = time;
         }
+        
+        public Timestamp()
+        {
+            this.time = 0;
+        }
 
         public override bool Equals(object obj)
         {
@@ -57,6 +62,11 @@ namespace Tcc
         }
 
         public override string ToString() => $"t = {time:F2}";
+
+        public static Timestamp Max(Timestamp t1, Timestamp t2)
+        {
+            return t1.CompareTo(t2)==1 ? t1 : t2;
+        }
         
     }
 }

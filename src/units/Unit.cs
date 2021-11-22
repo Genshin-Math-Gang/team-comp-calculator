@@ -1,16 +1,19 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using Tcc.Buffs;
 using Tcc.Elements;
 using Tcc.Events;
 using Tcc.Stats;
 using Tcc.Weapons;
+using Newtonsoft.Json;
 
 namespace Tcc.Units
 {
     public abstract class Unit: StatObject
     {
+        
         protected readonly int constellationLevel;
         protected readonly int burstEnergyCost;
         public readonly WeaponType weaponType;
@@ -58,32 +61,99 @@ namespace Tcc.Units
             }
         }
         
-
+        // I want to make something to represent level at some point but I couldn't get a lazy enum to work so i will
+        // work on that later
         protected Unit(
-            int constellationLevel, Element element, WeaponType weaponType, int burstEnergyCost,
-            CapacityStats capacityStats, GeneralStats generalStats, AbilityStats burst, AbilityStats skill, 
-            AbilityStats normal, AbilityStats charged, AbilityStats plunge 
-        ): base(generalStats) {
+            string name, String level, int constellationLevel, int autoLevel, int skillLevel, int burstLevel, Element element, 
+            WeaponType weaponType) 
+        {
             this.constellationLevel = constellationLevel;
             this.element = element;
             this.weaponType = weaponType;
-
-            this.burstEnergyCost = burstEnergyCost;
-            this.CurrentEnergy = burstEnergyCost;
-
-            this.startingCapacityStats = capacityStats;
-
-            this.startingAbilityStats[Types.NORMAL] = normal;
-            this.startingAbilityStats[Types.BURST] = burst;
-            this.startingAbilityStats[Types.CHARGED] = charged;
-            this.startingAbilityStats[Types.PLUNGE] = plunge;
-            this.startingAbilityStats[Types.SKILL] = skill;
+            
+            using (var sr = new StreamReader("characterData/" + name + "MVS.json"))
+            {
+                String content = sr.ReadToEnd();
+                var data = JsonConvert.DeserializeObject<Dictionary<string, double[][]>>(content);
+                startingAbilityStats[Types.NORMAL] = new AbilityStats(motionValues: data["normal"][autoLevel]);
+                startingAbilityStats[Types.CHARGED] = new AbilityStats(motionValues:data["charged"][autoLevel]);
+                startingAbilityStats[Types.PLUNGE] = new AbilityStats(motionValues: data["plunge"][autoLevel]);
+                startingAbilityStats[Types.BURST] = new AbilityStats(motionValues: data["burst"][burstLevel]);
+                startingAbilityStats[Types.SKILL] = new AbilityStats(motionValues: data["skill"][skillLevel]);
+            }
+            
+            using (var sr = new StreamReader("characterData/" + name + "Stats.json"))
+            {
+                String content = sr.ReadToEnd();
+                var data = JsonConvert.DeserializeObject<JSONSTats>(content);
+                // needs some kind of validation or something here but am lazy
+                String ascension = data.ascencion;
+                double[] stats = data.stats[level];
+                burstEnergyCost = data.energy;
+                CurrentEnergy = burstEnergyCost;
+                startingGeneralStats = new GeneralStats(baseAttack: stats[1], baseDefence: stats[2],
+                    critRate: stats[4], critDamage: stats[5]);
+                startingCapacityStats = new CapacityStats(baseHp: stats[0], energy: burstEnergyCost);
+                
+                // shit code
+                switch (ascension)
+                {
+                    case "Energy Recharge":
+                        startingGeneralStats += new GeneralStats(energyRecharge: stats[3]);
+                        break;
+                    case "ATK":
+                        startingGeneralStats += new GeneralStats(attackPercent: stats[3]);
+                        break;
+                    case "DEF":
+                        startingGeneralStats += new GeneralStats(defencePercent: stats[3]);
+                        break;
+                    case "HP":
+                        startingCapacityStats += new CapacityStats(hpPercent: stats[3]);
+                        break;
+                    case "Healing Bonus":
+                        startingGeneralStats += new GeneralStats(healingBonus: stats[3]);
+                        break;
+                    case "Anemo DMG Bonus":
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.ANEMO, stats[3]));
+                        break;
+                    case "Cryo DMG Bonus":
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.ANEMO, stats[3]));
+                        break;
+                    case "Dendro DMG Bonus":
+                        // :kleek:
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.DENDRO, stats[3]));
+                        break;
+                    case "Electro DMG Bonus":
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.ELECTRO, stats[3]));
+                        break;
+                    case "Geo DMG Bonus":
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.GEO, stats[3]));
+                        break;
+                    case "Hydro DMG Bonus":
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.HYDRO, stats[3]));
+                        break;
+                    case "Physical DMG Bonus":
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.PHYSICAL, stats[3]));
+                        break;
+                    case "Pyro DMG Bonus":
+                        startingGeneralStats += new GeneralStats(elementalBonus: 
+                            new KeyedPercentBonus<Element>(Element.PYRO, stats[3]));
+                        break;
+                }
+            }   
         }
 
         public Weapon Weapon { get; set; }
         
 
-        public double GetAbilityGauge(Types type)
+        /*public double GetAbilityGauge(Types type)
         {
             // this will probably need to be modified later to make it work with swirl 
             if (type == Types.TRANSFORMATIVE)
@@ -91,8 +161,9 @@ namespace Tcc.Units
 
                 return 0;
             }
-            return startingAbilityStats[type].GaugeStrength;
-        }
+            //return startingAbilityStats[type];
+            return 1;
+        }*/
 
         public List<WorldEvent> SwitchUnit(Timestamp timestamp) 
         {
