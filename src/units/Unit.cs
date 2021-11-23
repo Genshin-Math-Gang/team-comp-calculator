@@ -70,8 +70,10 @@ namespace Tcc.Units
             this.constellationLevel = constellationLevel;
             this.element = element;
             this.weaponType = weaponType;
+            // dumb file directory hack but i don't know a better solution
+            string dir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
             
-            using (var sr = new StreamReader("characterData/" + name + "MVS.json"))
+            using (var sr = new StreamReader(dir + "/src/units/characterData/" + name + "MVS.json"))
             {
                 String content = sr.ReadToEnd();
                 var data = JsonConvert.DeserializeObject<Dictionary<string, double[][]>>(content);
@@ -82,7 +84,7 @@ namespace Tcc.Units
                 startingAbilityStats[Types.SKILL] = new AbilityStats(motionValues: data["skill"][skillLevel]);
             }
             
-            using (var sr = new StreamReader("characterData/" + name + "Stats.json"))
+            using (var sr = new StreamReader(dir + "/src/units/characterData/" + name + "Stats.json"))
             {
                 String content = sr.ReadToEnd();
                 var data = JsonConvert.DeserializeObject<JSONSTats>(content);
@@ -147,7 +149,9 @@ namespace Tcc.Units
                             new KeyedPercentBonus<Element>(Element.PYRO, stats[3]));
                         break;
                 }
-            }   
+            }
+            base.startingCapacityStats = startingCapacityStats;
+            base.startingGeneralStats = startingGeneralStats;
         }
 
         public Weapon Weapon { get; set; }
@@ -174,7 +178,7 @@ namespace Tcc.Units
         {
             enemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
-
+            
             AbilityStats result = statsFromUnit.generalStats;
 
             if (startingAbilityStats.TryGetValue(type, out var startingStats)) result += startingStats;

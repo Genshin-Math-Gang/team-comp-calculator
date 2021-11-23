@@ -12,8 +12,9 @@ namespace Tcc.Units
     public abstract class StatObject
     {
         // Base stats
-        protected readonly CapacityStats startingCapacityStats;
-        protected readonly GeneralStats startingGeneralStats;
+        // i made these non-readonly to make some very sus workaround but this means i need to be super careful
+        protected CapacityStats startingCapacityStats;
+        protected GeneralStats startingGeneralStats;
 
         // Snapshottable buffs
         protected readonly List<Buff<CapacityModifier>> capacityBuffs = new();

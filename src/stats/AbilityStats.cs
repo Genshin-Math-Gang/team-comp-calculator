@@ -15,19 +15,12 @@ namespace Tcc.Stats
             this.motionValues = motionValues;
         }
 
-        public double CalculateHitMultiplier(int[] index, Element element)
-        {
-            var damagePercent = generalStats.DamagePercent + generalStats.ElementalBonus.GetPercentBonus(element);
 
-            return generalStats.Attack * (1 + damagePercent) * 
-                   (1 + generalStats.CritRate * generalStats.CritDamage) * generalStats.IndependentMultiplier;
-        }
         
         public double CalculateHitMultiplier(int index, Element element)
         {
             var damagePercent = generalStats.DamagePercent + generalStats.ElementalBonus.GetPercentBonus(element);
-
-            return generalStats.Attack * (1 + damagePercent) * 
+            return generalStats.Attack * (1 + damagePercent) * motionValues[index] *
                    (1 + generalStats.CritRate * generalStats.CritDamage) * generalStats.IndependentMultiplier;
         }
 
