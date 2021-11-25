@@ -1,4 +1,4 @@
-﻿namespace Tcc.Elements
+﻿namespace Tcc.elements
 {
     public enum Aura
     {

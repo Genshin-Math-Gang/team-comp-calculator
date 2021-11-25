@@ -1,11 +1,10 @@
-using System;
-using Tcc.Stats;
+using Tcc.units;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     public class SwitchUnit: WorldEvent
     {
-        public SwitchUnit(Timestamp timestamp, Units.Unit unit): base(
+        public SwitchUnit(Timestamp timestamp, Unit unit): base(
             timestamp,
             (world) => world.SwitchUnit(timestamp, unit), $"Switched to {unit}"
         ) {

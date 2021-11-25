@@ -1,7 +1,6 @@
 using System;
-using System.ComponentModel;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     public class WorldEvent: IComparable<WorldEvent>
     {

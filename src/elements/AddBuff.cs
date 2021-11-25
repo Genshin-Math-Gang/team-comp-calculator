@@ -1,10 +1,8 @@
-﻿using System;
-using Tcc.Buffs;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Units;
+﻿using Tcc.buffs;
+using Tcc.events;
+using Tcc.units;
 
-namespace Tcc.Elements
+namespace Tcc.elements
 {
     public class AddBuff<ModifierT>: WorldEvent
     {

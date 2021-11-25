@@ -1,16 +1,18 @@
 using System;
-using Tcc.Elements;
-using Tcc.Stats;
+using Tcc.elements;
+using Tcc.enemy;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     public class Hit: WorldEvent 
         // TODO: it might just be better to replace mvIndex with the MV itself
     {
         public Hit(
             Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
-             Units.Unit unit, Types type, HitType hitType, 
-            string description = "", Enemy.Enemy target = null): 
+             Unit unit, Types type, HitType hitType, 
+            string description = "", Enemy target = null): 
             base(
             timestamp,
 
@@ -24,8 +26,8 @@ namespace Tcc.Events
         
         public Hit(
             Timestamp timestamp, Func<Element> element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
-            Units.Unit unit, Types type, HitType hitType, 
-            string description = "", Enemy.Enemy target = null): 
+            Unit unit, Types type, HitType hitType, 
+            string description = "", Enemy target = null): 
             base(
                 timestamp,
 

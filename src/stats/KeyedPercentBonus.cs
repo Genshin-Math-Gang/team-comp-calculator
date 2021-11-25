@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tcc.Stats
+namespace Tcc.stats
 {
     public class KeyedPercentBonus<KeyT>
     {

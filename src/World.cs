@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Tcc.Buffs;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Units;
+using Tcc.elements;
+using Tcc.enemy;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.units;
 
 namespace Tcc
 {
@@ -17,15 +17,15 @@ namespace Tcc
         List<Unit> units;
         List<CharacterEvent> characterEvents;
         private WorldEventQueue queuedWorldEvents;
-        List<Enemy.Enemy> enemies;
+        List<Enemy> enemies;
         public double[] TotalDamage;
 
-        public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Stats.Types attackType)>
+        public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Types attackType)>
             enemyHitHook;
 
         public event EventHandler<(Unit from, Unit to, Timestamp timestamp)> unitSwapped;
 
-        public World(List<Enemy.Enemy> enemies)
+        public World(List<Enemy> enemies)
         {
             this.characterEvents = new List<CharacterEvent>();
             this.TotalDamage = new double[4];
@@ -42,7 +42,7 @@ namespace Tcc
 
         public ReadOnlyCollection<Unit> GetUnits() => units.AsReadOnly();
 
-        public void AddEnemy(Enemy.Enemy enemy)
+        public void AddEnemy(Enemy enemy)
         {
             this.enemies.Add(enemy);
         }
@@ -72,12 +72,12 @@ namespace Tcc
             Console.WriteLine($"Switched to {unit} at {timestamp}");
         }
 
-        public List<Enemy.Enemy> Enemies
+        public List<Enemy> Enemies
         {
             get => enemies;
         }
 
-        public void EnemyDeath(Timestamp timestamp, Enemy.Enemy enemy)
+        public void EnemyDeath(Timestamp timestamp, Enemy enemy)
         {
             enemies.Remove(enemy);
             Console.WriteLine($"Enemy {enemy} died at {timestamp}");
@@ -93,7 +93,7 @@ namespace Tcc
         }
 
         public void DealDamage(Timestamp timestamp, Element element, SecondPassStatsPage statsPage, Unit unit,
-            Types type, Enemy.Enemy enemy, int mvIndex, HitType hitType, string description = null)
+            Types type, Enemy enemy, int mvIndex, HitType hitType, string description = null)
         {
 
             var results = enemy.TakeDamage(timestamp, element, type, statsPage, unit, hitType,
@@ -130,7 +130,7 @@ namespace Tcc
                 // might be better to iterate over enemies randomly to be more realistic 
                 if (hitType.IsAoe)
                 {
-                    foreach (Enemy.Enemy enemy in enemies)
+                    foreach (Enemy enemy in enemies)
                     {
                         DealDamage(timestamp + i * hitType.Delay, element, statsPage, unit, type, enemy,
                             mvIndex, hitType, description);
@@ -138,7 +138,7 @@ namespace Tcc
                 }
                 else
                 {
-                    foreach (Enemy.Enemy enemy in enemies)
+                    foreach (Enemy enemy in enemies)
                     {
                         if (i > hitType.Bounces) break;
                         DealDamage(timestamp + i * hitType.Delay, element, statsPage, unit, type, enemy,

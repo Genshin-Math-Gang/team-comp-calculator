@@ -1,8 +1,10 @@
-﻿namespace Tcc.Events
+﻿using Tcc.enemy;
+
+namespace Tcc.events
 {
     public class EnemyDeath: WorldEvent
     {
-        public EnemyDeath(Enemy.Enemy enemy, Timestamp timestamp) : 
+        public EnemyDeath(Enemy enemy, Timestamp timestamp) : 
             base(timestamp, world => world.EnemyDeath(timestamp, enemy), priority: 0)
         {
             // this should work since it uses object equality 

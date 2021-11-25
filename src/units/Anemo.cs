@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Tcc.Buffs;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Weapons;
+using Tcc.elements;
+using Tcc.weapons;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public abstract class Anemo: Unit
     {

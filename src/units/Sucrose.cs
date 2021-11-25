@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Weapons;
+using Tcc.elements;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.weapons;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public class Sucrose: Anemo
     {

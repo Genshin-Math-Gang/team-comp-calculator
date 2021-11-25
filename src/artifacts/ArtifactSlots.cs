@@ -1,4 +1,4 @@
-﻿namespace Tcc.Buffs.Artifacts
+﻿namespace Tcc.artifacts
 {
     public enum ArtifactSlots
     {

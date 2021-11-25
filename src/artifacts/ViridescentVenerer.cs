@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Tcc.Stats;
-using Tcc.Units;
-using Tcc.Weapons;
-using Tcc.Elements;
+using Tcc.buffs;
+using Tcc.elements;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class ViridescentVenerer: ArtifactSet
     {
@@ -15,17 +15,17 @@ namespace Tcc.Buffs.Artifacts
         static readonly Guid PYRO = new("8cb0d928-a503-48a4-a435-c82ef4088f80");
         static readonly Guid ELECTRO = new("0e18cfd8-a891-46ee-8e56-55a058e09270");
         static readonly Guid CRYO = new("761e2384-ed2b-45d3-b96a-21810b28bba6");
-        private Dictionary<Reaction, (Guid, Stats.Stats)> guidDict = new()
+        private Dictionary<Reaction, (Guid, Stats)> guidDict = new()
         {
-            [Reaction.SWIRL_PYRO] = (PYRO, Stats.Stats.PyroDamageBonus),
-            [Reaction.SWIRL_HYDRO] = (HYDRO, Stats.Stats.HydroDamageBonus),
-            [Reaction.SWIRL_ELECTRO] = (ELECTRO, Stats.Stats.ElectroDamageBonus),
-            [Reaction.SWIRL_CRYO] = (CRYO, Stats.Stats.CryoDamageBonus)
+            [Reaction.SWIRL_PYRO] = (PYRO, Stats.PyroDamageBonus),
+            [Reaction.SWIRL_HYDRO] = (HYDRO, Stats.HydroDamageBonus),
+            [Reaction.SWIRL_ELECTRO] = (ELECTRO, Stats.ElectroDamageBonus),
+            [Reaction.SWIRL_CRYO] = (CRYO, Stats.CryoDamageBonus)
         };
 
 
-        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.Stats.AnemoDamageBonus, 0.15);
-        private static readonly FirstPassModifier MODIFIER_4PC_PASSIVE = _ => (Stats.Stats.SwirlBonus, 0.6);
+        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.AnemoDamageBonus, 0.15);
+        private static readonly FirstPassModifier MODIFIER_4PC_PASSIVE = _ => (Stats.SwirlBonus, 0.6);
         
         
         public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));

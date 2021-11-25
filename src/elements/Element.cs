@@ -1,6 +1,7 @@
 using System;
+using Tcc.stats;
 
-namespace Tcc.Elements
+namespace Tcc.elements
 {
     [Flags]
     public enum Element
@@ -45,34 +46,34 @@ namespace Tcc.Elements
             };
         }
 
-        public static Stats.Stats ElementToRes(Element element)
+        public static Stats ElementToRes(Element element)
         {
             return element switch
             {
-                Element.PYRO => Stats.Stats.PyroResistance,
-                Element.CRYO => Stats.Stats.CryoResistance,
-                Element.HYDRO => Stats.Stats.HydroResistance,
-                Element.ELECTRO => Stats.Stats.ElectroResistance,
-                Element.ANEMO => Stats.Stats.AnemoResistance,
-                Element.GEO => Stats.Stats.GeoResistance,
-                Element.PHYSICAL => Stats.Stats.PhysicalResistance,
-                Element.DENDRO => Stats.Stats.DendroResistance,
+                Element.PYRO => Stats.PyroResistance,
+                Element.CRYO => Stats.CryoResistance,
+                Element.HYDRO => Stats.HydroResistance,
+                Element.ELECTRO => Stats.ElectroResistance,
+                Element.ANEMO => Stats.AnemoResistance,
+                Element.GEO => Stats.GeoResistance,
+                Element.PHYSICAL => Stats.PhysicalResistance,
+                Element.DENDRO => Stats.DendroResistance,
                 _ => throw new ArgumentOutOfRangeException(nameof(element), element, null)
             };
         }
         
-        public static Stats.Stats ElementToBonus(Element element)
+        public static Stats ElementToBonus(Element element)
         {
             return element switch
             {
-                Element.PYRO => Stats.Stats.PyroDamageBonus,
-                Element.CRYO => Stats.Stats.CryoDamageBonus,
-                Element.HYDRO => Stats.Stats.HydroDamageBonus,
-                Element.ELECTRO => Stats.Stats.ElectroDamageBonus,
-                Element.ANEMO => Stats.Stats.AnemoDamageBonus,
-                Element.GEO => Stats.Stats.GeoDamageBonus,
-                Element.PHYSICAL => Stats.Stats.PhysicalDamageBonus,
-                Element.DENDRO => Stats.Stats.DendroDamageBonus,
+                Element.PYRO => Stats.PyroDamageBonus,
+                Element.CRYO => Stats.CryoDamageBonus,
+                Element.HYDRO => Stats.HydroDamageBonus,
+                Element.ELECTRO => Stats.ElectroDamageBonus,
+                Element.ANEMO => Stats.AnemoDamageBonus,
+                Element.GEO => Stats.GeoDamageBonus,
+                Element.PHYSICAL => Stats.PhysicalDamageBonus,
+                Element.DENDRO => Stats.DendroDamageBonus,
                 _ => throw new ArgumentOutOfRangeException(nameof(element), element, null)
             };
         }

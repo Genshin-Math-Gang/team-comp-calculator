@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Tcc.Buffs;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Weapons;
+using Tcc.buffs;
+using Tcc.elements;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.weapons;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public class Bennett: Unit
     {
@@ -70,8 +69,8 @@ namespace Tcc.Units
         {
             var stats = burstBuffSnapshot.GetStats(startTime);
             // TODO: BENNET BURST MODIFIER IS WRONG
-            var modifier = new StatsPage(Stats.Stats.AtkFlat, 
-                stats[Stats.Stats.AtkBase] /** StartingAbilityStats[Types.BURST].GetMotionValue(2)*/);
+            var modifier = new StatsPage(Stats.AtkFlat, 
+                stats[Stats.AtkBase] /** StartingAbilityStats[Types.BURST].GetMotionValue(2)*/);
 
             return new RefreshableBuff<SecondPassModifier>(BURST_BUFF_ID, startTime + BUFF_DURATION, (_) => modifier);
         }

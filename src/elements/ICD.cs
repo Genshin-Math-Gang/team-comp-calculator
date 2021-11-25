@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using Tcc.Stats;
-using Tcc.Units;
-
-namespace Tcc.Elements
+namespace Tcc.elements
 {
     
     public class ICD 

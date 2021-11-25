@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tcc.Buffs
+namespace Tcc.buffs
 {
     public abstract class Buff<ModifierT>
     {

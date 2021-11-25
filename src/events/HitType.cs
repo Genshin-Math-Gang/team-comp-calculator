@@ -1,6 +1,6 @@
-﻿using Tcc.Elements;
+﻿using Tcc.elements;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     public struct HitType
     {

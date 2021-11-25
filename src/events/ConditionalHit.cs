@@ -1,8 +1,10 @@
 ﻿using System;
-using Tcc.Elements;
-using Tcc.Stats;
+using Tcc.elements;
+using Tcc.enemy;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     // this is a kinda scuffed way of implementing things but whatever since it should work
     public class ConditionalHit: Hit
@@ -12,8 +14,8 @@ namespace Tcc.Events
         
         public ConditionalHit(
             Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
-            Units.Unit unit, Types type, HitType hitType, Func<object[], bool> condition, object[] conditionParam,
-            string description = "", Enemy.Enemy target = null): 
+            Unit unit, Types type, HitType hitType, Func<object[], bool> condition, object[] conditionParam,
+            string description = "", Enemy target = null): 
             base(timestamp, element, mvIndex, stats, unit, type, hitType, description, target)
         {
             this.condition = condition;
@@ -22,8 +24,8 @@ namespace Tcc.Events
         
         public ConditionalHit(
             Timestamp timestamp, Func<Element> element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
-            Units.Unit unit, Types type, HitType hitType, Func<object[], bool> condition, object[] conditionParam,
-            string description = "", Enemy.Enemy target = null): 
+            Unit unit, Types type, HitType hitType, Func<object[], bool> condition, object[] conditionParam,
+            string description = "", Enemy target = null): 
             base(timestamp, element, mvIndex, stats, unit, type, hitType, description, target)
         {
             this.condition = condition;

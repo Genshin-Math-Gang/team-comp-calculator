@@ -1,15 +1,16 @@
 using System;
-using Tcc.Stats;
-using Tcc.Units;
+using Tcc.buffs;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class BraveHeart: ArtifactSet
     {
         static readonly Guid ID_2PC = new Guid("d346bb43-a398-417d-813e-9c2b4cf42704");
         static readonly Guid ID_4PC = new Guid("c90588f9-98a0-4387-b0ac-0e61f46ed519");
 
-        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.Stats.AtkPercent, 0.18);
+        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.AtkPercent, 0.18);
         // TODO: implement this
         static readonly EnemyBasedModifier MODIFIER_4PC = (data) => throw new NotImplementedException();
         //static readonly EnemyBasedModifier MODIFIER_4PC = (data) => data.enemy.CurrentHp / data.enemy.MaxHp > 0.5 ? new DamagePercentAndStats(damagePercentBonus: 0.3) : null;

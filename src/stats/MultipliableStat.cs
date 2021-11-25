@@ -1,6 +1,6 @@
 using System;
 
-namespace Tcc.Stats
+namespace Tcc.stats
 {
     public class MultipliableStat
     {

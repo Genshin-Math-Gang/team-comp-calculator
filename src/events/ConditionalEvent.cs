@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     public class ConditionalEvent: WorldEvent
     {

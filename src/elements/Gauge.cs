@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Tcc.Stats;
-using Tcc.Events;
-using Tcc.Units;
+using Tcc.events;
+using Tcc.events.reactions;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Elements
+namespace Tcc.elements
 {
     
     // electro and hydro can coexist, frozen is weird 
@@ -24,7 +24,7 @@ namespace Tcc.Elements
 
         private static double MultiplicativeMultiplier (StatsPage stats, Reaction reaction)
         {
-            double em = stats[Stats.Stats.ElementalMastery];
+            double em = stats[Stats.ElementalMastery];
             double bonus = stats.ReactionBonus(reaction);
             return 1 + 2.78 * em / (1400 + em) + bonus;
         }

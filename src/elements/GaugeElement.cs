@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Tcc.Elements
+namespace Tcc.elements
 {
     public class GaugeElement
     {

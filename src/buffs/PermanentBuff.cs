@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tcc.Buffs
+namespace Tcc.buffs
 {
     public class PermanentBuff<ModifierT>: Buff<ModifierT>
     {

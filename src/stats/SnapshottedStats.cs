@@ -1,7 +1,7 @@
-using Tcc.Events;
-using Tcc.Units;
+using Tcc.events;
+using Tcc.units;
 
-namespace Tcc.Stats
+namespace Tcc.stats
 {
     public class SnapshottedStats
     {

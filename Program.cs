@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System;
-using Tcc.Buffs;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Units;
-using Tcc.Enemy;
-using Tcc.Elements;
-using Tcc.Buffs.Artifacts;
+using Tcc.artifacts;
+using Tcc.buffs;
+using Tcc.enemy;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.units;
 
 namespace Tcc
 {
@@ -34,8 +33,8 @@ namespace Tcc
         {
             Xingqiu xq = new Xingqiu();
             Bennett benentt = new Bennett();
-            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
-            enemies.Add(new Enemy.Enemy());
+            List<Enemy> enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
             World world = new World(enemies);
             world.SetUnits(xq, benentt, null, null);
             
@@ -56,9 +55,9 @@ namespace Tcc
             Sucrose sucrose = new Sucrose();
             Bennett benentt = new Bennett(0);
             
-            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
-            enemies.Add(new Enemy.Enemy());
-            enemies.Add(new Enemy.Enemy());
+            List<Enemy> enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
+            enemies.Add(new Enemy());
             //enemies.Add(new Enemy.Enemy());
 
             World world = new World(enemies);
@@ -85,8 +84,8 @@ namespace Tcc
         {
             Sucrose sucrose = new Sucrose(0);
             Bennett bennett = new Bennett(0);
-            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
-            enemies.Add(new Enemy.Enemy());
+            List<Enemy> enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
             World world = new World(enemies);
             world.SetUnits(sucrose, bennett, null, null);
             var noblesse = new NoblessOblige();
@@ -103,8 +102,8 @@ namespace Tcc
             Ganyu ganyu = new Ganyu(0);
             Bennett benentt = new Bennett(0);
             
-            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
-            enemies.Add(new Enemy.Enemy());
+            List<Enemy> enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
             
             World world = new World(enemies);
             world.SetUnits(ganyu, benentt, null, null);
@@ -145,8 +144,8 @@ namespace Tcc
             Raiden shogun = new Raiden();
             Xiangling xiangling = new Xiangling(0);
             
-            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
-            enemies.Add(new Enemy.Enemy());
+            List<Enemy> enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
 
             World world = new World(enemies);
             world.SetUnits(shogun, xiangling, null, null);
@@ -169,7 +168,7 @@ namespace Tcc
             //Buff Shogun
             world.AddCharacterEvent(new Timestamp(4), (timestamp) => new List<WorldEvent> {
                 new WorldEvent(timestamp, (world) => shogun.AddBuff(new PermanentBuff<FirstPassModifier>(
-                    new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), (_) => (Stats.Stats.EnergyRecharge, 0.5))))
+                    new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), (_) => (Stats.EnergyRecharge, 0.5))))
             });
 
             //Xiangling burst hit while off-field and post shogun buff
@@ -195,8 +194,8 @@ namespace Tcc
             Xiangling xiangling = new Xiangling(0);
             Bennett bennett = new Bennett(0);
 
-            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
-            enemies.Add(new Enemy.Enemy());
+            List<Enemy> enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
 
             World world = new World(enemies);
             world.SetUnits(xiangling, bennett, null, null);
@@ -226,8 +225,8 @@ namespace Tcc
             Bennett bennett = new Bennett(0);
             Raiden shogun = new Raiden(0);
 
-            List<Enemy.Enemy> enemies = new List<Enemy.Enemy>();
-            enemies.Add(new Enemy.Enemy());
+            List<Enemy> enemies = new List<Enemy>();
+            enemies.Add(new Enemy());
 
             World world = new World(enemies);
             world.SetUnits(xiangling, bennett, shogun, null);

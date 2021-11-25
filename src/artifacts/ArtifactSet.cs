@@ -1,6 +1,6 @@
-using Tcc.Units;
+using Tcc.units;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public abstract class ArtifactSet
     {

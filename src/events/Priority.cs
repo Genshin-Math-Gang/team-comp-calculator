@@ -1,4 +1,4 @@
-﻿namespace Tcc.Events
+﻿namespace Tcc.events
 {
     public enum Priority
     {

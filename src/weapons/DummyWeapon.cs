@@ -1,4 +1,4 @@
-namespace Tcc.Weapons
+namespace Tcc.weapons
 {
     public class DummyWeapon: Weapon
     {

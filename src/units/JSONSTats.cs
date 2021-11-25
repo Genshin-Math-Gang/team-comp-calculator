@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Specialized;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public class JSONSTats
     {

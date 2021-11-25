@@ -1,8 +1,9 @@
 using System;
-using Tcc.Stats;
-using Tcc.Units;
+using Tcc.buffs;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class Adventurer: ArtifactSet
     {

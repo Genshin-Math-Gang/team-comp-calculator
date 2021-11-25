@@ -1,7 +1,4 @@
-﻿using System;
-using Tcc.Elements;
-
-namespace Tcc.Stats
+﻿namespace Tcc.stats
 {
     public enum Stats
     {

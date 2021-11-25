@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Tcc.Elements
+namespace Tcc.elements
 {
     public class ICDCreator
     {

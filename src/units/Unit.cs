@@ -1,34 +1,33 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Tcc.Buffs;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Weapons;
 using Newtonsoft.Json;
+using Tcc.elements;
+using Tcc.enemy;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.weapons;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public abstract class Unit: StatObject
     {
-        private static Dictionary<String, Stats.Stats> fileConvert = new Dictionary<string, Stats.Stats>
+        private static Dictionary<String, Stats> fileConvert = new Dictionary<string, Stats>
         {
-            {"Energy Recharge", Stats.Stats.EnergyRecharge},
-            {"ATK", Stats.Stats.AtkPercent},
-            {"DEF", Stats.Stats.DefPercent},
-            {"HP", Stats.Stats.HpPercent},
-            {"Healing Bonus", Stats.Stats.HealingBonus},
-            {"Anemo DMG Bonus", Stats.Stats.AnemoDamageBonus},
-            {"Geo DMG Bonus", Stats.Stats.GeoDamageBonus},
-            {"Pyro DMG Bonus", Stats.Stats.PyroDamageBonus},
-            {"Hydro DMG Bonus", Stats.Stats.HydroDamageBonus},
-            {"Electro DMG Bonus", Stats.Stats.ElectroDamageBonus},
-            {"Cryo DMG Bonus", Stats.Stats.CryoDamageBonus},
-            {"Dendro DMG Bonus", Stats.Stats.DendroDamageBonus}, // :kleek:
-            {"Physical DMG Bonus", Stats.Stats.PhysicalDamageBonus}
+            {"Energy Recharge", Stats.EnergyRecharge},
+            {"ATK", Stats.AtkPercent},
+            {"DEF", Stats.DefPercent},
+            {"HP", Stats.HpPercent},
+            {"Healing Bonus", Stats.HealingBonus},
+            {"Anemo DMG Bonus", Stats.AnemoDamageBonus},
+            {"Geo DMG Bonus", Stats.GeoDamageBonus},
+            {"Pyro DMG Bonus", Stats.PyroDamageBonus},
+            {"Hydro DMG Bonus", Stats.HydroDamageBonus},
+            {"Electro DMG Bonus", Stats.ElectroDamageBonus},
+            {"Cryo DMG Bonus", Stats.CryoDamageBonus},
+            {"Dendro DMG Bonus", Stats.DendroDamageBonus}, // :kleek:
+            {"Physical DMG Bonus", Stats.PhysicalDamageBonus}
             
         };
 
@@ -60,7 +59,7 @@ namespace Tcc.Units
         public event EventHandler<(Timestamp timestamp, int reaction)> TriggeredReactionHook; // TODO Not fired by anything
         public event EventHandler<(Timestamp timestamp, Element? element)> ParticleCollectedHook; // TODO Not fired by anything
 
-        public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)> SwirlTriggeredHook;
+        public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy enemy)> SwirlTriggeredHook;
 
         public event EventHandler<NormalAttackArgs> NormalAttackHook;
         
@@ -115,13 +114,13 @@ namespace Tcc.Units
                 double[] stats = data.stats[level];
                 BurstEnergyCost = data.energy;
                 CurrentEnergy = BurstEnergyCost;
-                StartingStatsPage = new StatsPage(new Dictionary<Stats.Stats, double>
+                StartingStatsPage = new StatsPage(new Dictionary<Stats, double>
                 {
-                    {Stats.Stats.HpBase, stats[0]},
-                    {Stats.Stats.AtkBase, stats[1]},
-                    {Stats.Stats.DefBase, stats[2]},
-                    {Stats.Stats.CritRate, stats[4]},
-                    {Stats.Stats.CritDamage, stats[5]}
+                    {Stats.HpBase, stats[0]},
+                    {Stats.AtkBase, stats[1]},
+                    {Stats.DefBase, stats[2]},
+                    {Stats.CritRate, stats[4]},
+                    {Stats.CritDamage, stats[5]}
                 });
                 StartingStatsPage += new StatsPage(fileConvert[ascension], stats[3]);
             }
@@ -147,7 +146,7 @@ namespace Tcc.Units
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
         
-        public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy.Enemy enemy, Timestamp timestamp)
+        public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy enemy, Timestamp timestamp)
         {
             EnemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             foreach (var list in AbilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -214,7 +213,7 @@ namespace Tcc.Units
             return new WorldEvent(timestamp, (world) => ParticleCollectedHook?.Invoke(this, (timestamp, element)));
         }
 
-        public WorldEvent TriggeredSwirl(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)
+        public WorldEvent TriggeredSwirl(Timestamp timestamp, Reaction reaction, Enemy enemy)
         {
             if (!ReactionTypes.IsSwirl(reaction))
             {

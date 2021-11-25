@@ -1,12 +1,13 @@
-﻿using Tcc.Elements;
-using Tcc.Stats;
+﻿using Tcc.elements;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Events
+namespace Tcc.events.reactions
 {
     public class ElectroCharged: WorldEvent
     {
         public ElectroCharged(
-            Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit): 
+            Timestamp timestamp, SecondPassStatsPage stats, Unit unit): 
             // TODO: check how many times it bounces
             // Does EC apply electro to nearby enemies
             base(

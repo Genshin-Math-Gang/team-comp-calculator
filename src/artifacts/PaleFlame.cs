@@ -1,9 +1,9 @@
 using System;
-using Tcc.Elements;
-using Tcc.Stats;
-using Tcc.Units;
+using Tcc.buffs;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class PaleFlame: ArtifactSet
     {
@@ -11,10 +11,10 @@ namespace Tcc.Buffs.Artifacts
         static readonly Guid ID_4PC_STACK = new Guid("bdf450e0-8152-49c3-ab80-3f86225ce741");
         static readonly Guid ID_4PC_CONDITIONAL = new Guid("b5c41036-6c67-465f-8337-36fdc152abab");
 
-        static readonly FirstPassModifier MODIFIER_2PC = (_) => (Stats.Stats.PhysicalDamageBonus, 0.25);
-        static readonly FirstPassModifier MODIFIER_4PC_STACK = (_) => (Stats.Stats.AtkPercent, 0.09);
+        static readonly FirstPassModifier MODIFIER_2PC = (_) => (Stats.PhysicalDamageBonus, 0.25);
+        static readonly FirstPassModifier MODIFIER_4PC_STACK = (_) => (Stats.AtkPercent, 0.09);
         static readonly FirstPassModifier MODIFIER_4PC_CONDITIONAL = (data) => 
-            data.st.GetBuffCount(ID_4PC_STACK) == 2 ? (Stats.Stats.PhysicalDamageBonus, 0.25) : new StatsPage();
+            data.st.GetBuffCount(ID_4PC_STACK) == 2 ? (Stats.PhysicalDamageBonus, 0.25) : new StatsPage();
 
         Timestamp cooldown4pcUntil;
 
@@ -26,7 +26,7 @@ namespace Tcc.Buffs.Artifacts
 
             world.enemyHitHook += (_, data) =>
             {
-                if(!data.attackType.IsType(Stats.Types.SKILL)) return;
+                if(!data.attackType.IsType(Types.SKILL)) return;
 
                 if(cooldown4pcUntil != null && data.timestamp < cooldown4pcUntil) return;
                 else cooldown4pcUntil = data.timestamp + 0.3;

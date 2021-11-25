@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using Tcc.Buffs;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Weapons;
+using System.Linq;
+using Tcc.buffs;
+using Tcc.elements;
+using Tcc.stats;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public abstract class StatObject
     {

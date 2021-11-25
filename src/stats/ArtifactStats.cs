@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Tcc.Stats;
 
-namespace Tcc.Stats
+namespace Tcc.stats
 {
     public class ArtifactStats: StatsPage
     {

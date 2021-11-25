@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
-using Tcc.Stats;
-using Tcc.Units;
-using Tcc.Weapons;
+using Tcc.buffs;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class TenacityOfTheMillelith: ArtifactSet
     {
         static readonly Guid ID_2PC = new Guid("12f19925-c85e-4f15-857f-7d305dfb179f");
         static readonly Guid ID_4PC = new Guid("1c5c261f-ab76-4b38-8f59-fcbf829dc58f");
 
-        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.Stats.HpPercent, 0.2);
-        static readonly FirstPassModifier MODIFIER_4PC = _ =>new StatsPage(new Dictionary<Stats.Stats, double>
+        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.HpPercent, 0.2);
+        static readonly FirstPassModifier MODIFIER_4PC = _ =>new StatsPage(new Dictionary<Stats, double>
         {
-            {Stats.Stats.AtkPercent, 0.2},
-            {Stats.Stats.ShieldStrength, 0.3}
+            {Stats.AtkPercent, 0.2},
+            {Stats.ShieldStrength, 0.3}
         });
 
         Timestamp cooldown4pcUntil;
@@ -26,7 +26,7 @@ namespace Tcc.Buffs.Artifacts
         {
             world.enemyHitHook += (_, data) =>
             {
-                if(!data.attackType.IsType(Stats.Types.SKILL)) return;
+                if(!data.attackType.IsType(Types.SKILL)) return;
 
                 if(cooldown4pcUntil != null && data.timestamp < cooldown4pcUntil) return;
                 else cooldown4pcUntil = data.timestamp + 0.5;

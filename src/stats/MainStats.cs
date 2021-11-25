@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
 
-namespace Tcc.Stats
+namespace Tcc.stats
 {
     public class MainStats: IEnumerable
     {

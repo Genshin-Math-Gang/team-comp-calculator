@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Tcc.Buffs;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Weapons;
+using Tcc.buffs;
+using Tcc.elements;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.weapons;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public class Raiden: Unit
     {
@@ -59,8 +59,8 @@ namespace Tcc.Units
                 SKILL_BUFF_ID,
                 expiryTime: expiryTime,
                 data => new 
-                StatsPage(Stats.Stats.DamagePercent, 
-                    GetFirstPassStats(data.timestamp)[Stats.Stats.EnergyRecharge] * 0.3) 
+                StatsPage(Stats.DamagePercent, 
+                    GetFirstPassStats(data.timestamp)[Stats.EnergyRecharge] * 0.3) 
                 // TODO Will become part of burst MVs
             );
         }

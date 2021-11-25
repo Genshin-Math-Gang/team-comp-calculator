@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Tcc.Elements;
-using Tcc.Stats;
-using Tcc.Units;
+using Tcc.buffs;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class CrimsonWitch: ArtifactSet
     {
@@ -12,18 +12,18 @@ namespace Tcc.Buffs.Artifacts
         static readonly Guid ID_4PC_PASSIVE = new Guid("608f7b4e-96a3-4731-954a-6ca247ade87e");
         static readonly Guid ID_4PC_STACK = new Guid("73e3f42e-bfe4-4592-ac31-3db20097d8cb");
 
-        static readonly FirstPassModifier MODIFIER_2PC = (_) => (Stats.Stats.PyroDamageBonus, 0.15);
+        static readonly FirstPassModifier MODIFIER_2PC = (_) => (Stats.PyroDamageBonus, 0.15);
 
         private static readonly FirstPassModifier MODIFIER_4PC_PASSIVE = (_) =>
-            new StatsPage(new Dictionary<Stats.Stats, double>
+            new StatsPage(new Dictionary<Stats, double>
             {
-                {Stats.Stats.OverloadBonus, 0.4},
-                {Stats.Stats.BurningBonus, 0.4},
-                {Stats.Stats.MeltBonus, 0.15},
-                {Stats.Stats.VaporizeBonus, 0.15}
+                {Stats.OverloadBonus, 0.4},
+                {Stats.BurningBonus, 0.4},
+                {Stats.MeltBonus, 0.15},
+                {Stats.VaporizeBonus, 0.15}
             });
 
-        static readonly FirstPassModifier MODIFIER_4PC_STACK = (_) => (Stats.Stats.PyroDamageBonus, 0.075);
+        static readonly FirstPassModifier MODIFIER_4PC_STACK = (_) => (Stats.PyroDamageBonus, 0.075);
 
         public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));
 

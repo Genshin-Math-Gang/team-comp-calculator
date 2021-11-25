@@ -1,6 +1,6 @@
 using System;
 
-namespace Tcc.Buffs
+namespace Tcc.buffs
 {
     public class InvalidBuffException: Exception
     {

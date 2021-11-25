@@ -1,16 +1,17 @@
 using System;
-using Tcc.Stats;
-using Tcc.Units;
-using Tcc.Weapons;
+using Tcc.buffs;
+using Tcc.stats;
+using Tcc.units;
+using Tcc.weapons;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class Scholar: ArtifactSet
     {
         static readonly Guid ID_2PC = new Guid("7d94df2c-995e-4f83-9daa-57d3b497d594");
         static readonly Guid ID_4PC = new Guid("6d44e17e-6ebe-490b-b76e-da5fe68e1f0b");
 
-        static readonly FirstPassModifier MODIFIER_2PC = (_) => (Stats.Stats.EnergyRecharge, 0.2);
+        static readonly FirstPassModifier MODIFIER_2PC = (_) => (Stats.EnergyRecharge, 0.2);
 
         Timestamp cooldown4pcUntil;
 

@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
-namespace Tcc.Buffs
+namespace Tcc.buffs
 {
     public class RefreshableBuff<ModifierT>: Buff<ModifierT>
     {

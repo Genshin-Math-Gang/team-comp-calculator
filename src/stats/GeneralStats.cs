@@ -1,6 +1,6 @@
-using Tcc.Elements;
+using Tcc.elements;
 
-namespace Tcc.Stats
+namespace Tcc.stats
 {
     public class GeneralStats
     {

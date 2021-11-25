@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Tcc;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Stats;
-using Tcc.Weapons;
+﻿using System.Collections.Generic;
+using Tcc.elements;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.weapons;
 
-namespace Tcc.Units
+namespace Tcc.units
 {
     public class Xingqiu: Unit
     {

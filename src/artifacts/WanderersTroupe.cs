@@ -1,17 +1,18 @@
 using System;
-using Tcc.Stats;
-using Tcc.Units;
-using Tcc.Weapons;
+using Tcc.buffs;
+using Tcc.stats;
+using Tcc.units;
+using Tcc.weapons;
 
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     public class WanderersTroupe: ArtifactSet
     {
         static readonly Guid ID_2PC = new Guid("e111a06f-7f13-4dd7-8d08-cd33f2e1bd77");
         static readonly Guid ID_4PC = new Guid("5a976f3c-c777-4615-8b3a-6704401f4a83");
 
-        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.Stats.ElementalMastery, 80);
-        static readonly StatsPage STATS_4PC = (Stats.Stats.DamagePercent, 0.35);
+        static readonly FirstPassModifier MODIFIER_2PC = _ => (Stats.ElementalMastery, 80);
+        static readonly StatsPage STATS_4PC = (Stats.DamagePercent, 0.35);
 
         public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));
 

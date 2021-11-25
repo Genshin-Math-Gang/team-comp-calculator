@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     public class CharacterEvent
     {

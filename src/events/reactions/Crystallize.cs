@@ -1,13 +1,13 @@
-﻿using System;
-using Tcc.Elements;
-using Tcc.Stats;
+﻿using Tcc.elements;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Events
+namespace Tcc.events.reactions
 {
     public class Crystallize: WorldEvent
     {
         public Crystallize(
-            Timestamp timestamp, SecondPassStatsPage stats, Units.Unit unit, Element element): 
+            Timestamp timestamp, SecondPassStatsPage stats, Unit unit, Element element): 
             // TODO: dumb double swirl and chain swirl 
             base(
                 timestamp,

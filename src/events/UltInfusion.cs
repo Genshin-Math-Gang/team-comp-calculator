@@ -1,8 +1,6 @@
-﻿using System;
-using Tcc.Elements;
-using Tcc.Units;
+﻿using Tcc.units;
 
-namespace Tcc.Events
+namespace Tcc.events
 {
     public class AbilityInfusion: WorldEvent
     {

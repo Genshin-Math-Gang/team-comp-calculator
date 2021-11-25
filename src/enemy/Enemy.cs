@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Tcc.Buffs;
-using Tcc.Stats;
-using Tcc.Elements;
-using Tcc.Events;
-using Tcc.Units;
+using Tcc.buffs;
+using Tcc.elements;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.units;
 
-namespace Tcc.Enemy
+namespace Tcc.enemy
 {
     public class Enemy: StatObject
     {
@@ -19,14 +18,14 @@ namespace Tcc.Enemy
         
         private static Guid superconductID = new ("fb1fd9b8-6096-4dea-9e9a-5f3fa18976b8");
         private static StatsPage superconductDebuff =
-            new StatsPage(Stats.Stats.PhysicalResistance, -0.4);
+            new StatsPage(Stats.PhysicalResistance, -0.4);
         
         // dumb swirl hackery 
         private Dictionary<Reaction, int> swirlHitCounter;
         private Timestamp swirlLastChecked;
         
 
-        public Enemy(StatsPage statsPage = null, Gauge gauge = null) : base(statsPage ?? new StatsPage(Stats.Stats.HpBase, 100000))
+        public Enemy(StatsPage statsPage = null, Gauge gauge = null) : base(statsPage ?? new StatsPage(Stats.HpBase, 100000))
         {
             this.gauge = gauge ?? new Gauge();
             icdDict = new Dictionary<Guid, ICD>();
@@ -104,7 +103,7 @@ namespace Tcc.Enemy
                 }
 
                 damage = TransformativeScaling.ReactionMultiplier(reaction) *
-                         (TransformativeScaling.EmScaling(statsOfUnit[Stats.Stats.ElementalMastery]) +
+                         (TransformativeScaling.EmScaling(statsOfUnit[Stats.ElementalMastery]) +
                           statsOfUnit.ReactionBonus(reaction))
                          * TransformativeScaling.damage[unit.Level] *
                          ResistanceCalculation(timestamp, element, type, statsOfUnit);

@@ -1,10 +1,4 @@
-using System.Linq;
-using System;
-using Tcc.Elements;
-using Tcc.Stats;
-using Tcc.Units;
-
-namespace Tcc.Buffs.Artifacts
+namespace Tcc.artifacts
 {
     /*public class TinyMiracle: ArtifactSet
     {
