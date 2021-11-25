@@ -30,6 +30,15 @@ namespace Tcc.Stats
                 baseValue: first.Base + second.Base
             );
         }
+        
+        public static MultipliableStat operator -(MultipliableStat first, MultipliableStat second)
+        {
+            return new MultipliableStat(
+                flatBonus: first.FlatBonus - second.FlatBonus,
+                percentBonus: first.PercentBonus - second.PercentBonus,
+                baseValue: first.Base - second.Base
+            );
+        }
 
         public bool ReduceValue(double value)
         {

@@ -26,9 +26,9 @@ namespace Tcc.Units
             {
                 SkillActivated(timestamp),
                 skillSnapshot.Snapshot(timestamp),
-                new Hit(timestamp, element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                new Hit(timestamp, Element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
                    new HitType(true, 1, false, false), "Trail of the Qilin cast" ),
-                new Hit(timestamp + 6, element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                new Hit(timestamp + 6, Element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
                     new HitType(true, 1, false, false),  "Trail of the Qilin explosion" )
 
             };
@@ -49,7 +49,7 @@ namespace Tcc.Units
                 for (int j = 0; j < num; j++)
                 {
                     time += .3;
-                    events.Add(new Hit(time, element, 0, burstSnapshot.GetStats, this, Types.BURST,
+                    events.Add(new Hit(time, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
                         new HitType(true, 1, false, icd: BurstICD),"Icicle hit"));
                 }
             }
@@ -68,7 +68,7 @@ namespace Tcc.Units
 
         private WorldEvent Icicle(Timestamp timestamp)
         {
-            return new Hit(timestamp, element, 0, burstSnapshot.GetStats, this, Types.BURST,
+            return new Hit(timestamp, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
                 new HitType(true, 1, false, false),"Icicle hit");
         }
 

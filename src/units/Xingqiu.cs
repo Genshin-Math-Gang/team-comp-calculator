@@ -43,13 +43,13 @@ namespace Tcc.Units
         {
 
             //double multiplier = (constellationLevel >= 4 && ultActive)? 1.5 : 1;
-            int indexShift = (constellationLevel >= 4 && ultActive) ? 2 : 1;
+            int indexShift = (ConstellationLevel >= 4 && ultActive) ? 2 : 1;
             return new List<WorldEvent>
             {
                 SkillActivated(timestamp),
-                new Hit(timestamp + 24.0/30, element, indexShift, GetStatsPage, this, Types.SKILL, 
+                new Hit(timestamp + 24.0/30, Element, indexShift, GetStatsPage, this, Types.SKILL, 
                     new HitType(true), "Fatal Rainscreen first hit"),
-                new Hit(timestamp + 40.0/30, element, 1 + indexShift, GetStatsPage, this, Types.SKILL, 
+                new Hit(timestamp + 40.0/30, Element, 1 + indexShift, GetStatsPage, this, Types.SKILL, 
                     new HitType(true), "Fatal Rainscreen second hit")
             };
         }
@@ -58,7 +58,7 @@ namespace Tcc.Units
         {
 
             burstWaveCount = 0;
-            int duration = constellationLevel >= 2 ? 18 : 15;
+            int duration = ConstellationLevel >= 2 ? 18 : 15;
 
             return new List<WorldEvent>
             {
@@ -67,14 +67,14 @@ namespace Tcc.Units
                 {
                     foreach (var unit in world.GetUnits())
                     {
-                        if (unit is not null) unit.normalAttackHook += RainSword;
+                        if (unit is not null) unit.NormalAttackHook += RainSword;
                     }
                 }),
                 new WorldEvent(timestamp + duration, world =>
                 {
                     foreach (var unit in world.GetUnits())
                     {
-                        if (unit is not null) unit.normalAttackHook -= RainSword;
+                        if (unit is not null) unit.NormalAttackHook -= RainSword;
                     }
                 })
                 // add events which add and remove an event listener for auto attacks
@@ -97,7 +97,7 @@ namespace Tcc.Units
             int bounces = burstWaveSwordCount[burstWaveCount];
             burstWaveCount += 1;
             lastBurstWave = timestamp;
-            e.World.AddWorldEvent(new Hit(Timestamp.Max(timestamp, lastBurstWave+1), element, 0, GetStatsPage, 
+            e.World.AddWorldEvent(new Hit(Timestamp.Max(timestamp, lastBurstWave+1), Element, 0, GetStatsPage, 
                 this, Types.BURST, new HitType(bounces: bounces, delay:new Timestamp(0)), "Rain Sword"));
         }
 

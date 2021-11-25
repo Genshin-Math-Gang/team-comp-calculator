@@ -32,7 +32,7 @@ namespace Tcc.Units
             return new List<WorldEvent>()
             {
                 // i think sucrose autos have aoe, will check later
-                new Hit(timestamp, element, normalIndex, GetStatsPage, this, Types.NORMAL, 
+                new Hit(timestamp, Element, normalIndex, GetStatsPage, this, Types.NORMAL, 
                     new HitType(false, 1, false, icd: NormalICD), $"Wind Spirit Creation {normalIndex}"),
                 // TODO: find frame data for auto attacks
                 NormalAttackGeneralUsed(timestamp, new Timestamp(0.2))
@@ -46,7 +46,7 @@ namespace Tcc.Units
             return new List<WorldEvent>()
             {
                 // i think sucrose autos have aoe, will check later
-                new Hit(timestamp, element, normalIndex, GetStatsPage, this, Types.NORMAL, 
+                new Hit(timestamp, Element, normalIndex, GetStatsPage, this, Types.NORMAL, 
                     new HitType(true, 1, false, false), "Wind Spirit Creation CA" ),
 
             };
@@ -58,7 +58,7 @@ namespace Tcc.Units
             return new List<WorldEvent>()
             {
                 SkillActivated(timestamp),
-                new Hit(timestamp, element, 0, GetStatsPage, this, Types.SKILL, 
+                new Hit(timestamp, Element, 0, GetStatsPage, this, Types.SKILL, 
                     new HitType(true, 1, false), "Astable Anemohypostasis Creation-6308" ),
 
             };
@@ -70,34 +70,34 @@ namespace Tcc.Units
         public List<WorldEvent> Burst(Timestamp timestamp)
         {
             Timestamp castingTime = new Timestamp(67.0 / 60);
-            Timestamp endTime = timestamp + castingTime + 3 * UltInterval + (constellationLevel >= 2 ? 2: 0);
+            Timestamp endTime = timestamp + castingTime + 3 * UltInterval + (ConstellationLevel >= 2 ? 2: 0);
             Timestamp firstHit = timestamp + castingTime;
             var events = new List<WorldEvent>()
             {
                 BurstActivated(timestamp),
                 burstSnapshot.Snapshot(timestamp), 
                 new AbilityInfusion(firstHit - .1, endTime, this),
-                new Hit(firstHit, element, 0, burstSnapshot.GetStats, this, Types.BURST,
+                new Hit(firstHit, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
                     new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"),
                 new ConditionalHit(firstHit, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
                     new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
                 new AbilityInfusion(firstHit + UltInterval - .1, endTime, this),
-                new Hit(firstHit + UltInterval, element, 0, burstSnapshot.GetStats, this, Types.BURST,
+                new Hit(firstHit + UltInterval, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
                     new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"),
                 new ConditionalHit(firstHit + UltInterval, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
                     new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
                 new AbilityInfusion(firstHit + 2 * UltInterval - .1, endTime, this),
-                new Hit(firstHit + 2*UltInterval, element, 0, burstSnapshot.GetStats, this, Types.BURST,
+                new Hit(firstHit + 2*UltInterval, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
                     new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"),
                 new ConditionalHit(firstHit + 2*UltInterval, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
                     new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"),
                 
             };
 
-            if (constellationLevel < 2) return events;
+            if (ConstellationLevel < 2) return events;
             
             events.Add(new AbilityInfusion(firstHit + 3 * UltInterval - .1, endTime, this));
-            events.Add(new Hit(firstHit + 3*UltInterval, element, 0, burstSnapshot.GetStats, this, Types.BURST,
+            events.Add(new Hit(firstHit + 3*UltInterval, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
                 new HitType(true, 1, false, icd: BurstICD), "Forbidden Creation-Isomer 75/Type II"));
             events.Add(new ConditionalHit(firstHit + 3*UltInterval, GetInfusion, 1, burstSnapshot.GetStats, this, Types.BURST,
                 new HitType(true, 1, false, icd: BurstICD), DoInfusionHit,new object[] {this},"Forbidden Creation-Isomer 75/Type II infusion"));

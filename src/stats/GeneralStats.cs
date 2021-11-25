@@ -71,6 +71,16 @@ namespace Tcc.Stats
                 reactionBonus: first.ReactionBonus + second.ReactionBonus
             );
         }
+        
+        public static GeneralStats operator -(GeneralStats first, GeneralStats second)
+        {
+            return new GeneralStats(
+                nonKeyedStats: first.NonKeyedStats - second.NonKeyedStats,
+                elementalBonus: first.ElementalBonus - second.ElementalBonus,
+                elementalResistance: first.ElementalResistance - second.ElementalResistance,
+                reactionBonus: first.ReactionBonus - second.ReactionBonus
+            );
+        }
 
         public int Level => NonKeyedStats.Level;
         public MultipliableStat Attack => NonKeyedStats.Attack;

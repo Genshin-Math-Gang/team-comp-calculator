@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Tcc.Elements
@@ -26,6 +27,8 @@ namespace Tcc.Elements
         {
             return 1 + 16 * em / (2000 + em);
         }
+
+        
         
         public static Dictionary<int, double> damage = new Dictionary<int, double>() {
         {1, 17.2}, 

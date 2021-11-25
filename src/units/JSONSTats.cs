@@ -5,7 +5,7 @@ namespace Tcc.Units
 {
     public class JSONSTats
     {
-        public string ascencion;
+        public string ascension;
         public int energy;
         public Dictionary<string, double[]> stats;
 

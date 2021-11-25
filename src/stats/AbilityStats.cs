@@ -5,13 +5,13 @@ namespace Tcc.Stats
 {
     public class AbilityStats
     {
-        readonly GeneralStats generalStats;
+        readonly StatsPage statsPage;
         readonly double[] motionValues;
 
 
-        public AbilityStats(GeneralStats generalStats = null, double[] motionValues = null)
+        public AbilityStats(StatsPage statsPage = null, double[] motionValues = null)
         {
-            this.generalStats = generalStats ?? new GeneralStats();
+            this.statsPage = statsPage ?? new StatsPage();
             this.motionValues = motionValues;
         }
 
@@ -19,9 +19,9 @@ namespace Tcc.Stats
         
         public double CalculateHitMultiplier(int index, Element element)
         {
-            var damagePercent = generalStats.DamagePercent + generalStats.ElementalBonus.GetPercentBonus(element);
-            return generalStats.Attack * (1 + damagePercent) * motionValues[index] *
-                   (1 + generalStats.CritRate * generalStats.CritDamage) * generalStats.IndependentMultiplier;
+            // what the fuck is independent multiplier
+            return statsPage.Atk * statsPage.CritMultiplier * statsPage.DamageMultiplier(element) 
+                   * motionValues[index] * (1 + statsPage[Stats.IndependentMultiplier]);
         }
 
         public double GetMotionValue(int mvIndex) => motionValues[mvIndex];
@@ -55,11 +55,15 @@ namespace Tcc.Stats
             }
 
             return new AbilityStats(
-                generalStats: first.generalStats + second.generalStats,
+                statsPage: first.statsPage + second.statsPage,
                 motionValues: motionValues
             );
         }
 
-        public static implicit operator AbilityStats(GeneralStats generalStats) => new AbilityStats(generalStats: generalStats);
+        
+        public static implicit operator AbilityStats(SecondPassStatsPage statsPage) => new (statsPage.firstPassStats);
+        public static implicit operator AbilityStats(StatsPage statsPage) => new (statsPage);
+        
+        public static implicit operator AbilityStats((Stats, double) data) => new StatsPage(data.Item1, data.Item2);
     }
 }

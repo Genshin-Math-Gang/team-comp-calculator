@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Tcc.Buffs;
 using Tcc.Elements;
@@ -13,36 +14,55 @@ namespace Tcc.Units
 {
     public abstract class Unit: StatObject
     {
-        
-        protected readonly int constellationLevel;
-        protected readonly int burstEnergyCost;
-        public readonly WeaponType weaponType;
-        public readonly Element element;
+        private static Dictionary<String, Stats.Stats> fileConvert = new Dictionary<string, Stats.Stats>
+        {
+            {"Energy Recharge", Stats.Stats.EnergyRecharge},
+            {"ATK", Stats.Stats.AtkPercent},
+            {"DEF", Stats.Stats.DefPercent},
+            {"HP", Stats.Stats.HpPercent},
+            {"Healing Bonus", Stats.Stats.HealingBonus},
+            {"Anemo DMG Bonus", Stats.Stats.AnemoDamageBonus},
+            {"Geo DMG Bonus", Stats.Stats.GeoDamageBonus},
+            {"Pyro DMG Bonus", Stats.Stats.PyroDamageBonus},
+            {"Hydro DMG Bonus", Stats.Stats.HydroDamageBonus},
+            {"Electro DMG Bonus", Stats.Stats.ElectroDamageBonus},
+            {"Cryo DMG Bonus", Stats.Stats.CryoDamageBonus},
+            {"Dendro DMG Bonus", Stats.Stats.DendroDamageBonus}, // :kleek:
+            {"Physical DMG Bonus", Stats.Stats.PhysicalDamageBonus}
+            
+        };
+
+        protected readonly int ConstellationLevel;
+        protected readonly int BurstEnergyCost;
+        public readonly WeaponType WeaponType;
+        public readonly Element Element;
 
         // Base stats
-        protected readonly CapacityStats startingCapacityStats;
-        protected readonly GeneralStats startingGeneralStats;
-        protected readonly Dictionary<Types, AbilityStats> startingAbilityStats = new();
-
+        protected readonly Dictionary<Types, AbilityStats> StartingAbilityStats = new();
+        
+        // Artifact stats
+        private ArtifactStats ArtifactStats;
+        
+        /*
         // Snapshottable buffs
-        protected readonly List<Buff<CapacityModifier>> capacityBuffs = new();
-        protected readonly List<Buff<FirstPassModifier>> firstPassBuffs = new();
-        protected readonly List<Buff<SecondPassModifier>> secondPassBuffs = new();
+        protected readonly List<Buff<CapacityModifier>> CapacityBuffs = new();
+        protected readonly List<Buff<FirstPassModifier>> FirstPassBuffs = new();
+        protected readonly List<Buff<SecondPassModifier>> SecondPassBuffs = new();
 
         // Unsnapshottable buffs
-        protected readonly List<Buff<EnemyBasedModifier>> enemyBasedBuffs = new();
-        protected readonly Dictionary<Element, List<Buff<ElementBasedModifier>>> elementBasedBuffs = new();
-        protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> abilityBuffs = new();
+        protected readonly List<Buff<EnemyBasedModifier>> EnemyBasedBuffs = new();
+        protected readonly Dictionary<Element, List<Buff<ElementBasedModifier>>> ElementBasedBuffs = new();
+        protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> AbilityBuffs = new();*/
 
         // Hooks
-        public event EventHandler<Timestamp> skillActivatedHook;
-        public event EventHandler<Timestamp> burstActivatedHook;
-        public event EventHandler<(Timestamp timestamp, int reaction)> triggeredReactionHook; // TODO Not fired by anything
-        public event EventHandler<(Timestamp timestamp, Element? element)> particleCollectedHook; // TODO Not fired by anything
+        public event EventHandler<Timestamp> SkillActivatedHook;
+        public event EventHandler<Timestamp> BurstActivatedHook;
+        public event EventHandler<(Timestamp timestamp, int reaction)> TriggeredReactionHook; // TODO Not fired by anything
+        public event EventHandler<(Timestamp timestamp, Element? element)> ParticleCollectedHook; // TODO Not fired by anything
 
-        public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)> swirlTriggeredHook;
+        public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)> SwirlTriggeredHook;
 
-        public event EventHandler<NormalAttackArgs> normalAttackHook;
+        public event EventHandler<NormalAttackArgs> NormalAttackHook;
         
         
         // TODO: probably make args class for all of these and  move them somewhere
@@ -65,23 +85,24 @@ namespace Tcc.Units
         // work on that later
         protected Unit(
             string name, String level, int constellationLevel, int autoLevel, int skillLevel, int burstLevel, Element element, 
-            WeaponType weaponType) 
+            WeaponType weaponType) : base(level)
         {
-            this.constellationLevel = constellationLevel;
-            this.element = element;
-            this.weaponType = weaponType;
+            ConstellationLevel = constellationLevel;
+            Element = element;
+            WeaponType = weaponType;
             // dumb file directory hack but i don't know a better solution
-            string dir = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName;
+            string dir = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
             
             using (var sr = new StreamReader(dir + "/src/units/characterData/" + name + "MVS.json"))
             {
                 String content = sr.ReadToEnd();
                 var data = JsonConvert.DeserializeObject<Dictionary<string, double[][]>>(content);
-                startingAbilityStats[Types.NORMAL] = new AbilityStats(motionValues: data["normal"][autoLevel]);
-                startingAbilityStats[Types.CHARGED] = new AbilityStats(motionValues:data["charged"][autoLevel]);
-                startingAbilityStats[Types.PLUNGE] = new AbilityStats(motionValues: data["plunge"][autoLevel]);
-                startingAbilityStats[Types.BURST] = new AbilityStats(motionValues: data["burst"][burstLevel]);
-                startingAbilityStats[Types.SKILL] = new AbilityStats(motionValues: data["skill"][skillLevel]);
+                Debug.Assert(data != null, "data loaded from file got fucked");
+                StartingAbilityStats[Types.NORMAL] = new AbilityStats(motionValues: data["normal"][autoLevel]);
+                StartingAbilityStats[Types.CHARGED] = new AbilityStats(motionValues:data["charged"][autoLevel]);
+                StartingAbilityStats[Types.PLUNGE] = new AbilityStats(motionValues: data["plunge"][autoLevel]);
+                StartingAbilityStats[Types.BURST] = new AbilityStats(motionValues: data["burst"][burstLevel]);
+                StartingAbilityStats[Types.SKILL] = new AbilityStats(motionValues: data["skill"][skillLevel]);
             }
             
             using (var sr = new StreamReader(dir + "/src/units/characterData/" + name + "Stats.json"))
@@ -89,74 +110,26 @@ namespace Tcc.Units
                 String content = sr.ReadToEnd();
                 var data = JsonConvert.DeserializeObject<JSONSTats>(content);
                 // needs some kind of validation or something here but am lazy
-                String ascension = data.ascencion;
+                Debug.Assert(data != null, "data loaded from file got fucked");
+                String ascension = data.ascension;
                 double[] stats = data.stats[level];
-                burstEnergyCost = data.energy;
-                CurrentEnergy = burstEnergyCost;
-                startingGeneralStats = new GeneralStats(baseAttack: stats[1], baseDefence: stats[2],
-                    critRate: stats[4], critDamage: stats[5]);
-                startingCapacityStats = new CapacityStats(baseHp: stats[0], energy: burstEnergyCost);
-                
-                // shit code
-                switch (ascension)
+                BurstEnergyCost = data.energy;
+                CurrentEnergy = BurstEnergyCost;
+                StartingStatsPage = new StatsPage(new Dictionary<Stats.Stats, double>
                 {
-                    case "Energy Recharge":
-                        startingGeneralStats += new GeneralStats(energyRecharge: stats[3]);
-                        break;
-                    case "ATK":
-                        startingGeneralStats += new GeneralStats(attackPercent: stats[3]);
-                        break;
-                    case "DEF":
-                        startingGeneralStats += new GeneralStats(defencePercent: stats[3]);
-                        break;
-                    case "HP":
-                        startingCapacityStats += new CapacityStats(hpPercent: stats[3]);
-                        break;
-                    case "Healing Bonus":
-                        startingGeneralStats += new GeneralStats(healingBonus: stats[3]);
-                        break;
-                    case "Anemo DMG Bonus":
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.ANEMO, stats[3]));
-                        break;
-                    case "Cryo DMG Bonus":
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.ANEMO, stats[3]));
-                        break;
-                    case "Dendro DMG Bonus":
-                        // :kleek:
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.DENDRO, stats[3]));
-                        break;
-                    case "Electro DMG Bonus":
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.ELECTRO, stats[3]));
-                        break;
-                    case "Geo DMG Bonus":
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.GEO, stats[3]));
-                        break;
-                    case "Hydro DMG Bonus":
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.HYDRO, stats[3]));
-                        break;
-                    case "Physical DMG Bonus":
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.PHYSICAL, stats[3]));
-                        break;
-                    case "Pyro DMG Bonus":
-                        startingGeneralStats += new GeneralStats(elementalBonus: 
-                            new KeyedPercentBonus<Element>(Element.PYRO, stats[3]));
-                        break;
-                }
+                    {Stats.Stats.HpBase, stats[0]},
+                    {Stats.Stats.AtkBase, stats[1]},
+                    {Stats.Stats.DefBase, stats[2]},
+                    {Stats.Stats.CritRate, stats[4]},
+                    {Stats.Stats.CritDamage, stats[5]}
+                });
+                StartingStatsPage += new StatsPage(fileConvert[ascension], stats[3]);
             }
-            base.startingCapacityStats = startingCapacityStats;
-            base.startingGeneralStats = startingGeneralStats;
         }
 
         public Weapon Weapon { get; set; }
         
-
+        
         /*public double GetAbilityGauge(Types type)
         {
             // this will probably need to be modified later to make it work with swirl 
@@ -176,24 +149,24 @@ namespace Tcc.Units
         
         public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy.Enemy enemy, Timestamp timestamp)
         {
-            enemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
-            foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            EnemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            foreach (var list in AbilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             
-            AbilityStats result = statsFromUnit.generalStats;
+            AbilityStats result = statsFromUnit;
 
-            if (startingAbilityStats.TryGetValue(type, out var startingStats)) result += startingStats;
+            if (StartingAbilityStats.TryGetValue(type, out var startingStats)) result += startingStats;
 
             if (enemy != null)
             {
-                foreach (var buff in enemyBasedBuffs) result += buff.GetModifier((this, timestamp, enemy, statsFromUnit.firstPassStats));
+                foreach (var buff in EnemyBasedBuffs) result += buff.GetModifier((this, timestamp, enemy, statsFromUnit.firstPassStats));
             }
 
-            if (elementBasedBuffs.TryGetValue(element, out var elementBuffList))
+            if (ElementBasedBuffs.TryGetValue(element, out var elementBuffList))
             {
                 foreach (var buff in elementBuffList) result += buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats));
             }
 
-            if (abilityBuffs.TryGetValue(type, out var abilityBuffList))
+            if (AbilityBuffs.TryGetValue(type, out var abilityBuffList))
             {
                 foreach (var buff in abilityBuffList) result += buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats));
             }
@@ -202,17 +175,17 @@ namespace Tcc.Units
         }
         
 
-        public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, CapacityStats.Energy);
+        public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, BurstEnergyCost);
         public void LoseEnergy(int energy) => CurrentEnergy = Math.Max(CurrentEnergy - energy, 0);
 
         protected WorldEvent SkillActivated(Timestamp timestamp)
         {
-            return new WorldEvent(timestamp, (world) => skillActivatedHook?.Invoke(this, timestamp),$"Skill activated by {this}");
+            return new WorldEvent(timestamp, (world) => SkillActivatedHook?.Invoke(this, timestamp),$"Skill activated by {this}");
         }
 
         protected WorldEvent NormalAttackUsed(Timestamp timestamp, Timestamp duration)
         {
-            return new WorldEvent(timestamp, world => normalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world)));
+            return new WorldEvent(timestamp, world => NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world)));
         }
         
         protected WorldEvent NormalAttackGeneralUsed(Timestamp timestamp, Timestamp duration)
@@ -220,7 +193,7 @@ namespace Tcc.Units
             return new WorldEvent(timestamp, world => {
                 foreach (var unit in world.GetUnits())
                 {
-                    unit?.normalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world));
+                    unit?.NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world));
                 }
             });
         }
@@ -228,17 +201,17 @@ namespace Tcc.Units
 
         protected WorldEvent BurstActivated(Timestamp timestamp)
         {
-            return new WorldEvent(timestamp, (world) => burstActivatedHook?.Invoke(this, timestamp), $"Burst activated by {this}");
+            return new WorldEvent(timestamp, (world) => BurstActivatedHook?.Invoke(this, timestamp), $"Burst activated by {this}");
         }
 
         protected WorldEvent TriggeredReaction(Timestamp timestamp, int reaction)
         {
-            return new WorldEvent(timestamp, (world) => triggeredReactionHook?.Invoke(this, (timestamp, reaction)));
+            return new WorldEvent(timestamp, (world) => TriggeredReactionHook?.Invoke(this, (timestamp, reaction)));
         }
 
         protected WorldEvent ParticleCollected(Timestamp timestamp, Element? element)
         {
-            return new WorldEvent(timestamp, (world) => particleCollectedHook?.Invoke(this, (timestamp, element)));
+            return new WorldEvent(timestamp, (world) => ParticleCollectedHook?.Invoke(this, (timestamp, element)));
         }
 
         public WorldEvent TriggeredSwirl(Timestamp timestamp, Reaction reaction, Enemy.Enemy enemy)
@@ -248,7 +221,7 @@ namespace Tcc.Units
                 // throw some error
             }
 
-            return new WorldEvent(timestamp, _ => swirlTriggeredHook?.Invoke(this, (timestamp, reaction, enemy)),
+            return new WorldEvent(timestamp, _ => SwirlTriggeredHook?.Invoke(this, (timestamp, reaction, enemy)),
                 $"{this} triggered swirl at {timestamp}", 1);
         }
 

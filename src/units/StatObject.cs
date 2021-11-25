@@ -13,65 +13,93 @@ namespace Tcc.Units
     {
         // Base stats
         // i made these non-readonly to make some very sus workaround but this means i need to be super careful
-        protected CapacityStats startingCapacityStats;
-        protected GeneralStats startingGeneralStats;
+        protected StatsPage StartingStatsPage;
+        protected string level;
+        public int Level
+        {
+            get
+            {
+                return level switch
+                {
+                    "1" => 1,
+                    "20" or "20+" => 20,
+                    "40" or "40+" => 40,
+                    "50" or "50+" => 50,
+                    "60" or "60+" => 60,
+                    "70" or "70+" => 70,
+                    "80" or "80+" => 80,
+                    "90" => 90,
+                    _ => throw new ArgumentException($"bad level given {level}")
+                };
+            }
+        }
+
+        private double currentHp;
+        public double CurrentHp
+        {
+            get => currentHp;
+            set => currentHp = Math.Max(0, value);
+        }
+        
 
         // Snapshottable buffs
-        protected readonly List<Buff<CapacityModifier>> capacityBuffs = new();
-        protected readonly List<Buff<FirstPassModifier>> firstPassBuffs = new();
-        protected readonly List<Buff<SecondPassModifier>> secondPassBuffs = new();
+        protected readonly List<Buff<CapacityModifier>> CapacityBuffs = new();
+        protected readonly List<Buff<FirstPassModifier>> FirstPassBuffs = new();
+        protected readonly List<Buff<SecondPassModifier>> SecondPassBuffs = new();
 
         // Unsnapshottable buffs
-        protected readonly List<Buff<EnemyBasedModifier>> enemyBasedBuffs = new();
-        protected readonly Dictionary<Element, List<Buff<ElementBasedModifier>>> elementBasedBuffs = new();
-        protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> abilityBuffs = new();
+        protected readonly List<Buff<EnemyBasedModifier>> EnemyBasedBuffs = new();
+        protected readonly Dictionary<Element, List<Buff<ElementBasedModifier>>> ElementBasedBuffs = new();
+        protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> AbilityBuffs = new();
         
-        protected StatObject(GeneralStats stats, CapacityStats capacityStats=null)
+        protected StatObject(string level = "90")
         {
-            startingGeneralStats = stats ?? new GeneralStats();
-            startingCapacityStats = capacityStats ?? new CapacityStats(baseHp:100000);
+            this.level = level;
+            StartingStatsPage = new StatsPage();
+            currentHp = StartingStatsPage.Hp;
         }
         
-        protected StatObject()
+        protected StatObject(StatsPage statsPage, string level = "90")
         {
-            startingGeneralStats = new GeneralStats();
-            startingCapacityStats = new CapacityStats();
+            this.level = level;
+            StartingStatsPage = statsPage;
+            currentHp = StartingStatsPage.Hp;
         }
         
-        public double CurrentHp {
+        /*public double CurrentHp {
             get { return CapacityStats.Hp.Current; }
-        }
+        }*/
         public double CurrentEnergy { get; protected set; }
         public bool IsShielded => throw new NotImplementedException();
         
-        public CapacityStats CapacityStats => capacityBuffs.Aggregate(startingCapacityStats, (total, buff) => total + buff.GetModifier());
+        //public CapacityStats CapacityStats => CapacityBuffs.Aggregate(StartingCapacityStats, (total, buff) => total + buff.GetModifier());
 
         public StatsPage GetFirstPassStats(Timestamp timestamp)
         {
-            var capacityStats = CapacityStats;
-            firstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
-            return firstPassBuffs.Aggregate(new StatsPage(capacityStats, startingGeneralStats), (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, capacityStats)));
+            return FirstPassBuffs.Aggregate(StartingStatsPage, 
+                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));
         }
 
         public SecondPassStatsPage GetStatsPage(Timestamp timestamp)
         {
             var stats = new SecondPassStatsPage(GetFirstPassStats(timestamp));
-            secondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            SecondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
-            return secondPassBuffs.Aggregate(stats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
+            return SecondPassBuffs.Aggregate(stats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
         }
         
-        public void AddBuff(Buff<CapacityModifier> buff) => buff.AddToList(capacityBuffs);
-        public void AddBuff(Buff<FirstPassModifier> buff) => buff.AddToList(firstPassBuffs);
-        public void AddBuff(Buff<SecondPassModifier> buff) => buff.AddToList(secondPassBuffs);
-        public void AddBuff(Buff<EnemyBasedModifier> buff) => buff.AddToList(enemyBasedBuffs);
+        public void AddBuff(Buff<CapacityModifier> buff) => buff.AddToList(CapacityBuffs);
+        public void AddBuff(Buff<FirstPassModifier> buff) => buff.AddToList(FirstPassBuffs);
+        public void AddBuff(Buff<SecondPassModifier> buff) => buff.AddToList(SecondPassBuffs);
+        public void AddBuff(Buff<EnemyBasedModifier> buff) => buff.AddToList(EnemyBasedBuffs);
 
         public void AddBuff(Buff<AbilityModifier> buff, params Types[] abilityTypes)
         {
             foreach (var abilityType in abilityTypes)
             {
-                if (abilityBuffs.TryGetValue(abilityType, out var list))
+                if (AbilityBuffs.TryGetValue(abilityType, out var list))
                 {
                     buff.AddToList(list);
                 }
@@ -79,28 +107,28 @@ namespace Tcc.Units
                 {
                     list = new List<Buff<AbilityModifier>>();
                     buff.AddToList(list);
-                    abilityBuffs.Add(abilityType, list);
+                    AbilityBuffs.Add(abilityType, list);
                 }
             }
         }
 
         public int GetBuffCount(Guid id)
         {
-            return capacityBuffs.Count((buff) => buff.id == id)
-                   + firstPassBuffs.Count((buff) => buff.id == id)
-                   + secondPassBuffs.Count((buff) => buff.id == id)
-                   + enemyBasedBuffs.Count((buff) => buff.id == id)
-                   + abilityBuffs.Values.SelectMany((list) => list).Distinct().Count((buff) => buff.id == id);
+            return CapacityBuffs.Count((buff) => buff.id == id)
+                   + FirstPassBuffs.Count((buff) => buff.id == id)
+                   + SecondPassBuffs.Count((buff) => buff.id == id)
+                   + EnemyBasedBuffs.Count((buff) => buff.id == id)
+                   + AbilityBuffs.Values.SelectMany((list) => list).Distinct().Count((buff) => buff.id == id);
         }
 
         public void RemoveAllBuffs(Guid id)
         {
-            capacityBuffs.RemoveAll((buff) => buff.id == id);
-            firstPassBuffs.RemoveAll((buff) => buff.id == id);
-            secondPassBuffs.RemoveAll((buff) => buff.id == id);
-            enemyBasedBuffs.RemoveAll((buff) => buff.id == id);
+            CapacityBuffs.RemoveAll((buff) => buff.id == id);
+            FirstPassBuffs.RemoveAll((buff) => buff.id == id);
+            SecondPassBuffs.RemoveAll((buff) => buff.id == id);
+            EnemyBasedBuffs.RemoveAll((buff) => buff.id == id);
 
-            foreach (var list in abilityBuffs.Values) list.RemoveAll((buff) => buff.id == id);
+            foreach (var list in AbilityBuffs.Values) list.RemoveAll((buff) => buff.id == id);
         }
         
     }

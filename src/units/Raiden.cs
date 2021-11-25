@@ -53,12 +53,14 @@ namespace Tcc.Units
             return events;
         }
 
-        Buff<AbilityModifier> CreateSkillBuff(Timestamp expiryTime)
+        private Buff<AbilityModifier> CreateSkillBuff(Timestamp expiryTime)
         {
             return new RefreshableBuff<AbilityModifier>(
                 SKILL_BUFF_ID,
                 expiryTime: expiryTime,
-                (data) => new GeneralStats(damagePercent: GetFirstPassStats(data.timestamp).EnergyRecharge * 0.3) 
+                data => new 
+                StatsPage(Stats.Stats.DamagePercent, 
+                    GetFirstPassStats(data.timestamp)[Stats.Stats.EnergyRecharge] * 0.3) 
                 // TODO Will become part of burst MVs
             );
         }

@@ -69,7 +69,9 @@ namespace Tcc.Units
         Buff<SecondPassModifier> CreateBurstBuff(Timestamp startTime)
         {
             var stats = burstBuffSnapshot.GetStats(startTime);
-            var modifier = new GeneralStats(flatAttack: stats.Attack.Base * startingAbilityStats[Types.BURST].GetMotionValue(2));
+            // TODO: BENNET BURST MODIFIER IS WRONG
+            var modifier = new StatsPage(Stats.Stats.AtkFlat, 
+                stats[Stats.Stats.AtkBase] /** StartingAbilityStats[Types.BURST].GetMotionValue(2)*/);
 
             return new RefreshableBuff<SecondPassModifier>(BURST_BUFF_ID, startTime + BUFF_DURATION, (_) => modifier);
         }

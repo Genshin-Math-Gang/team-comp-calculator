@@ -44,5 +44,37 @@ namespace Tcc.Elements
                 _ => Aura.NONE
             };
         }
+
+        public static Stats.Stats ElementToRes(Element element)
+        {
+            return element switch
+            {
+                Element.PYRO => Stats.Stats.PyroResistance,
+                Element.CRYO => Stats.Stats.CryoResistance,
+                Element.HYDRO => Stats.Stats.HydroResistance,
+                Element.ELECTRO => Stats.Stats.ElectroResistance,
+                Element.ANEMO => Stats.Stats.AnemoResistance,
+                Element.GEO => Stats.Stats.GeoResistance,
+                Element.PHYSICAL => Stats.Stats.PhysicalResistance,
+                Element.DENDRO => Stats.Stats.DendroResistance,
+                _ => throw new ArgumentOutOfRangeException(nameof(element), element, null)
+            };
+        }
+        
+        public static Stats.Stats ElementToBonus(Element element)
+        {
+            return element switch
+            {
+                Element.PYRO => Stats.Stats.PyroDamageBonus,
+                Element.CRYO => Stats.Stats.CryoDamageBonus,
+                Element.HYDRO => Stats.Stats.HydroDamageBonus,
+                Element.ELECTRO => Stats.Stats.ElectroDamageBonus,
+                Element.ANEMO => Stats.Stats.AnemoDamageBonus,
+                Element.GEO => Stats.Stats.GeoDamageBonus,
+                Element.PHYSICAL => Stats.Stats.PhysicalDamageBonus,
+                Element.DENDRO => Stats.Stats.DendroDamageBonus,
+                _ => throw new ArgumentOutOfRangeException(nameof(element), element, null)
+            };
+        }
     }
 }

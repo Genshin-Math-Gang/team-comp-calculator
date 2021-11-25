@@ -168,7 +168,8 @@ namespace Tcc
     
             //Buff Shogun
             world.AddCharacterEvent(new Timestamp(4), (timestamp) => new List<WorldEvent> {
-                new WorldEvent(timestamp, (world) => shogun.AddBuff(new PermanentBuff<FirstPassModifier>(new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), (_) => new GeneralStats(energyRecharge: 0.5))))
+                new WorldEvent(timestamp, (world) => shogun.AddBuff(new PermanentBuff<FirstPassModifier>(
+                    new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), (_) => (Stats.Stats.EnergyRecharge, 0.5))))
             });
 
             //Xiangling burst hit while off-field and post shogun buff

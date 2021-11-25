@@ -88,5 +88,24 @@ namespace Tcc.Stats
                 independentMultiplier: first.IndependentMultiplier * second.IndependentMultiplier
             );
         }
+        
+        public static NonKeyedStats operator -(NonKeyedStats first, NonKeyedStats second)
+        {
+            return new NonKeyedStats(
+                level: first.Level - second.Level,
+                attack: first.Attack - second.Attack,
+                defence: first.Defence - second.Defence,
+                elementalMastery: first.ElementalMastery - second.ElementalMastery,
+                critRate: first.CritRate - second.CritRate,
+                critDamage: first.CritDamage - second.CritDamage,
+                healingBonus: first.HealingBonus - second.HealingBonus,
+                incomingHealingBonus: first.IncomingHealingBonus - second.IncomingHealingBonus,
+                energyRecharge: first.EnergyRecharge - second.EnergyRecharge,
+                cdReduction: first.CdReduction - second.CdReduction,
+                shieldStrength: first.ShieldStrength - second.ShieldStrength,
+                damagePercent: first.DamagePercent - second.DamagePercent,
+                independentMultiplier: first.IndependentMultiplier / second.IndependentMultiplier
+            );
+        }
     }
 }

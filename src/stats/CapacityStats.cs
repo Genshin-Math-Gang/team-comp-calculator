@@ -10,7 +10,7 @@ namespace Tcc.Stats
         {
         }
 
-        CapacityStats(MultipliableStat hp, int energy)
+        public CapacityStats(MultipliableStat hp, int energy)
         {
             this.Hp = hp;
             this.Energy = energy;
@@ -21,6 +21,14 @@ namespace Tcc.Stats
             return new CapacityStats(
                 hp: first.Hp + second.Hp,
                 energy: first.Energy + second.Energy
+            );
+        }
+        
+        public static CapacityStats operator -(CapacityStats first, CapacityStats second)
+        {
+            return new CapacityStats(
+                hp: first.Hp - second.Hp,
+                energy: first.Energy - second.Energy
             );
         }
     }

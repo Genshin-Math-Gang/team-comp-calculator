@@ -22,14 +22,14 @@ namespace Tcc.Elements
 
         public Aura GetAura() => aura;
 
-        private double MultiplicativeMultiplier (StatsPage stats, Reaction reaction)
+        private static double MultiplicativeMultiplier (StatsPage stats, Reaction reaction)
         {
-            double em = stats.ElementalMastery;
-            double bonus = stats.generalStats.ReactionBonus.GetPercentBonus(reaction);
+            double em = stats[Stats.Stats.ElementalMastery];
+            double bonus = stats.ReactionBonus(reaction);
             return 1 + 2.78 * em / (1400 + em) + bonus;
         }
         
-        public (double, List<WorldEvent>) ElementApplied(Timestamp timestamp, Element elementType, double GaugeStrength, 
+        public (double, List<WorldEvent>) ElementApplied(Timestamp timestamp, Element elementType, double gaugeStrength, 
             Unit unit, SecondPassStatsPage statsPage, Types type, ICD icd, bool isHeavy=false)
         {
             
@@ -47,7 +47,7 @@ namespace Tcc.Elements
             {
                 return (1, transformativeReactions);
             } 
-            if (GaugeStrength == 0)
+            if (gaugeStrength == 0)
             {
                 return (1, null);
             }
@@ -59,7 +59,7 @@ namespace Tcc.Elements
             
             
 
-            var strength = GaugeStrength * 1.25;
+            var strength = gaugeStrength * 1.25;
             // need to do something else regarding damage but for now i just want to track aura properly
             // swirl is terrifying 
             // frozen is weird
@@ -78,14 +78,14 @@ namespace Tcc.Elements
                     {
                         return (1, null);
                     }
-                    gaugeDict.Add(elementType, new GaugeElement(elementType, GaugeStrength)); 
+                    gaugeDict.Add(elementType, new GaugeElement(elementType, gaugeStrength)); 
                     aura = Converter.ElementToAura(elementType);
                     return (1, null);
                 case Aura.PYRO:
                     switch (elementType)
                     {
                         case Element.PYRO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             return (1, null);
                         case Element.HYDRO:
                             strength *= 2;
@@ -112,7 +112,7 @@ namespace Tcc.Elements
                     switch (elementType)
                     {
                         case Element.HYDRO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             return (1, null);
                         case Element.PYRO:
                             strength /= 2;
@@ -141,7 +141,7 @@ namespace Tcc.Elements
                     {
                         
                         case Element.CRYO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             return (1, null);
                         case Element.PYRO:
                             strength *= 2;
@@ -168,7 +168,7 @@ namespace Tcc.Elements
                     {
                         
                         case Element.ELECTRO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             return (1, null);
                         case Element.PYRO:
                             transformativeReactions.Add(new Overload(timestamp, statsPage, unit));
@@ -200,14 +200,14 @@ namespace Tcc.Elements
                             strength = 0;
                             break;
                         case Element.HYDRO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             strength = 0;
                             break;
                         case Element.CRYO:
                             // TODO: i'm not actually sure what happens when you apply cryo to an ec enemy
                             break;
                         case Element.ELECTRO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             strength = 0;
                             break;
                         case Element.ANEMO:
@@ -245,11 +245,11 @@ namespace Tcc.Elements
                             multiplier = 2 * MultiplicativeMultiplier (statsPage, Reaction.MELT);
                             break;
                         case Element.HYDRO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             strength = 0;
                             break;
                         case Element.CRYO:
-                            gaugeDict[elementType].UpdateGauge(GaugeStrength);
+                            gaugeDict[elementType].UpdateGauge(gaugeStrength);
                             strength = 0;
                             break;
                         case Element.ELECTRO:
