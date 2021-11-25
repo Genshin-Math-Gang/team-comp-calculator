@@ -2,8 +2,8 @@
 
 namespace Tcc.artifacts
 {
-    public class Flower<T>: ArtifactBase<T> where T : ArtifactSet
+    public class Flower: ArtifactBase
     {
-        public Flower() : base(ArtifactSlots.Flower, Stats.HpFlat) {}
+        public Flower(ArtifactSet artifactSet=null) : base(ArtifactSlots.Flower, Stats.HpFlat, artifactSet) {}
     }
 }

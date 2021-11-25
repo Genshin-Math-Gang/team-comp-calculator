@@ -4,9 +4,9 @@ using Tcc.stats;
 namespace Tcc.artifacts
 
 {
-    public class Circlet<T>: ArtifactBase<T> where T : ArtifactSet
+    public class Circlet: ArtifactBase
     {
-        public Circlet(Stats mainStat) : base(ArtifactSlots.Circlet, mainStat)
+        public Circlet(Stats mainStat, ArtifactSet artifactSet= null) : base(ArtifactSlots.Circlet, mainStat, artifactSet)
         {
             if (mainStat is Stats.AtkPercent or Stats.DefPercent or Stats.HpPercent
                 or Stats.ElementalMastery or Stats.CritRate or Stats.CritDamage or Stats.HealingBonus)

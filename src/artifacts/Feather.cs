@@ -2,8 +2,8 @@
 
 namespace Tcc.artifacts
 {
-    public class Feather<T>: ArtifactBase<T> where T : ArtifactSet
+    public class Feather: ArtifactBase
     {
-        public Feather() : base(ArtifactSlots.Feather, Stats.HpFlat) {}
+        public Feather(ArtifactSet artifactSet=null) : base(ArtifactSlots.Feather, Stats.AtkFlat, artifactSet) {}
     }
 }

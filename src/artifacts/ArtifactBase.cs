@@ -3,7 +3,7 @@ using Tcc.stats;
 
 namespace Tcc.artifacts
 {
-    public abstract class ArtifactBase<T> where T: ArtifactSet
+    public abstract class ArtifactBase
     {
         private static Dictionary<Stats, double> AverageSubstatRoll = new Dictionary<Stats, double>
         {
@@ -46,15 +46,17 @@ namespace Tcc.artifacts
         public ArtifactSlots Slot { get; }
         public Dictionary<Stats, int> SubstatRolls;
         public StatsPage ArtifactStats { get; private set; }
+        public ArtifactSet ArtifactSet { get; }
 
-        public ArtifactBase(ArtifactSlots artifactSlot, Stats mainStat)
+        public ArtifactBase(ArtifactSlots artifactSlot, Stats mainStat, ArtifactSet artifactSet=null)
         {
             // TODO: add validation
             Slot = artifactSlot;
             MainStat = mainStat;
             SubstatRolls = new Dictionary<Stats, int>();
             ArtifactStats = new StatsPage(mainStat, MainStatValues[mainStat]);
-            
+            ArtifactSet = artifactSet;
+
         }
 
         public void AddSubstat(Stats stats)

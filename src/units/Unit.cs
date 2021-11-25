@@ -40,7 +40,7 @@ namespace Tcc.units
         protected readonly Dictionary<Types, AbilityStats> StartingAbilityStats = new();
         
         // Artifact stats
-        private ArtifactStats ArtifactStats;
+        public ArtifactStats ArtifactStats;
         
         /*
         // Snapshottable buffs
@@ -123,6 +123,7 @@ namespace Tcc.units
                     {Stats.CritDamage, stats[5]}
                 });
                 StartingStatsPage += new StatsPage(fileConvert[ascension], stats[3]);
+                ArtifactStats = new ArtifactStats();
             }
         }
 
@@ -151,7 +152,7 @@ namespace Tcc.units
             EnemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             foreach (var list in AbilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             
-            AbilityStats result = statsFromUnit;
+            AbilityStats result = statsFromUnit + ArtifactStats.Stats;
 
             if (StartingAbilityStats.TryGetValue(type, out var startingStats)) result += startingStats;
 

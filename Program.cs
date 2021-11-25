@@ -33,6 +33,8 @@ namespace Tcc
         {
             Xingqiu xq = new Xingqiu();
             Bennett benentt = new Bennett();
+            xq.ArtifactStats = new ArtifactStats(new Flower(), new Feather(),
+                new Sands(Stats.AtkPercent), new Goblet(Stats.HydroDamageBonus), new Circlet(Stats.CritRate));
             List<Enemy> enemies = new List<Enemy>();
             enemies.Add(new Enemy());
             World world = new World(enemies);
