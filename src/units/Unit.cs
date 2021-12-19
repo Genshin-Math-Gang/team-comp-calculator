@@ -62,7 +62,8 @@ namespace Tcc.units
         public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy enemy)> SwirlTriggeredHook;
 
         public event EventHandler<NormalAttackArgs> NormalAttackHook;
-        
+
+        public event EventHandler<Timestamp> EnemyDeathHook;
         
         // TODO: probably make args class for all of these and  move them somewhere
         public class NormalAttackArgs: EventArgs
@@ -196,6 +197,11 @@ namespace Tcc.units
                     unit?.NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world));
                 }
             });
+        }
+
+        public WorldEvent EnemyDeath(Timestamp timestamp)
+        {
+            return new WorldEvent(timestamp, world => EnemyDeathHook?.Invoke(this, timestamp));
         }
 
 

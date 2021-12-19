@@ -44,6 +44,7 @@ namespace Tcc.units
             };
             for (int i = 0; i < 10; i++)
             {
+                // need to adapt for number of enemies
                 Timestamp time = timestamp + new Timestamp(1.5 * i);
                 for (int j = 0; j < num; j++)
                 {

@@ -19,7 +19,7 @@ namespace Tcc
             //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental burst buff from her elemental skill (Eye of Stormy Judgement)");
             //Simulate_Xiangling_Burst_With_Shogun_Snapshot();
 
-            //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental skill buff from her lemental skill (Eye of Stormy Judgement) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
+            //System.Console.WriteLine("\n\nSimulating Xiangling's elemental burst (Pyronado) and Shogun's elemental skill buff from her elemental skill (Eye of Stormy Judgement) and Bennett's global buff from his elemental burst (Fantastic Voyage)");
             //Simulate_Xiangling_burst_with_Shogun_And_Bennett_Snapshot();
             
             //Ganyu_Test();

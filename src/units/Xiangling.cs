@@ -41,11 +41,11 @@ namespace Tcc.units
             return new List<WorldEvent> {
                 BurstActivated(timestamp),
                 new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, Types.BURST, 
-                    new HitType(false, 1, false, icd: BurstInitialICD), "nado initial 1st hit"),
+                    new HitType(true, 1, false, icd: BurstInitialICD), "nado initial 1st hit"),
                 new Hit(timestamp + 0.5, Element.PYRO, 1, GetStatsPage, this, Types.BURST, 
-                    new HitType(false, 1, false, icd: BurstInitialICD), "nado initial 2nd hit"),
+                    new HitType(true, 1, false, icd: BurstInitialICD), "nado initial 2nd hit"),
                 new Hit(timestamp + 1, Element.PYRO, 2, GetStatsPage, this, Types.BURST, 
-                    new HitType(false, 1, false, icd: BurstInitialICD), "nado initial 3rd hit"),
+                    new HitType(true, 1, false, icd: BurstInitialICD), "nado initial 3rd hit"),
                 burstSnapshot.Snapshot(timestamp + 1)
             };
         }

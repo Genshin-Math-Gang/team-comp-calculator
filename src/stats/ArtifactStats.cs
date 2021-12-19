@@ -28,6 +28,8 @@ namespace Tcc.stats
             artifactList = new ArtifactBase[] {f, ff, s, g, c};
 
         }
+
+
     }
     
     

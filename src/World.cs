@@ -81,6 +81,10 @@ namespace Tcc
         {
             enemies.Remove(enemy);
             Console.WriteLine($"Enemy {enemy} died at {timestamp}");
+            foreach (var unit in units)
+            {
+                unit.EnemyDeath(timestamp);
+            }
             if (enemies.Count == 0)
             {
                 AddWorldEvent(new End(timestamp));

@@ -129,7 +129,7 @@ namespace Tcc.enemy
 
         private double DefenceCalculator (Timestamp timestamp, Unit unit)
         {
-            return (unit.Level + 100d)/((1/* TODO - statsOfUnit.DEFReduction*/) * (this.Level + 100) + unit.Level + 100);
+            return (unit.Level + 100d)/((1/* TODO - statsOfUnit.DEFReduction*/) * (Level + 100) + unit.Level + 100);
         }
         
         public bool HasAura(Aura aura) => throw new NotImplementedException();
