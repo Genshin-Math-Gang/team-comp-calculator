@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Tcc.elements;
 using Tcc.events;
 using Tcc.stats;
@@ -82,9 +85,11 @@ namespace Tcc.units
 
             int bounces = burstWaveSwordCount[burstWaveCount];
             burstWaveCount += 1;
-            lastBurstWave = timestamp;
-            e.World.AddWorldEvent(new Hit(Timestamp.Max(timestamp, lastBurstWave+1), Element, 0, GetStatsPage, 
-                this, Types.BURST, new HitType(bounces: bounces, delay:new Timestamp(0)), "Rain Sword"));
+            // this is not quite correct
+            Timestamp newWave = Timestamp.Max(timestamp, lastBurstWave + 1);
+            lastBurstWave = newWave;
+            e.World.AddWorldEvent(new Hit(newWave, Element, 0, GetStatsPage, this, Types.BURST, 
+                new HitType(bounces: bounces, delay:new Timestamp(0)), "Rain Sword"));
         }
 
     }

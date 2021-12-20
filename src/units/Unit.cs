@@ -155,7 +155,6 @@ namespace Tcc.units
             Timestamp duration;
             for (int i = 0; i < normalCount; i++)
             {
-                start += AutoAttackFrameData[i] / 60.0;
                 if (i == 0)
                 {
                     duration = AutoAttackFrameData[i] / 60.0;
@@ -163,6 +162,7 @@ namespace Tcc.units
                 else
                 {
                     duration = (AutoAttackFrameData[i] - AutoAttackFrameData[i - 1]) / 60.0;
+                    start += AutoAttackFrameData[i-1] / 60.0;
                 }
 
                 hits.Add(NormalAttackGeneralUsed(start, duration));

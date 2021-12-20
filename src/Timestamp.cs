@@ -56,7 +56,7 @@ namespace Tcc
             return this.time.CompareTo(other.time);
         }
 
-        public override string ToString() => $"t = {time:F2}";
+        public override string ToString() => $"t = {time:F3}";
 
         public static Timestamp Max(Timestamp t1, Timestamp t2)
         {
