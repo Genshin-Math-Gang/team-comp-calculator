@@ -14,8 +14,10 @@ namespace Tcc.units
         public Xiangling(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("xiangling", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.PYRO, WeaponType.POLEARM)
         {
-            this.skillSnapshot = new SnapshottedStats(this, Types.SKILL);
-            this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
+            skillSnapshot = new SnapshottedStats(this, Types.SKILL);
+            burstSnapshot = new SnapshottedStats(this, Types.BURST);
+            // TODO: kqm didn't include frames for xl CA but included n1c so i guessed, needs to be checked
+            AutoAttackFrameData = new[] {12, 38, 72, 141, 167, 78};
         }
         
         // TODO: the timing for this is sus

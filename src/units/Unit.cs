@@ -35,6 +35,9 @@ namespace Tcc.units
         protected readonly int BurstEnergyCost;
         public readonly WeaponType WeaponType;
         public readonly Element Element;
+        
+        // assume 60 fps
+        protected int[] AutoAttackFrameData;
 
         // Base stats
         protected readonly Dictionary<Types, AbilityStats> StartingAbilityStats = new();

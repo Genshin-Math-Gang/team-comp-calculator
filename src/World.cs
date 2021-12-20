@@ -129,6 +129,7 @@ namespace Tcc
             Unit unit, Types type, HitType hitType, string description = null)
         {
 
+            // this code has a lot of room for optimization if needed, could be parallelized or something
             for (int i = 0; i < hitType.Bounces; i++)
             {
                 // might be better to iterate over enemies randomly to be more realistic 

@@ -20,6 +20,7 @@ namespace Tcc.units
         {
             burstWaveSwordCount = constellationLevel != 6 ? new[] {2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3} 
                 : new[] {2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5};
+            AutoAttackFrameData = new[] {9, 34, 59, 78, 116, 160, 195, 63};
         }
         
         

@@ -17,8 +17,8 @@ namespace Tcc.units
         static readonly Timestamp BUFF_DURATION = new Timestamp(2);
 
         SnapshottedStats burstBuffSnapshot;
-        
-        
+
+
         // TODO: add logic for cons increasing talent levels later
         public Bennett(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("bennett", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.PYRO, WeaponType.SWORD)
@@ -26,6 +26,7 @@ namespace Tcc.units
 
         {
             burstBuffSnapshot = new SnapshottedStats(this, Types.BURST);
+            AutoAttackFrameData = new[] {12, 32, 63, 118, 167, 100};
         }
         
         public List<WorldEvent> NormalAttack(Timestamp timestamp, params object[] param)

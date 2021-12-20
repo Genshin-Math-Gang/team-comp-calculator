@@ -17,6 +17,7 @@ namespace Tcc.units
         {
             skillSnapshot = new SnapshottedStats(this, Types.SKILL);
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
+            AutoAttackFrameData = new[] {18, 43, 73, 117, 153, 190, 94, 115};
         }
 
         public List<WorldEvent> Skill(Timestamp timestamp)

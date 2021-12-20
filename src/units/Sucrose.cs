@@ -19,6 +19,7 @@ namespace Tcc.units
             base("sucrose", level, constellationLevel, autoLevel, skillLevel, burstLevel, WeaponType.CATALYST)
         {
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
+            AutoAttackFrameData = new[] {19, 38, 70, 101, 132, 53};
         }
 
 
