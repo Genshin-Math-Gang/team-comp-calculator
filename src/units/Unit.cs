@@ -45,6 +45,12 @@ namespace Tcc.units
         // Artifact stats
         public ArtifactStats ArtifactStats;
         
+        // Default ability ICDs
+        protected ICDCreator NormalICD, ChargedICD, SkillICD, BurstICD;
+
+        // kinda hack to make normal attack stuff work
+        protected bool HasHeavyAttacks;
+        
         /*
         // Snapshottable buffs
         protected readonly List<Buff<CapacityModifier>> CapacityBuffs = new();
@@ -93,6 +99,11 @@ namespace Tcc.units
             ConstellationLevel = constellationLevel;
             Element = element;
             WeaponType = weaponType;
+            
+            // not initializing other icd here could bite me later but if that happens hopefully i remember this
+            // if that happens you are a dumbass
+            NormalICD = new ICDCreator();
+
             // dumb file directory hack but i don't know a better solution
             string dir = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
             
@@ -129,6 +140,49 @@ namespace Tcc.units
                 StartingStatsPage += new StatsPage(fileConvert[ascension], stats[3]);
                 ArtifactStats = new ArtifactStats();
             }
+            
+        }
+
+        // TODO: needs to be overwritten for bow and claymore characters who have weird CA
+        public List<WorldEvent> AutoAttack(Timestamp timestamp, AutoString autoString)
+        {
+            int normalCount = 1 + (int) autoString / 2;
+            int doCharged = (int) autoString % 2;
+            // for now i am going to write a naive implementation and later worry about characters with  
+            // multiple hits corresponding to 1 normal or charged attack, ie xiangling and childe
+            List<WorldEvent> hits = new List<WorldEvent>();
+            Timestamp start = timestamp;
+            Timestamp duration;
+            for (int i = 0; i < normalCount; i++)
+            {
+                start += AutoAttackFrameData[i] / 60.0;
+                if (i == 0)
+                {
+                    duration = AutoAttackFrameData[i] / 60.0;
+                }
+                else
+                {
+                    duration = (AutoAttackFrameData[i] - AutoAttackFrameData[i - 1]) / 60.0;
+                }
+
+                hits.Add(NormalAttackGeneralUsed(start, duration));
+                // rn i'm assuming that the hit lands at the end of the duration which seems reasonable
+                // but idk if that is true
+                // TODO: add check if user has elemental infusion
+                // TODO: apparently itto works weirdly with how his stats work so need to check that
+                // TODO: when i get around to adding different levels of aoe this will need to be changed
+                hits.Add(new Hit(timestamp + duration, Element.PHYSICAL, i, GetStatsPage, this, 
+                    Types.NORMAL, new HitType(false, heavy: HasHeavyAttacks), ToString() + " normal " + (i+1)));
+            }
+
+            if (doCharged == 1)
+            {
+                int i = AutoAttackFrameData.Length - 1;
+                hits.Add(new Hit(timestamp + AutoAttackFrameData[i], Element.PHYSICAL, i, GetStatsPage, this, 
+                    Types.CHARGED, new HitType(false, heavy: HasHeavyAttacks), ToString() + "charged attack"));
+            }
+
+            return hits;
         }
 
         public Weapon Weapon { get; set; }

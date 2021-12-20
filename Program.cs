@@ -41,13 +41,13 @@ namespace Tcc
             world.SetUnits(xq, benentt, null, null);
             
             world.AddCharacterEvent(new Timestamp(0), xq.Burst);
-            world.AddCharacterEvent(new Timestamp(1), xq.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(1), time => xq.AutoAttack(time, AutoString.N1));
             world.AddCharacterEvent(new Timestamp(1.5), benentt.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(2), benentt.NormalAttack, 0);
-            world.AddCharacterEvent(new Timestamp(2.5), benentt.NormalAttack, 0);
-            world.AddCharacterEvent(new Timestamp(3), benentt.NormalAttack, 0);
-            world.AddCharacterEvent(new Timestamp(14), benentt.NormalAttack, 0);
-            world.AddCharacterEvent(new Timestamp(16), benentt.NormalAttack, 0);
+            world.AddCharacterEvent(new Timestamp(2), time => benentt.AutoAttack(time, AutoString.N1));
+            world.AddCharacterEvent(new Timestamp(2.5), time => benentt.AutoAttack(time, AutoString.N1));
+            world.AddCharacterEvent(new Timestamp(3), time => benentt.AutoAttack(time, AutoString.N1));
+            world.AddCharacterEvent(new Timestamp(14), time => benentt.AutoAttack(time, AutoString.N1));
+            world.AddCharacterEvent(new Timestamp(16), time => benentt.AutoAttack(time, AutoString.N1));
             
             world.Simulate();
         }

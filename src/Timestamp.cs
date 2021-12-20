@@ -32,11 +32,6 @@ namespace Tcc
         }
 
         // Would get reduced from double to int and replaced in favour of a function to generate a timestamp from frames if we switch
-        public static Timestamp operator +(Timestamp time, double seconds) => time + new Timestamp(seconds);
-        public static Timestamp operator +(double seconds, Timestamp time) => time + new Timestamp(seconds);
-
-        public static Timestamp operator -(Timestamp time, double seconds) => time - new Timestamp(seconds);
-        public static Timestamp operator -(double seconds, Timestamp time) => new Timestamp(seconds) - time;
 
         public static Timestamp operator -(Timestamp first, Timestamp second) => new Timestamp(first.time - second.time);
         public static Timestamp operator +(Timestamp time1, Timestamp time2) => 
@@ -67,6 +62,8 @@ namespace Tcc
         {
             return t1.CompareTo(t2)==1 ? t1 : t2;
         }
-        
+
+        public static implicit operator Timestamp(double d) => new (d);
+
     }
 }

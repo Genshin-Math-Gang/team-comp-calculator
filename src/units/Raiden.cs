@@ -13,7 +13,6 @@ namespace Tcc.units
         static readonly Guid SKILL_BUFF_ID = new Guid("0e88cab3-e1d1-4592-9059-b36e6595e25d");
         static readonly Timestamp BUFF_DURATION = new Timestamp(25);
         // raiden will need more ICD stuff but i need to find that
-        private static readonly ICDCreator SkillICD = new ICDCreator("4c77095b-9d2d-4e3d-8568-1697b60b7503");
 
         EventHandler<(Unit from, Unit to, Timestamp)> currentBuffListener = null;
 
@@ -22,6 +21,7 @@ namespace Tcc.units
         {
             AutoAttackFrameData = new[] {14, 31, 56, 102, 151, 172, 44};
             int[] AutoAttackBurstFrameData = new[] {12, 32, 54, 95, 139, 215, 50};
+            SkillICD = new();
         }
 
         public List<WorldEvent> Skill(Timestamp timestamp)

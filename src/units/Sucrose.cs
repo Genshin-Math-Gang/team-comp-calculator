@@ -11,8 +11,6 @@ namespace Tcc.units
     {
         
         SnapshottedStats burstSnapshot;
-        private static readonly ICDCreator NormalICD = new ("39dc65e1-8235-4c67-ac5c-591a19d87131");
-        private static readonly ICDCreator BurstICD = new (new Timestamp(0), 0,"67a891f4-8cc8-4684-b627-cff7f11c6fcf");
         private const int UltInterval = 2;
         
         public Sucrose(int constellationLevel=0, String level="90" , int autoLevel=6, int skillLevel=6, int burstLevel=6): 
@@ -20,6 +18,7 @@ namespace Tcc.units
         {
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
             AutoAttackFrameData = new[] {19, 38, 70, 101, 132, 53};
+            BurstICD = new ICDCreator(0,0);
         }
 
 

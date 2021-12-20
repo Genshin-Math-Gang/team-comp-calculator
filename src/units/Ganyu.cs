@@ -10,7 +10,7 @@ namespace Tcc.units
     public class Ganyu: Unit
     {
         SnapshottedStats skillSnapshot, burstSnapshot;
-        private static readonly ICDCreator BurstICD = new ICDCreator("c6de4351-963c-4775-bbe8-4b0b38bc5a9d");
+        
 
         public Ganyu(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("ganyu", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.CRYO, WeaponType.BOW)
@@ -18,6 +18,7 @@ namespace Tcc.units
             skillSnapshot = new SnapshottedStats(this, Types.SKILL);
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
             AutoAttackFrameData = new[] {18, 43, 73, 117, 153, 190, 94, 115};
+            ICDCreator BurstICD = new ICDCreator();
         }
 
         public List<WorldEvent> Skill(Timestamp timestamp)

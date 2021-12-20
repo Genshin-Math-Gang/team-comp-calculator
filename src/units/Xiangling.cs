@@ -9,7 +9,7 @@ namespace Tcc.units
     public class Xiangling: Unit
     {
         SnapshottedStats skillSnapshot, burstSnapshot;
-        private static readonly ICDCreator BurstInitialICD = new("e225e4b3-54e0-450e-9145-6c7e175d8f31");
+        private ICDCreator BurstInitialICD;
 
         public Xiangling(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("xiangling", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.PYRO, WeaponType.POLEARM)
@@ -18,6 +18,7 @@ namespace Tcc.units
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
             // TODO: kqm didn't include frames for xl CA but included n1c so i guessed, needs to be checked
             AutoAttackFrameData = new[] {12, 38, 72, 141, 167, 78};
+            BurstInitialICD = new();
         }
         
         // TODO: the timing for this is sus
@@ -28,13 +29,13 @@ namespace Tcc.units
                 SkillActivated(timestamp), // Order important: Guoba snapshots CW skill activation buff
                 skillSnapshot.Snapshot(timestamp),
                 new Hit(timestamp, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL,
-                    new HitType(true, 1, false, false), "guoba"),
+                    new HitType(true), "guoba"),
                 new Hit(timestamp + 3.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL,
-                    new HitType(true, 1, false, false), "guoba"),
+                    new HitType(true), "guoba"),
                 new Hit(timestamp + 5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
-                    new HitType(true, 1, false, false), "guoba"),
+                    new HitType(true), "guoba"),
                 new Hit(timestamp + 7.5, Element.PYRO, 0, skillSnapshot.GetStats, this, Types.SKILL, 
-                    new HitType(true, 1, false, false), "guoba"),
+                    new HitType(true), "guoba"),
             };
         }
 
