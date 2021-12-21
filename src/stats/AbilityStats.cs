@@ -19,7 +19,6 @@ namespace Tcc.stats
         
         public double CalculateHitMultiplier(int index, Element element)
         {
-            // what the fuck is independent multiplier
             return statsPage.Atk * statsPage.CritMultiplier * statsPage.DamageMultiplier(element) 
                    * motionValues[index] * (1 + statsPage[Stats.IndependentMultiplier]);
         }

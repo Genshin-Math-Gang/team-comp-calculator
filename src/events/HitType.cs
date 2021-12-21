@@ -1,8 +1,10 @@
-﻿using Tcc.elements;
+﻿using System;
+using Tcc.elements;
+using Tcc.units;
 
 namespace Tcc.events
 {
-    public struct HitType
+    public class HitType
     {
         public readonly bool IsAoe;
         public readonly int Bounces;
@@ -13,9 +15,11 @@ namespace Tcc.events
         // TODO: need to figure out how long different attacks take to bounce
         public readonly Timestamp Delay;
         public readonly int Gauge;
+        private readonly Element? element;
+        private InfusionRef _ref;
 
-        public HitType(bool aoe=true, int bounces=1, bool self=false, bool heavy=false, Reaction reaction=Reaction.UNKNOWN, 
-            ICDCreator icd=null, Timestamp delay=null, int gauge=1)
+        public HitType(Element element, bool aoe=true, int bounces=1, bool self=false, bool heavy=false,
+                Reaction reaction=Reaction.UNKNOWN, ICDCreator icd=null, Timestamp delay=null, int gauge=1)
         {
             IsAoe = aoe;
             Bounces = bounces;
@@ -25,6 +29,23 @@ namespace Tcc.events
             Creator = icd;
             Delay = delay ?? new Timestamp(0.1);
             Gauge = gauge;
+            this.element = element;
         }
+        
+        public HitType(InfusionRef element, bool aoe=true, int bounces=1, bool self=false, bool heavy=false,
+            Reaction reaction=Reaction.UNKNOWN, ICDCreator icd=null, Timestamp delay=null, int gauge=1)
+        {
+            IsAoe = aoe;
+            Bounces = bounces;
+            SelfBounce = self;
+            IsHeavy = heavy;
+            ReactionType = reaction;
+            Creator = icd;
+            Delay = delay ?? new Timestamp(0.1);
+            Gauge = gauge;
+            _ref = element;
+        }
+
+        public Element Element => element ?? _ref.Value;
     }
 }

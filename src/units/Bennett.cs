@@ -14,6 +14,7 @@ namespace Tcc.units
         const int N_BURST_TICKS = 12;
         static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
         static readonly Timestamp BUFF_DURATION = new Timestamp(2);
+        private readonly HitType BurstHitType;
 
         SnapshottedStats burstBuffSnapshot;
 
@@ -26,6 +27,7 @@ namespace Tcc.units
         {
             burstBuffSnapshot = new SnapshottedStats(this, Types.BURST);
             AutoAttackFrameData = new[] {12, 32, 63, 118, 167, 100};
+            BurstHitType = new HitType(Element, gauge: 2);
         }
         
         
@@ -46,8 +48,8 @@ namespace Tcc.units
                     (world) => world.OnFieldUnit.AddBuff(CreateBurstBuff(startTime)), "Bennett buff refresh", 1));
 
                 // Deal burst damage after modifier snapshot and first application,
-                if(tick == 0) events.Add(new Hit(timestamp, Element.PYRO, 0, GetStatsPage, this, 
-                    Types.BURST, new HitType(true, 1, false, gauge:2), "Bennett Burst"));
+                if(tick == 0) events.Add(new Hit(timestamp, 0, GetStatsPage, this, 
+                    Types.BURST, BurstHitType, "Bennett Burst"));
             }
 
             return events;
@@ -62,11 +64,7 @@ namespace Tcc.units
 
             return new RefreshableBuff<SecondPassModifier>(BURST_BUFF_ID, startTime + BUFF_DURATION, (_) => modifier);
         }
-
-        public override string ToString()
-        {
-            return "Bennett";
-        }
+        
 
         /*public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
         {

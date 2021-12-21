@@ -14,6 +14,8 @@ namespace Tcc.units
         static readonly Timestamp BUFF_DURATION = new Timestamp(25);
         // raiden will need more ICD stuff but i need to find that
 
+        private readonly HitType SkillHitType;
+
         EventHandler<(Unit from, Unit to, Timestamp)> currentBuffListener = null;
 
         public Raiden(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
@@ -22,6 +24,7 @@ namespace Tcc.units
             AutoAttackFrameData = new[] {14, 31, 56, 102, 151, 172, 44};
             int[] AutoAttackBurstFrameData = new[] {12, 32, 54, 95, 139, 215, 50};
             SkillICD = new();
+            SkillHitType = new HitType(Element.ELECTRO, true, icd: SkillICD);
         }
 
         public List<WorldEvent> Skill(Timestamp timestamp)
@@ -49,8 +52,7 @@ namespace Tcc.units
             }));
 
             events.Add(new WorldEvent(expiryTime, (world) => world.unitSwapped -= newBuffListener));
-            events.Add(new Hit(timestamp, Element.ELECTRO, 0, GetStatsPage, this, Types.SKILL, 
-                new HitType(true, 1, false, icd: SkillICD)));
+            events.Add(new Hit(timestamp, 0, GetStatsPage, this, Types.SKILL, SkillHitType));
 
             return events;
         }
@@ -66,11 +68,7 @@ namespace Tcc.units
                 // TODO Will become part of burst MVs
             );
         }
-
-        public override string ToString()
-        {
-            return "Shogun";
-        }
+        
 
         /*public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
         {

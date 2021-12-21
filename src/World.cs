@@ -96,11 +96,11 @@ namespace Tcc
             queuedWorldEvents = new WorldEventQueue();
         }
 
-        public void DealDamage(Timestamp timestamp, Element element, SecondPassStatsPage statsPage, Unit unit,
+        public void DealDamage(Timestamp timestamp, SecondPassStatsPage statsPage, Unit unit,
             Types type, Enemy enemy, int mvIndex, HitType hitType, string description = null)
         {
 
-            var results = enemy.TakeDamage(timestamp, element, type, statsPage, unit, hitType,
+            var results = enemy.TakeDamage(timestamp, type, statsPage, unit, hitType,
                 mvIndex);
             double final_damage = results.Item1;
             List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
@@ -125,7 +125,7 @@ namespace Tcc
         }
 
 
-        public void CalculateDamage(Timestamp timestamp, Element element, int mvIndex, SecondPassStatsPage statsPage,
+        public void CalculateDamage(Timestamp timestamp, int mvIndex, SecondPassStatsPage statsPage,
             Unit unit, Types type, HitType hitType, string description = null)
         {
 
@@ -137,7 +137,7 @@ namespace Tcc
                 {
                     foreach (Enemy enemy in enemies)
                     {
-                        DealDamage(timestamp + i * hitType.Delay, element, statsPage, unit, type, enemy,
+                        DealDamage(timestamp + i * hitType.Delay, statsPage, unit, type, enemy,
                             mvIndex, hitType, description);
                     }
                 }
@@ -146,7 +146,7 @@ namespace Tcc
                     foreach (Enemy enemy in enemies)
                     {
                         if (i > hitType.Bounces) break;
-                        DealDamage(timestamp + i * hitType.Delay, element, statsPage, unit, type, enemy,
+                        DealDamage(timestamp + i * hitType.Delay, statsPage, unit, type, enemy,
                             mvIndex, hitType, description);
                         i++;
                     }
@@ -161,7 +161,7 @@ namespace Tcc
 
         public void InfuseAbility(Timestamp startTime, Timestamp endTime, Anemo unit)
         {
-            if (unit.Infusion != Element.PHYSICAL) { return;}
+            if (unit.GetInfusion() != Element.PHYSICAL) { return;}
             
             Element element = Element.PHYSICAL;
             foreach (var enemy in enemies)
@@ -182,9 +182,9 @@ namespace Tcc
             {
                 return;
             }
-            unit.Infusion = element;
-            Console.WriteLine($"{unit} had their ability infused with {unit.Infusion} at {startTime}");
-            AddWorldEvent(new WorldEvent(endTime, _ => unit.Infusion=Element.PHYSICAL));
+            unit.SetInfusion(element);
+            Console.WriteLine($"{unit} had their ability infused with {unit.GetInfusion()} at {startTime}");
+            AddWorldEvent(new WorldEvent(endTime, _ => unit.SetInfusion(Element.PHYSICAL)));
         }
         
 

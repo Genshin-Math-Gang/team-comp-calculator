@@ -13,8 +13,8 @@ namespace Tcc.events.reactions
             // TODO: dumb double swirl and chain swirl 
             // TODO: figure out ICD bullshit for transformative reactions
             base(
-                timestamp, (world) => world.CalculateDamage(timestamp, element, 0, stats, unit, Types.TRANSFORMATIVE,
-                    new HitType(true, 1, false, reaction: SwirlType(element)), "Swirl " + element)
+                timestamp, world => world.CalculateDamage(timestamp, 0, stats, unit, Types.TRANSFORMATIVE,
+                    new HitType(element, true, 1, false, reaction: SwirlType(element)), "Swirl " + element)
             )
         {
             // bruh

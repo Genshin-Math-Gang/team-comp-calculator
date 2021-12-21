@@ -15,6 +15,7 @@ namespace Tcc.units
         private bool ultActive = false;
         private int burstWaveCount = 0;
         private int[] burstWaveSwordCount;
+        private readonly HitType SkillHitType;
         
         public Xingqiu(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("bennett", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.HYDRO, WeaponType.SWORD)
@@ -23,6 +24,7 @@ namespace Tcc.units
                 : new[] {2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5};
             AutoAttackFrameData = new[] {9, 34, 59, 78, 116, 160, 195, 63};
             BurstICD = new();
+            SkillHitType = new HitType(Element.HYDRO);
         }
         
         
@@ -36,10 +38,10 @@ namespace Tcc.units
             return new List<WorldEvent>
             {
                 SkillActivated(timestamp),
-                new Hit(timestamp + 24.0/30, Element, indexShift, GetStatsPage, this, Types.SKILL, 
-                    new HitType(true), "Fatal Rainscreen first hit"),
-                new Hit(timestamp + 40.0/30, Element, 1 + indexShift, GetStatsPage, this, Types.SKILL, 
-                    new HitType(true), "Fatal Rainscreen second hit")
+                new Hit(timestamp + 24.0/30, indexShift, GetStatsPage, this, Types.SKILL, 
+                    SkillHitType, "Fatal Rainscreen first hit"),
+                new Hit(timestamp + 40.0/30, 1 + indexShift, GetStatsPage, this, Types.SKILL, 
+                    SkillHitType, "Fatal Rainscreen second hit")
             };
         }
 
@@ -85,11 +87,12 @@ namespace Tcc.units
 
             int bounces = burstWaveSwordCount[burstWaveCount];
             burstWaveCount += 1;
-            // this is not quite correct
             Timestamp newWave = Timestamp.Max(timestamp, lastBurstWave + 1);
             lastBurstWave = newWave;
-            e.World.AddWorldEvent(new Hit(newWave, Element, 0, GetStatsPage, this, Types.BURST, 
-                new HitType(bounces: bounces, delay:new Timestamp(0)), "Rain Sword"));
+            // check how many frames swords take to hit, 29 frames is filler
+            // TODO: maybe make HitType for this but i would need 3 or to rewrite the class
+            e.World.AddWorldEvent(new Hit(newWave + 29/60.0, 0, GetStatsPage, this, Types.BURST, 
+                new HitType(Element.HYDRO, bounces: bounces, delay:new Timestamp(0)), "Rain Sword"));
         }
 
     }

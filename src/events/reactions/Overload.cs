@@ -6,12 +6,14 @@ namespace Tcc.events.reactions
 {
     public class Overload: WorldEvent
     {
+
+        private static readonly HitType overloadHitType = new HitType(Element.PYRO, heavy:true, reaction: Reaction.OVERLOADED);
         public Overload(
             Timestamp timestamp, SecondPassStatsPage stats, Unit unit): 
             base(
-            timestamp, (world) => world.CalculateDamage(timestamp, Element.PYRO, 0, stats, unit, Types.TRANSFORMATIVE,
-                new HitType(true, 1, false, true, Reaction.OVERLOADED), "Overload")
-        ) {
+            timestamp, (world) => world.CalculateDamage(timestamp, 0, stats, unit, 
+                Types.TRANSFORMATIVE, overloadHitType), "Overload") 
+        {
         }
     }
 }

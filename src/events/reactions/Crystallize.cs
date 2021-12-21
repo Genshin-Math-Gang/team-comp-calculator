@@ -13,8 +13,8 @@ namespace Tcc.events.reactions
                 timestamp,
                 // TODO: this is probably wrong but i just want the code to compile rn
                 // does crystallize do damage
-                (world) => world.CalculateDamage(timestamp, element, 0, stats, unit, Types.TRANSFORMATIVE, 
-                    new HitType(false, 1, false, true,CrystalType(element)), "Crystallize")
+                (world) => world.CalculateDamage(timestamp, 0, stats, unit, Types.TRANSFORMATIVE, 
+                    new HitType(element, true, 1, false, true,CrystalType(element)), "Crystallize")
             ) {
         }
 

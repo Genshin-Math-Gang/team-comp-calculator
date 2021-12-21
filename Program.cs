@@ -24,9 +24,9 @@ namespace Tcc
             
             //Ganyu_Test();
             
-            //Sucrose_Test();
+            Sucrose_Test();
             //Noblesse_Test();
-            Xingqiu_Test();
+            //Xingqiu_Test();
         }
 
         static void Xingqiu_Test()

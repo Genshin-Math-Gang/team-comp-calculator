@@ -10,6 +10,8 @@ namespace Tcc.units
     public class Ganyu: Unit
     {
         SnapshottedStats skillSnapshot, burstSnapshot;
+        private readonly HitType IcicleHitType;
+        private readonly HitType LotusHitType;
         
 
         public Ganyu(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
@@ -19,6 +21,8 @@ namespace Tcc.units
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
             AutoAttackFrameData = new[] {18, 43, 73, 117, 153, 190, 94, 115};
             ICDCreator BurstICD = new ICDCreator();
+            IcicleHitType = new HitType(Element.CRYO, icd: BurstICD);
+            LotusHitType = new HitType(Element.CRYO);
         }
 
         public List<WorldEvent> Skill(Timestamp timestamp)
@@ -27,10 +31,10 @@ namespace Tcc.units
             {
                 SkillActivated(timestamp),
                 skillSnapshot.Snapshot(timestamp),
-                new Hit(timestamp, Element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
-                   new HitType(true, 1, false, false), "Trail of the Qilin cast" ),
-                new Hit(timestamp + 6, Element, 0, skillSnapshot.GetStats, this, Types.SKILL, 
-                    new HitType(true, 1, false, false),  "Trail of the Qilin explosion" )
+                new Hit(timestamp, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                 LotusHitType, "Trail of the Qilin cast" ),
+                new Hit(timestamp + 6, 0, skillSnapshot.GetStats, this, Types.SKILL, 
+                    LotusHitType,  "Trail of the Qilin explosion" )
 
             };
         }
@@ -51,8 +55,8 @@ namespace Tcc.units
                 for (int j = 0; j < num; j++)
                 {
                     time += .3;
-                    events.Add(new Hit(time, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                        new HitType(true, 1, false, icd: BurstICD),"Icicle hit"));
+                    events.Add(new Hit(time, 0, burstSnapshot.GetStats, this, Types.BURST,
+                       IcicleHitType,"Icicle hit"));
                 }
             }
 
@@ -70,32 +74,29 @@ namespace Tcc.units
 
         private WorldEvent Icicle(Timestamp timestamp)
         {
-            return new Hit(timestamp, Element, 0, burstSnapshot.GetStats, this, Types.BURST,
-                new HitType(true, 1, false, false),"Icicle hit");
+            return new Hit(timestamp, 0, burstSnapshot.GetStats, this, Types.BURST,
+               IcicleHitType,"Icicle hit");
         }
 
+        // TODO: rewrite this to be up to standard later
         public List<WorldEvent> ChargedAttack(Timestamp timestamp, params object[] param)
         {
             int chargeLevel = (int) param[1];
             // TODO: what is icd override and how do i use it
             return chargeLevel switch
             {
-                1 => new List<WorldEvent>(){new Hit(timestamp, Element.PHYSICAL, 0,GetStatsPage, this, 
-                    Types.CHARGED, new HitType(false, 1, false, false), "Charged Attack")},
-                2 => new List<WorldEvent>(){new Hit(timestamp, Element.CRYO, 1,GetStatsPage, this, 
-                    Types.CHARGED, new HitType(false, 1, false, false), "Fully Aimed charged shot")},
-                3 => new List<WorldEvent>(){new Hit(timestamp, Element.CRYO, 2,GetStatsPage, this, 
-                    Types.CHARGED, new HitType(false, 1, false, false), "Frostlake Arrow"),
-                    new Hit(timestamp+.3, Element.CRYO, 3,GetStatsPage, this, 
-                        Types.CHARGED, new HitType(true, 1, false, false), "Frostlake Arrow bloom")
+                1 => new List<WorldEvent>(){new Hit(timestamp, 0,GetStatsPage, this, 
+                    Types.CHARGED, new HitType(Element.PHYSICAL, false), "Charged Attack")},
+                2 => new List<WorldEvent>(){new Hit(timestamp, 1,GetStatsPage, this, 
+                    Types.CHARGED, new HitType(Element.CRYO, false), "Fully Aimed charged shot")},
+                3 => new List<WorldEvent>(){new Hit(timestamp, 2,GetStatsPage, this, 
+                    Types.CHARGED, new HitType(Element.CRYO,false), "Frostlake Arrow"),
+                    new Hit(timestamp+.3, 3,GetStatsPage, this, 
+                        Types.CHARGED, new HitType(Element.CRYO), "Frostlake Arrow bloom")
                 }
             };
         }
-
-        public override string ToString()
-        {
-            return "Ganyu";
-        }
+        
         
         /*public override Dictionary<string,Delegate> GetCharacterEvents()
         {

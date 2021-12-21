@@ -37,9 +37,10 @@ namespace Tcc.enemy
         
         
         // TODO: make transformative reactions not terrible tomorrow 
-        public (double, List<WorldEvent>) TakeDamage(Timestamp timestamp, Element element, Types type,
+        public (double, List<WorldEvent>) TakeDamage(Timestamp timestamp, Types type,
             SecondPassStatsPage statsOfUnit, Unit unit, HitType hitType, int index)
         {
+            Element element = hitType.Element;
             var unitAbilityStats = unit.GetAbilityStats(statsOfUnit, type, element, this, timestamp);
             ICD icd;
             ICDCreator creator = hitType.Creator;

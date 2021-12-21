@@ -6,11 +6,12 @@ namespace Tcc.events.reactions
 {
     public class Superconduct: WorldEvent
     {
+        private static readonly HitType scHitType = new HitType(Element.CRYO, reaction: Reaction.SUPERCONDUCT);
         public Superconduct(
             Timestamp timestamp, SecondPassStatsPage stats, Unit unit):
             base(
-                timestamp, (world) => world.CalculateDamage(timestamp, Element.CRYO, 0, stats, unit, Types.TRANSFORMATIVE, 
-                    new HitType(true, 1, false, false, Reaction.SUPERCONDUCT), "Superconduct")
+                timestamp, (world) => world.CalculateDamage(timestamp, 0, stats, unit, 
+                    Types.TRANSFORMATIVE, scHitType, "Superconduct")
             ) {
             
         }

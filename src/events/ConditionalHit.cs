@@ -13,10 +13,10 @@ namespace Tcc.events
         private object[] param;
         
         public ConditionalHit(
-            Timestamp timestamp, Element element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
+            Timestamp timestamp, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
             Unit unit, Types type, HitType hitType, Func<object[], bool> condition, object[] conditionParam,
             string description = "", Enemy target = null): 
-            base(timestamp, element, mvIndex, stats, unit, type, hitType, description, target)
+            base(timestamp, mvIndex, stats, unit, type, hitType, description, target)
         {
             this.condition = condition;
             this.param = conditionParam;
@@ -26,7 +26,7 @@ namespace Tcc.events
             Timestamp timestamp, Func<Element> element, int mvIndex, Func<Timestamp, SecondPassStatsPage> stats,
             Unit unit, Types type, HitType hitType, Func<object[], bool> condition, object[] conditionParam,
             string description = "", Enemy target = null): 
-            base(timestamp, element, mvIndex, stats, unit, type, hitType, description, target)
+            base(timestamp, mvIndex, stats, unit, type, hitType, description, target)
         {
             this.condition = condition;
             this.param = conditionParam;

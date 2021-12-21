@@ -32,7 +32,7 @@ namespace Tcc.elements
         public (double, List<WorldEvent>) ElementApplied(Timestamp timestamp, Element elementType, double gaugeStrength, 
             Unit unit, SecondPassStatsPage statsPage, Types type, ICD icd, bool isHeavy=false)
         {
-            
+
             // I'm unclear what this is for
             if (type == Types.TRANSFORMATIVE) return (1, null);  
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using Newtonsoft.Json;
 using Tcc.elements;
@@ -35,6 +36,7 @@ namespace Tcc.units
         protected readonly int BurstEnergyCost;
         public readonly WeaponType WeaponType;
         public readonly Element Element;
+        public readonly string Name;
         
         // assume 60 fps
         protected int[] AutoAttackFrameData;
@@ -99,6 +101,9 @@ namespace Tcc.units
             ConstellationLevel = constellationLevel;
             Element = element;
             WeaponType = weaponType;
+            // jank
+            TextInfo ti = new CultureInfo("en-US").TextInfo;
+            Name = ti.ToTitleCase(name);
             
             // not initializing other icd here could bite me later but if that happens hopefully i remember this
             // if that happens you are a dumbass
@@ -171,15 +176,16 @@ namespace Tcc.units
                 // TODO: add check if user has elemental infusion
                 // TODO: apparently itto works weirdly with how his stats work so need to check that
                 // TODO: when i get around to adding different levels of aoe this will need to be changed
-                hits.Add(new Hit(timestamp + duration, Element.PHYSICAL, i, GetStatsPage, this, 
-                    Types.NORMAL, new HitType(false, heavy: HasHeavyAttacks), ToString() + " normal " + (i+1)));
+                hits.Add(new Hit(timestamp + duration, i, GetStatsPage, this, Types.NORMAL, 
+                    new HitType( Element.PHYSICAL,false, heavy: HasHeavyAttacks), 
+                    ToString() + " normal " + (i+1)));
             }
 
             if (doCharged == 1)
             {
                 int i = AutoAttackFrameData.Length - 1;
-                hits.Add(new Hit(timestamp + AutoAttackFrameData[i], Element.PHYSICAL, i, GetStatsPage, this, 
-                    Types.CHARGED, new HitType(false, heavy: HasHeavyAttacks), ToString() + "charged attack"));
+                hits.Add(new Hit(timestamp + AutoAttackFrameData[i], i, GetStatsPage, this, 
+                    Types.CHARGED, new HitType(Element.PHYSICAL, false, heavy: HasHeavyAttacks), ToString() + "charged attack"));
             }
 
             return hits;
@@ -289,5 +295,10 @@ namespace Tcc.units
         }
 
         //public abstract Dictionary<string, Delegate> GetCharacterEvents();
+
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 }
