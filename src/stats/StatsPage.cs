@@ -36,7 +36,6 @@ namespace Tcc.stats
             {
                 return 1 + this[Stats.CritRate] * this[Stats.CritDamage];
             }
-
             if (r.NextDouble() < this[Stats.CritRate])
             {
                 return 1;

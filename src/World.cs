@@ -23,6 +23,7 @@ namespace Tcc
 
         private Random r = new LCG();
         private bool isDeterministic = false;
+        private int simulationCount = 2;
 
         public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Types attackType)>
             enemyHitHook;
@@ -112,7 +113,7 @@ namespace Tcc
             AddWorldEvents(events);
             foreach (var u in GetUnits())
             {
-                AddWorldEvent(u.DealtDamage(timestamp, unit));
+                if (u is not null)  AddWorldEvent(u.DealtDamage(timestamp, unit));
             }
             TotalDamage[units.IndexOf(unit)] += final_damage;
             // hack to exit early 
