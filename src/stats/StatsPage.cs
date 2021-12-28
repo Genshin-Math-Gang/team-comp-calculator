@@ -30,7 +30,19 @@ namespace Tcc.stats
 
         public double Atk => this[Stats.AtkBase] * (1 + this[Stats.AtkPercent]) + this[Stats.AtkFlat];
 
-        public double CritMultiplier => 1 + this[Stats.CritDamage] * this[Stats.CritRate];
+        public double CritMultiplier(Random r, bool deterministic)
+        {
+            if (deterministic)
+            {
+                return 1 + this[Stats.CritRate] * this[Stats.CritDamage];
+            }
+
+            if (r.NextDouble() < this[Stats.CritRate])
+            {
+                return 1;
+            }
+            return 1 + this[Stats.CritDamage];
+        }
 
         public double DamageMultiplier(Element element) =>
             1 + this[Stats.DamagePercent] + this[Converter.ElementToBonus(element)];

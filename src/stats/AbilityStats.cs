@@ -17,9 +17,9 @@ namespace Tcc.stats
 
 
         
-        public double CalculateHitMultiplier(int index, Element element)
+        public double CalculateHitMultiplier(int index, Element element, Random r, bool deterministic)
         {
-            return statsPage.Atk * statsPage.CritMultiplier * statsPage.DamageMultiplier(element) 
+            return statsPage.Atk * statsPage.CritMultiplier(r, deterministic) * statsPage.DamageMultiplier(element) 
                    * motionValues[index] * (1 + statsPage[Stats.IndependentMultiplier]);
         }
 

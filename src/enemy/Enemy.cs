@@ -38,7 +38,7 @@ namespace Tcc.enemy
         
         // TODO: make transformative reactions not terrible tomorrow 
         public (double, List<WorldEvent>) TakeDamage(Timestamp timestamp, Types type,
-            SecondPassStatsPage statsOfUnit, Unit unit, HitType hitType, int index)
+            SecondPassStatsPage statsOfUnit, Unit unit, HitType hitType, int index, Random r, bool deterministic)
         {
             Element element = hitType.Element;
             var unitAbilityStats = unit.GetAbilityStats(statsOfUnit, type, element, this, timestamp);
@@ -66,7 +66,7 @@ namespace Tcc.enemy
             if (type != Types.TRANSFORMATIVE)
             {
                 damage = reactionMultiplier *
-                         unitAbilityStats.CalculateHitMultiplier(index, element) *
+                         unitAbilityStats.CalculateHitMultiplier(index, element, r, deterministic) *
                          DefenceCalculator(timestamp, unit) *
                          ResistanceCalculation(timestamp, element, type, statsOfUnit);
             }
