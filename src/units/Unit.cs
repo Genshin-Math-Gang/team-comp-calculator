@@ -65,6 +65,8 @@ namespace Tcc.units
         protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> AbilityBuffs = new();*/
 
         // Hooks
+        public event EventHandler<DealDamageArgs> DealDamageHook; 
+        
         public event EventHandler<Timestamp> SkillActivatedHook;
         public event EventHandler<Timestamp> BurstActivatedHook;
         public event EventHandler<(Timestamp timestamp, int reaction)> TriggeredReactionHook; // TODO Not fired by anything
@@ -89,6 +91,19 @@ namespace Tcc.units
                 Timestamp = timestamp;
                 Duration = duration;
                 World = world;
+            }
+        }
+        
+        public class DealDamageArgs: EventArgs
+        {
+            public Timestamp Timestamp { get;}
+            public Unit Unit { get;}
+            
+
+            public DealDamageArgs(Timestamp timestamp, Unit unit)
+            {
+                Timestamp = timestamp;
+                Unit = unit;
             }
         }
         
@@ -252,6 +267,7 @@ namespace Tcc.units
             return new WorldEvent(timestamp, world => NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world)));
         }
         
+        
         protected WorldEvent NormalAttackGeneralUsed(Timestamp timestamp, Timestamp duration)
         {
             return new WorldEvent(timestamp, world => {
@@ -260,6 +276,12 @@ namespace Tcc.units
                     unit?.NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world));
                 }
             });
+        }
+
+        public WorldEvent DealtDamage(Timestamp timestamp, Unit unit)
+        {
+            return new WorldEvent(timestamp, world => DealDamageHook?.Invoke(this, 
+                new DealDamageArgs(timestamp, unit)));
         }
 
         public WorldEvent EnemyDeath(Timestamp timestamp)

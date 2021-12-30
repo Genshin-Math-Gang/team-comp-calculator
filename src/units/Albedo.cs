@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using Tcc.elements;
 using Tcc.events;
 using Tcc.stats;
+using System.Runtime.InteropServices;
+using Tcc.events;
+using Tcc.stats;
+using Tcc.units;
+using Tcc.elements;
 using Tcc.weapons;
 
 namespace Tcc.Units
@@ -10,14 +15,14 @@ namespace Tcc.Units
     public class Albedo: Unit
     {
         SnapshottedStats burstSnapshot;
-        public Albedo(int constellationLevel=0, string level="90", int autolevel=6, int skillLevel=6, int burstLevel=6):
+        public Albedo(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6):
             base("Albedo", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.GEO, WeaponType.SWORD)
         {
             
             this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
            
         }  
- 
+
         public List<WorldEvent> Skill(Timestamp timestamp)
         {
             return new List<WorldEvent>
@@ -77,6 +82,7 @@ namespace Tcc.Units
         }
  
    */
+
  
         public override string ToString()
         {

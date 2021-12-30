@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Tcc.elements;
 using Tcc.enemy;
 using Tcc.events;
@@ -19,6 +20,10 @@ namespace Tcc
         private WorldEventQueue queuedWorldEvents;
         List<Enemy> enemies;
         public double[] TotalDamage;
+
+        private Random r = new LCG();
+        private bool isDeterministic = false;
+        private int simulationCount = 2;
 
         public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Types attackType)>
             enemyHitHook;
@@ -36,15 +41,15 @@ namespace Tcc
 
         public void SetUnits(Unit onFieldUnit, Unit unit2, Unit unit3, Unit unit4)
         {
-            this.OnFieldUnit = onFieldUnit;
-            this.units = new List<Unit> {onFieldUnit, unit2, unit3, unit4};
+            OnFieldUnit = onFieldUnit;
+            units = new List<Unit> {onFieldUnit, unit2, unit3, unit4};
         }
 
         public ReadOnlyCollection<Unit> GetUnits() => units.AsReadOnly();
 
         public void AddEnemy(Enemy enemy)
         {
-            this.enemies.Add(enemy);
+            enemies.Add(enemy);
         }
 
         public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> characterAction,
@@ -99,13 +104,17 @@ namespace Tcc
         public void DealDamage(Timestamp timestamp, SecondPassStatsPage statsPage, Unit unit,
             Types type, Enemy enemy, int mvIndex, HitType hitType, string description = null)
         {
-
+            
             var results = enemy.TakeDamage(timestamp, type, statsPage, unit, hitType,
-                mvIndex);
+                mvIndex, r, isDeterministic);
             double final_damage = results.Item1;
             List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
             // scuffed
             AddWorldEvents(events);
+            foreach (var u in GetUnits())
+            {
+                if (u is not null)  AddWorldEvent(u.DealtDamage(timestamp, unit));
+            }
             TotalDamage[units.IndexOf(unit)] += final_damage;
             // hack to exit early 
             if (final_damage < 0)
@@ -113,15 +122,10 @@ namespace Tcc
                 return;
             }
 
-            if (description != null)
-            {
-                Console.WriteLine(
-                    $"Damage dealt by {description} at {timestamp} is {final_damage:N2} to {enemy.GetHashCode()}");
-            }
-            else
-            {
-                Console.WriteLine($"Damage dealt at {timestamp} is {final_damage:N2} to {enemy.GetHashCode()}");
-            }
+            Console.WriteLine(
+                description != null
+                    ? $"Damage dealt by {description} at {timestamp} is {final_damage:N2} to {enemy.GetHashCode()}"
+                    : $"Damage dealt at {timestamp} is {final_damage:N2} to {enemy.GetHashCode()}");
         }
 
 

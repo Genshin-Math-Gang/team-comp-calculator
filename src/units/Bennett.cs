@@ -15,6 +15,7 @@ namespace Tcc.units
         static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
         static readonly Timestamp BUFF_DURATION = new Timestamp(2);
         private readonly HitType BurstHitType;
+        private readonly HitType SkillHitType;
 
         SnapshottedStats burstBuffSnapshot;
 
@@ -28,8 +29,37 @@ namespace Tcc.units
             burstBuffSnapshot = new SnapshottedStats(this, Types.BURST);
             AutoAttackFrameData = new[] {12, 32, 63, 118, 167, 100};
             BurstHitType = new HitType(Element, gauge: 2);
+            BurstHitType = new HitType(Element);
         }
-        
+
+        // i hecking love frame counting
+        // does bennett e have aoe
+        // do something about timing to hold
+        public List<WorldEvent> Skill(Timestamp timestamp, int chargeLevel = 0)
+        {
+
+            return chargeLevel switch
+            {
+                0 => new List<WorldEvent>
+                {
+                    SkillActivated(timestamp),
+                    new Hit(timestamp + 31.0 / 60, 0, GetStatsPage, this, Types.SKILL, BurstHitType, "Bennett tap e")
+                },
+                1 => new List<WorldEvent>
+                {
+                    SkillActivated(timestamp),
+                    new Hit(timestamp + 20.0 / 60, 1, GetStatsPage, this, Types.SKILL, SkillHitType,
+                        "Bennett short hold e"),
+                    new Hit(timestamp + 40.0 / 60, 2, GetStatsPage, this, Types.SKILL, SkillHitType,
+                        "Bennett short hold e")
+                },
+                2 => new List<WorldEvent>
+                {
+                    SkillActivated(timestamp) // why are you doing this
+                },
+                _ => throw new ArgumentOutOfRangeException(nameof(chargeLevel), chargeLevel, "bennett e argument bad")
+            };
+        }
         
         public List<WorldEvent> Burst(Timestamp timestamp)
         {
