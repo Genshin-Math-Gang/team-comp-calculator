@@ -26,7 +26,7 @@ namespace Tcc.units
         }
         
 
-        public List<WorldEvent> Skill(Timestamp timestamp)
+        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
         {
             
             return new List<WorldEvent>()
@@ -41,7 +41,7 @@ namespace Tcc.units
         
         // TODO: when does sucrose burst snapshot
         // TODO: how does infusion work
-        public List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(Timestamp timestamp)
         {
             Timestamp castingTime = new Timestamp(67.0 / 60);
             Timestamp endTime = timestamp + castingTime + 3 * UltInterval + (ConstellationLevel >= 2 ? 2: 0);

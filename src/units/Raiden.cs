@@ -27,7 +27,7 @@ namespace Tcc.units
             SkillHitType = new HitType(Element.ELECTRO, true, icd: SkillICD);
         }
 
-        public List<WorldEvent> Skill(Timestamp timestamp)
+        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
         {
             var events = new List<WorldEvent>();
             var expiryTime = timestamp + BUFF_DURATION; //Bugged because it was static
@@ -55,6 +55,11 @@ namespace Tcc.units
             events.Add(new Hit(timestamp, 0, GetStatsPage, this, Types.SKILL, SkillHitType));
 
             return events;
+        }
+
+        public override List<WorldEvent> Burst(Timestamp timestamp)
+        {
+            throw new NotImplementedException();
         }
 
         private Buff<AbilityModifier> CreateSkillBuff(Timestamp expiryTime)

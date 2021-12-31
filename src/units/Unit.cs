@@ -17,6 +17,7 @@ namespace Tcc.units
         private static Dictionary<String, Stats> fileConvert = new Dictionary<string, Stats>
         {
             {"Energy Recharge", Stats.EnergyRecharge},
+            {"EM", Stats.ElementalMastery},
             {"ATK", Stats.AtkPercent},
             {"DEF", Stats.DefPercent},
             {"HP", Stats.HpPercent},
@@ -77,7 +78,7 @@ namespace Tcc.units
         public event EventHandler<NormalAttackArgs> NormalAttackHook;
 
         public event EventHandler<Timestamp> EnemyDeathHook;
-        
+
         // TODO: probably make args class for all of these and  move them somewhere
         public class NormalAttackArgs: EventArgs
         {
@@ -99,11 +100,13 @@ namespace Tcc.units
             public Timestamp Timestamp { get;}
             public Unit Unit { get;}
             
+            public World World { get; }
 
-            public DealDamageArgs(Timestamp timestamp, Unit unit)
+            public DealDamageArgs(Timestamp timestamp, Unit unit, World world)
             {
                 Timestamp = timestamp;
                 Unit = unit;
+                World = world;
             }
         }
         
@@ -162,6 +165,16 @@ namespace Tcc.units
             }
             
         }
+
+        public void Reset()
+        {
+            // need to implement this for all characters to make sure internal state gets updated
+        }
+
+        public abstract List<WorldEvent> Skill(Timestamp timestamp, params object[] p);
+        
+        public abstract List<WorldEvent> Burst(Timestamp timestamp);
+
 
         // TODO: needs to be overwritten for bow and claymore characters who have weird CA
         public List<WorldEvent> AutoAttack(Timestamp timestamp, AutoString autoString)
@@ -281,7 +294,7 @@ namespace Tcc.units
         public WorldEvent DealtDamage(Timestamp timestamp, Unit unit)
         {
             return new WorldEvent(timestamp, world => DealDamageHook?.Invoke(this, 
-                new DealDamageArgs(timestamp, unit)));
+                new DealDamageArgs(timestamp, unit, world)));
         }
 
         public WorldEvent EnemyDeath(Timestamp timestamp)
@@ -321,6 +334,22 @@ namespace Tcc.units
         public override string ToString()
         {
             return this.Name;
+        }
+
+        public static Unit UnitCreator(UnitCreator u)
+        {
+            // this is terrible code but i cant find a way to programmatically ensure all derived classes implement
+            // a constructor with the same arguments
+            return u.Character switch
+            {
+                Character.Bennett => new Bennett(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                Character.Ganyu => new Ganyu(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                Character.Raiden => new Raiden(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                Character.Sucrose => new Sucrose(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                Character.Xiangling => new Xiangling(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                Character.Xingqiu => new Xingqiu(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                _ => throw new ArgumentOutOfRangeException(nameof(u), "terrible unit constructor bullshit")
+            };
         }
     }
 }

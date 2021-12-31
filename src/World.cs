@@ -3,6 +3,8 @@ using System.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Tcc.elements;
@@ -15,15 +17,19 @@ namespace Tcc
 {
     public class World
     {
-        List<Unit> units;
+        Unit[] units;
         List<CharacterEvent> characterEvents;
         private WorldEventQueue queuedWorldEvents;
         List<Enemy> enemies;
         public double[] TotalDamage;
 
-        private Random r = new LCG();
+        private Random r = new ();
         private bool isDeterministic = false;
         private int simulationCount = 2;
+        public bool Verbose;
+
+
+
 
         public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Types attackType)>
             enemyHitHook;
@@ -32,9 +38,72 @@ namespace Tcc
 
         public World(List<Enemy> enemies)
         {
-            this.characterEvents = new List<CharacterEvent>();
-            this.TotalDamage = new double[4];
+            characterEvents = new List<CharacterEvent>();
+            TotalDamage = new double[4];
             this.enemies = enemies;
+        }
+        
+        public World(List<Enemy> enemies, ActionList actionList): this(actionList)
+        {
+            this.enemies = enemies;
+        }
+
+        public World(ActionList actionList)
+        {
+            enemies = new List<Enemy> {new Enemy()}; 
+            TotalDamage = new double[4];
+            units = new Unit[4];
+            for (int i = 0; i < 4; i++)
+            {
+                units[i] = Unit.UnitCreator(actionList.characters[i]);
+            }
+            OnFieldUnit = units[0];
+
+            List<Action> actions = actionList.eventList;
+            characterEvents = new List<CharacterEvent>();
+            for (int i = 0; i < actions.Count; i++)
+            {
+                Unit u = units[actions[i].Character];
+                Timestamp t = actions[i].Timestamp;
+                object[] p = actions[i].param;
+                // IF YOU GET WEIRD BUGS FROM SOMETHING CALLED AnonymousTypes,
+                // TRY CHANGING CODE FROM new {...} to new object[]{...}
+                switch (actions[i].ActionType)
+                {
+                    case ActionType.Normal:
+                        AddCharacterEvent(t, time => u.AutoAttack(time, (AutoString) p[0]));
+                        break;
+                    case ActionType.Charge:
+                        throw new NotImplementedException("charged attacks broken, please fix mathboi");
+                        break;
+                    case ActionType.Plunge:
+                        throw new NotImplementedException("plunge attacks broken, please fix mathboi");
+                        break;
+                    case ActionType.Skill:
+                        AddCharacterEvent(t, time => u.Skill(time, p));
+                        break;
+                    case ActionType.Burst:
+                        AddCharacterEvent(t, u.Burst);
+                        break;
+                    case ActionType.Swap:
+                        AddCharacterEvent(t, u.SwitchUnit);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
+        public void Reset()
+        {
+            OnFieldUnit = units[0];
+            // TODO: change the enemy thing later
+            enemies = new List<Enemy> {new Enemy()}; 
+            TotalDamage = new double[4];
+            foreach (var u in units)
+            {
+                u.Reset();
+            }
         }
 
         public Unit OnFieldUnit { get; private set; }
@@ -42,10 +111,10 @@ namespace Tcc
         public void SetUnits(Unit onFieldUnit, Unit unit2, Unit unit3, Unit unit4)
         {
             OnFieldUnit = onFieldUnit;
-            units = new List<Unit> {onFieldUnit, unit2, unit3, unit4};
+            units = new Unit[] {onFieldUnit, unit2, unit3, unit4};
         }
 
-        public ReadOnlyCollection<Unit> GetUnits() => units.AsReadOnly();
+        public ReadOnlyCollection<Unit> GetUnits() => Array.AsReadOnly(units);
 
         public void AddEnemy(Enemy enemy)
         {
@@ -74,7 +143,11 @@ namespace Tcc
         {
             unitSwapped?.Invoke(this, (OnFieldUnit, unit, timestamp));
             OnFieldUnit = unit;
-            Console.WriteLine($"Switched to {unit} at {timestamp}");
+            if (Verbose)
+            {
+                Console.WriteLine($"Switched to {unit} at {timestamp}");
+            }
+            
         }
 
         public List<Enemy> Enemies
@@ -85,7 +158,7 @@ namespace Tcc
         public void EnemyDeath(Timestamp timestamp, Enemy enemy)
         {
             enemies.Remove(enemy);
-            Console.WriteLine($"Enemy {enemy} died at {timestamp}");
+            if (Verbose) Console.WriteLine($"Enemy {enemy} died at {timestamp}");
             foreach (var unit in units)
             {
                 unit.EnemyDeath(timestamp);
@@ -115,14 +188,14 @@ namespace Tcc
             {
                 if (u is not null)  AddWorldEvent(u.DealtDamage(timestamp, unit));
             }
-            TotalDamage[units.IndexOf(unit)] += final_damage;
+            TotalDamage[Array.IndexOf(units, unit)] += final_damage;
             // hack to exit early 
             if (final_damage < 0)
             {
                 return;
             }
 
-            Console.WriteLine(
+            if (Verbose) Console.WriteLine(
                 description != null
                     ? $"Damage dealt by {description} at {timestamp} is {final_damage:N2} to {enemy.GetHashCode()}"
                     : $"Damage dealt at {timestamp} is {final_damage:N2} to {enemy.GetHashCode()}");
@@ -187,15 +260,16 @@ namespace Tcc
                 return;
             }
             unit.SetInfusion(element);
-            Console.WriteLine($"{unit} had their ability infused with {unit.GetInfusion()} at {startTime}");
+            if (Verbose) Console.WriteLine($"{unit} had their ability infused with {unit.GetInfusion()} at {startTime}");
             AddWorldEvent(new WorldEvent(endTime, _ => unit.SetInfusion(Element.PHYSICAL)));
         }
         
 
-        public void Simulate()
+        public void Simulate(bool verbose=false)
         {
             queuedWorldEvents = new WorldEventQueue(characterEvents);
 
+            Verbose = verbose;
 
             while (queuedWorldEvents.IsEmpty())
             {

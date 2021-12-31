@@ -25,7 +25,7 @@ namespace Tcc.units
             LotusHitType = new HitType(Element.CRYO);
         }
 
-        public List<WorldEvent> Skill(Timestamp timestamp)
+        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
         {
             return new List<WorldEvent>()
             {
@@ -39,10 +39,10 @@ namespace Tcc.units
             };
         }
 
-        public List<WorldEvent> BurstCast(Timestamp timestamp, params object[] param)
+        public override List<WorldEvent> Burst(Timestamp timestamp)
         {
-            var world = (World) param[0];
-            int num = Math.Max(world.Enemies.Count, 4);
+            // figure out some way to find number of enemies and make this work
+            int num = /*Math.Max(world.Enemies.Count, 4)*/ 1;
             var events = new List<WorldEvent>()
             {
                 BurstActivated(timestamp),

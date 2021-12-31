@@ -10,6 +10,7 @@ namespace Tcc.units
 {
     public class Bennett: Unit
     {
+        
         static readonly Guid BURST_BUFF_ID = new Guid("c1a23bde-db12-4589-9baf-d25b76ccb989");
         const int N_BURST_TICKS = 12;
         static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
@@ -35,9 +36,9 @@ namespace Tcc.units
         // i hecking love frame counting
         // does bennett e have aoe
         // do something about timing to hold
-        public List<WorldEvent> Skill(Timestamp timestamp, int chargeLevel = 0)
+        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
         {
-
+            var chargeLevel = (int) p[0];
             return chargeLevel switch
             {
                 0 => new List<WorldEvent>
@@ -61,7 +62,7 @@ namespace Tcc.units
             };
         }
         
-        public List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(Timestamp timestamp)
         {
             var events = new List<WorldEvent> {
                 BurstActivated(timestamp),
@@ -103,5 +104,7 @@ namespace Tcc.units
                 { "Burst", Burst }
             };
         }*/
+
     }
+    
 }

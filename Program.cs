@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Tcc.artifacts;
 using Tcc.buffs;
 using Tcc.enemy;
@@ -32,25 +35,69 @@ namespace Tcc
         
         static void Xingqiu_Test()
         {
-            Xingqiu xq = new Xingqiu();
+            /*var watch = new Stopwatch();
+            watch.Start();
+            int limit = (int) Math.Pow(10, 5);
+            double[] totalDamage = new double[limit];
             Bennett benentt = new Bennett();
-            xq.ArtifactStats = new ArtifactStats(new Flower(), new Feather(),
-                new Sands(Stats.AtkPercent), new Goblet(Stats.HydroDamageBonus), new Circlet(Stats.CritRate));
-            List<Enemy> enemies = new List<Enemy>();
-            enemies.Add(new Enemy());
-            World world = new World(enemies);
-            world.SetUnits(xq, benentt, null, null);
+            Xingqiu xq = new Xingqiu();
+            Parallel.For(0, limit, i =>
+            {
+                Bennett benentt = new Bennett();
+                Xingqiu xq = new Xingqiu();
+                xq.ArtifactStats = new ArtifactStats(new Flower(), new Feather(),
+                    new Sands(Stats.AtkPercent), new Goblet(Stats.HydroDamageBonus), new Circlet(Stats.CritRate));
+                List<Enemy> enemies = new List<Enemy>();
+                enemies.Add(new Enemy());
+                World world = new World(enemies);
+                world.SetUnits(xq, benentt, null, null);
+
+                world.AddCharacterEvent(new Timestamp(0), xq.Burst);
+                world.AddCharacterEvent(new Timestamp(1), time => xq.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent(new Timestamp(1.5), benentt.SwitchUnit);
+                world.AddCharacterEvent(new Timestamp(2), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent(new Timestamp(2.5), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent(new Timestamp(3), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent(new Timestamp(14), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent(new Timestamp(16), time => benentt.AutoAttack(time, AutoString.N1));
+                world.Simulate();
+                totalDamage[i] = world.TotalDamage[0] + world.TotalDamage[1];
+            }); 
+            Console.WriteLine(totalDamage.Average());
+            watch.Stop();
+            Console.WriteLine(watch.ElapsedMilliseconds);*/
+            var watch = new Stopwatch();
+            watch.Start();
+            int limit = (int) Math.Pow(10, 5);
+            double[] totalDamage = new double[limit];
+            ActionList actionList = new ActionList(
+                Character.Xingqiu,
+                Character.Bennett,
+                Character.Xiangling,
+                Character.Sucrose, new List<Action>
+                {
+                    new (0, 0, ActionType.Burst),
+                    new (0, 1, ActionType.Normal, new object[]{AutoString.N1}),
+                    new (1, 1.5, ActionType.Swap),
+                    new (1, 2, ActionType.Normal, new object[]{AutoString.N1}),
+                    new (1, 2.5, ActionType.Normal, new object[]{AutoString.N1}),
+                    new (1, 3, ActionType.Normal, new object[]{AutoString.N1}),
+                    new (1, 13, ActionType.Normal, new object[]{AutoString.N1}),
+                    new (1, 14, ActionType.Normal, new object[]{AutoString.N1})
+                });
             
-            world.AddCharacterEvent(new Timestamp(0), xq.Burst);
-            world.AddCharacterEvent(new Timestamp(1), time => xq.AutoAttack(time, AutoString.N1));
-            world.AddCharacterEvent(new Timestamp(1.5), benentt.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(2), time => benentt.AutoAttack(time, AutoString.N1));
-            world.AddCharacterEvent(new Timestamp(2.5), time => benentt.AutoAttack(time, AutoString.N1));
-            world.AddCharacterEvent(new Timestamp(3), time => benentt.AutoAttack(time, AutoString.N1));
-            world.AddCharacterEvent(new Timestamp(14), time => benentt.AutoAttack(time, AutoString.N1));
-            world.AddCharacterEvent(new Timestamp(16), time => benentt.AutoAttack(time, AutoString.N1));
-            
-            world.Simulate();
+            Parallel.For<World>(0, limit, () => new World(actionList), (i, loop, world) =>
+                {
+                    world.Simulate();
+                    totalDamage[i] = world.TotalDamage[0] + world.TotalDamage[1];
+                    world.Reset();
+                    return world;
+                },
+                (x) => {}
+                );
+            Console.WriteLine(totalDamage.Average());
+            watch.Stop();
+            Console.WriteLine(watch.ElapsedMilliseconds);
         }
 
         static void Sucrose_Test()
@@ -134,7 +181,7 @@ namespace Tcc
             
             world.AddCharacterEvent(new Timestamp(43), ganyu.SwitchUnit);
             
-            world.AddCharacterEvent(new Timestamp(44), ganyu.BurstCast);
+            world.AddCharacterEvent(new Timestamp(44), ganyu.Burst);
 
             world.Simulate();
             
@@ -162,7 +209,7 @@ namespace Tcc
 
             //Switch to Xiangling cast burst
             world.AddCharacterEvent(new Timestamp(1), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(1.5), xiangling.InitialBurst);
+            world.AddCharacterEvent(new Timestamp(1.5), xiangling.Burst);
             world.AddCharacterEvent(new Timestamp(3), xiangling.BurstHit);
 
             //Switch off Xiangling
@@ -180,10 +227,10 @@ namespace Tcc
 
             //Return to Xiangling and cast burst
             world.AddCharacterEvent(new Timestamp(11), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(11.5), xiangling.InitialBurst);
+            world.AddCharacterEvent(new Timestamp(11.5), xiangling.Burst);
 
             //Cast burst again after Shogun buff expired;
-            world.AddCharacterEvent(new Timestamp(501), xiangling.InitialBurst);
+            world.AddCharacterEvent(new Timestamp(501), xiangling.Burst);
             world.AddCharacterEvent(new Timestamp(503), xiangling.BurstHit);
 
             world.Simulate();
@@ -240,7 +287,7 @@ namespace Tcc
 
             //Switch to Xiangling and cast burst
             world.AddCharacterEvent(new Timestamp (1.8), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(2), xiangling.InitialBurst);
+            world.AddCharacterEvent(new Timestamp(2), xiangling.Burst);
 
             //Switch to Bennett and cast burst
             world.AddCharacterEvent(new Timestamp(4), bennett.SwitchUnit);
@@ -263,7 +310,7 @@ namespace Tcc
 
             //Cast xiangling nado
             world.AddCharacterEvent(new Timestamp(403), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(404), xiangling.InitialBurst);
+            world.AddCharacterEvent(new Timestamp(404), xiangling.Burst);
             world.AddCharacterEvent(new Timestamp(407), xiangling.BurstHit);
 
             //Switch off Xiangling and her nado hits off-field

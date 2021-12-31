@@ -28,7 +28,7 @@ namespace Tcc.units
         
         // TODO: the timing for this is sus
 
-        public List<WorldEvent> Skill(Timestamp timestamp)
+        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
         {
             return new List<WorldEvent> {
                 SkillActivated(timestamp), // Order important: Guoba snapshots CW skill activation buff
@@ -44,7 +44,7 @@ namespace Tcc.units
             };
         }
 
-        public List<WorldEvent> InitialBurst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(Timestamp timestamp)
         {
             return new List<WorldEvent> {
                 BurstActivated(timestamp),

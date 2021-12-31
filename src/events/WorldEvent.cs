@@ -29,7 +29,7 @@ namespace Tcc.events
                 return temp;
             }
 
-            return this.priority.CompareTo(other.priority);
+            return priority.CompareTo(other.priority);
         }
 
         public Timestamp Timestamp { get; }

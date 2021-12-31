@@ -18,7 +18,7 @@ namespace Tcc.units
         private readonly HitType SkillHitType;
         
         public Xingqiu(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
-            base("bennett", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.HYDRO, WeaponType.SWORD)
+            base("xingqiu", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.HYDRO, WeaponType.SWORD)
         {
             burstWaveSwordCount = constellationLevel != 6 ? new[] {2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3} 
                 : new[] {2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5, 2, 3, 5};
@@ -30,7 +30,7 @@ namespace Tcc.units
         
         
         // TODO: frame data for xq e was done at 30 fps apparently since my pc sucks, need to cross check results
-        public List<WorldEvent> Skill(Timestamp timestamp)
+        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
         {
 
             //double multiplier = (constellationLevel >= 4 && ultActive)? 1.5 : 1;
@@ -45,7 +45,7 @@ namespace Tcc.units
             };
         }
 
-        public List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(Timestamp timestamp)
         {
 
             burstWaveCount = 0;
