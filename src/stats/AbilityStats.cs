@@ -5,8 +5,8 @@ namespace Tcc.stats
 {
     public class AbilityStats
     {
-        readonly StatsPage statsPage;
-        readonly double[] motionValues;
+         StatsPage statsPage;
+         double[] motionValues;
 
 
         public AbilityStats(StatsPage statsPage = null, double[] motionValues = null)
@@ -27,7 +27,30 @@ namespace Tcc.stats
 
         public void Add(AbilityStats stats)
         {
-            
+
+            if (motionValues != null)
+            {
+                if (stats.motionValues != null)
+                {
+                    if (motionValues.Length != stats.motionValues.Length) throw new Exception("Cannot add different motion values together");
+                    
+
+                    for (int i = 0; i < motionValues.Length; i++)
+                    {
+                        motionValues[i] += stats.motionValues[i];
+                    }
+                }
+                else
+                {
+                    motionValues = (double[])motionValues.Clone();
+                }
+            }
+            else if (stats.motionValues != null)
+            {
+                motionValues = (double[])stats.motionValues.Clone();
+            }
+
+            statsPage.Add(stats.statsPage);
         }
 
         public static AbilityStats operator +(AbilityStats first, AbilityStats second)

@@ -250,7 +250,6 @@ namespace Tcc.units
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
         
-        // is there some way so speed this up with caching
         public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy enemy, Timestamp timestamp)
         {
             EnemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -258,7 +257,7 @@ namespace Tcc.units
             
             AbilityStats result = statsFromUnit + ArtifactStats.Stats;
 
-            if (StartingAbilityStats.TryGetValue(type, out var startingStats)) result += startingStats;
+            if (StartingAbilityStats.TryGetValue(type, out var startingStats)) result.Add(startingStats);
 
             if (enemy != null)
             {

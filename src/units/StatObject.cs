@@ -86,27 +86,10 @@ namespace Tcc.units
 
         public StatsPage GetFirstPassStats(Timestamp timestamp)
         {
-            /*FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
             return FirstPassBuffs.Aggregate(StartingStatsPage, 
-                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));*/
-            if (lastFirstPass is null)
-            {
-                FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
-                lastFirstPass = FirstPassBuffs.Aggregate(StartingStatsPage, 
-                    (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));
-                return lastFirstPass;
-            }
-
-            foreach (var buff in FirstPassBuffs)
-            {
-                if (buff.ShouldRemove(timestamp))
-                {
-                    lastFirstPass.Subtract(buff.GetModifier((this, timestamp)));
-                }
-                
-            }
-            return lastFirstPass;
+                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));
         }
 
         public SecondPassStatsPage GetStatsPage(Timestamp timestamp)

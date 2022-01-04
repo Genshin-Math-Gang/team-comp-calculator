@@ -67,7 +67,7 @@ namespace Tcc
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);*/
             var watch = new Stopwatch();
-            int limit = (int) Math.Pow(10, 3);
+            int limit = (int) Math.Pow(10, 4);
             double[] totalDamage = new double[limit];
             ActionList actionList = new ActionList(
                 Character.Xingqiu,

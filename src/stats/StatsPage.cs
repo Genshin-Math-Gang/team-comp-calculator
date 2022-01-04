@@ -75,12 +75,14 @@ namespace Tcc.stats
             }
         }
 
-        public void Add(StatsPage st)
+        public StatsPage Add(StatsPage st)
         {
             for (int i=0; i < st.StatValues.Length; i++)
             {
                 StatValues[i] += st.StatValues[i];
             }
+
+            return this;
         }
         
         public void Subtract(StatsPage st)
