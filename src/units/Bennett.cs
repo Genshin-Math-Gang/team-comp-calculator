@@ -13,8 +13,8 @@ namespace Tcc.units
         
         static readonly Guid BURST_BUFF_ID = new Guid("c1a23bde-db12-4589-9baf-d25b76ccb989");
         const int N_BURST_TICKS = 12;
-        static readonly Timestamp BUFF_FREQUENCY = new Timestamp(1);
-        static readonly Timestamp BUFF_DURATION = new Timestamp(2);
+        static readonly double BUFF_FREQUENCY = (1);
+        static readonly double BUFF_DURATION = (2);
         private readonly HitType BurstHitType;
         private readonly HitType SkillHitType;
 
@@ -36,7 +36,7 @@ namespace Tcc.units
         // i hecking love frame counting
         // does bennett e have aoe
         // do something about timing to hold
-        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
+        public override List<WorldEvent> Skill(double timestamp, params object[] p)
         {
             var chargeLevel = (int) p[0];
             return chargeLevel switch
@@ -63,7 +63,7 @@ namespace Tcc.units
         }
         
 
-        public override List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(double timestamp)
         {
             var events = new List<WorldEvent> {
                 BurstActivated(timestamp),
@@ -87,7 +87,7 @@ namespace Tcc.units
             return events;
         }
 
-        Buff<SecondPassModifier> CreateBurstBuff(Timestamp startTime)
+        Buff<SecondPassModifier> CreateBurstBuff(double startTime)
         {
             var stats = burstBuffSnapshot.GetStats(startTime);
             // TODO: BENNET BURST MODIFIER IS WRONG
@@ -98,9 +98,9 @@ namespace Tcc.units
         }
         
 
-        /*public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        /*public override Dictionary<string, Func<double, List<WorldEvent>>> GetCharacterEvents()
         {
-            return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
+            return new Dictionary<string, Func<double, List<WorldEvent>>>
             {
                 { "Burst", Burst }
             };

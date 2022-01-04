@@ -28,7 +28,7 @@ namespace Tcc.units
         
         // TODO: the timing for this is sus
 
-        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
+        public override List<WorldEvent> Skill(double timestamp, params object[] p)
         {
             return new List<WorldEvent> {
                 SkillActivated(timestamp), // Order important: Guoba snapshots CW skill activation buff
@@ -44,7 +44,7 @@ namespace Tcc.units
             };
         }
 
-        public override List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(double timestamp)
         {
             return new List<WorldEvent> {
                 BurstActivated(timestamp),
@@ -58,7 +58,7 @@ namespace Tcc.units
             };
         }
 
-        public List<WorldEvent> BurstHit(Timestamp timestamp)
+        public List<WorldEvent> BurstHit(double timestamp)
         {
             return new List<WorldEvent> { new Hit(timestamp + 1, 3, burstSnapshot.GetStats, 
                 this, Types.BURST, new HitType(Element.PYRO), "nado") };
@@ -66,9 +66,9 @@ namespace Tcc.units
 
         
 
-        /*public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        /*public override Dictionary<string, Func<double, List<WorldEvent>>> GetCharacterEvents()
         {
-            return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
+            return new Dictionary<string, Func<double, List<WorldEvent>>>
             {
                 { "Initial Burst", InitialBurst },
                 { "Burst Hit", BurstHit },

@@ -38,7 +38,7 @@ namespace Tcc
             /*var watch = new Stopwatch();
             watch.Start();
             int limit = (int) Math.Pow(10, 5);
-            double[] totalDamage = new double[limit];
+            double[] totalDamage = [limit];
             Bennett benentt = new Bennett();
             Xingqiu xq = new Xingqiu();
             Parallel.For(0, limit, i =>
@@ -52,14 +52,14 @@ namespace Tcc
                 World world = new World(enemies);
                 world.SetUnits(xq, benentt, null, null);
 
-                world.AddCharacterEvent(new Timestamp(0), xq.Burst);
-                world.AddCharacterEvent(new Timestamp(1), time => xq.AutoAttack(time, AutoString.N1));
-                world.AddCharacterEvent(new Timestamp(1.5), benentt.SwitchUnit);
-                world.AddCharacterEvent(new Timestamp(2), time => benentt.AutoAttack(time, AutoString.N1));
-                world.AddCharacterEvent(new Timestamp(2.5), time => benentt.AutoAttack(time, AutoString.N1));
-                world.AddCharacterEvent(new Timestamp(3), time => benentt.AutoAttack(time, AutoString.N1));
-                world.AddCharacterEvent(new Timestamp(14), time => benentt.AutoAttack(time, AutoString.N1));
-                world.AddCharacterEvent(new Timestamp(16), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent((0), xq.Burst);
+                world.AddCharacterEvent((1), time => xq.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent((1.5), benentt.SwitchUnit);
+                world.AddCharacterEvent((2), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent((2.5), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent((3), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent((14), time => benentt.AutoAttack(time, AutoString.N1));
+                world.AddCharacterEvent((16), time => benentt.AutoAttack(time, AutoString.N1));
                 world.Simulate();
                 totalDamage[i] = world.TotalDamage[0] + world.TotalDamage[1];
             }); 
@@ -67,7 +67,7 @@ namespace Tcc
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);*/
             var watch = new Stopwatch();
-            int limit = (int) Math.Pow(10, 4);
+            int limit = (int) Math.Pow(10, 5);
             double[] totalDamage = new double[limit];
             ActionList actionList = new ActionList(
                 Character.Xingqiu,
@@ -116,9 +116,9 @@ namespace Tcc
             vv.Add2pc(world, sucrose);
             vv.Add4pc(world, sucrose);
             
-            world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
-            world.AddCharacterEvent(new Timestamp(1), sucrose.Burst);
-            world.AddCharacterEvent(new Timestamp(1.5), sucrose.Skill);
+            world.AddCharacterEvent((0), benentt.Burst);
+            world.AddCharacterEvent((1), sucrose.Burst);
+            world.AddCharacterEvent((1.5), sucrose.Skill);
 
             world.Simulate();
             
@@ -140,9 +140,9 @@ namespace Tcc
             var noblesse = new NoblessOblige();
             noblesse.Add4pc(world, sucrose);
             
-            world.AddCharacterEvent(new Timestamp(.5), sucrose.Skill);
-            world.AddCharacterEvent(new Timestamp(1), sucrose.Burst);
-            world.AddCharacterEvent(new Timestamp(1.5), sucrose.Skill);
+            world.AddCharacterEvent((.5), sucrose.Skill);
+            world.AddCharacterEvent((1), sucrose.Burst);
+            world.AddCharacterEvent((1.5), sucrose.Skill);
             
             world.Simulate();
         }
@@ -164,23 +164,23 @@ namespace Tcc
             shime.Add2pc(world, ganyu);
             shime.Add4pc(world, ganyu);
             
-            world.AddCharacterEvent(new Timestamp(0), benentt.Burst);
+            world.AddCharacterEvent((0), benentt.Burst);
             
-            world.AddCharacterEvent(new Timestamp(1), ganyu.SwitchUnit);
+            world.AddCharacterEvent((1), ganyu.SwitchUnit);
             
-            world.AddCharacterEvent(new Timestamp(1.5), ganyu.Skill);
-            world.AddCharacterEvent(new Timestamp(2), ganyu.ChargedAttack, 3);
-            world.AddCharacterEvent(new Timestamp(19), ganyu.Skill);
-            world.AddCharacterEvent(new Timestamp(20), ganyu.ChargedAttack, 3);
-            world.AddCharacterEvent(new Timestamp(30), ganyu.ChargedAttack, 3);
+            world.AddCharacterEvent((1.5), ganyu.Skill);
+            world.AddCharacterEvent((2), ganyu.ChargedAttack, 3);
+            world.AddCharacterEvent((19), ganyu.Skill);
+            world.AddCharacterEvent((20), ganyu.ChargedAttack, 3);
+            world.AddCharacterEvent((30), ganyu.ChargedAttack, 3);
             
-            world.AddCharacterEvent(new Timestamp(41), benentt.SwitchUnit);
+            world.AddCharacterEvent((41), benentt.SwitchUnit);
             
-            world.AddCharacterEvent(new Timestamp(42), benentt.Burst);
+            world.AddCharacterEvent((42), benentt.Burst);
             
-            world.AddCharacterEvent(new Timestamp(43), ganyu.SwitchUnit);
+            world.AddCharacterEvent((43), ganyu.SwitchUnit);
             
-            world.AddCharacterEvent(new Timestamp(44), ganyu.Burst);
+            world.AddCharacterEvent((44), ganyu.Burst);
 
             world.Simulate();
             
@@ -204,33 +204,33 @@ namespace Tcc
             crimsonWitch.Add4pc(world, xiangling);
 
             //Use Shogun skill
-            world.AddCharacterEvent(new Timestamp(0), shogun.Skill);
+            world.AddCharacterEvent((0), shogun.Skill);
 
             //Switch to Xiangling cast burst
-            world.AddCharacterEvent(new Timestamp(1), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(1.5), xiangling.Burst);
-            world.AddCharacterEvent(new Timestamp(3), xiangling.BurstHit);
+            world.AddCharacterEvent((1), xiangling.SwitchUnit);
+            world.AddCharacterEvent((1.5), xiangling.Burst);
+            world.AddCharacterEvent((3), xiangling.BurstHit);
 
             //Switch off Xiangling
-            world.AddCharacterEvent(new Timestamp(4), shogun.SwitchUnit);
+            world.AddCharacterEvent((4), shogun.SwitchUnit);
     
             //Buff Shogun
-            world.AddCharacterEvent(new Timestamp(4), (timestamp) => new List<WorldEvent> {
+            world.AddCharacterEvent((4), (timestamp) => new List<WorldEvent> {
                 new WorldEvent(timestamp, (world) => shogun.AddBuff(new PermanentBuff<FirstPassModifier>(
                     new Guid("e6a06a2f-7d42-437a-b330-fb08b79d5045"), (_) => (Stats.EnergyRecharge, 0.5))))
             });
 
             //Xiangling burst hit while off-field and post shogun buff
-            world.AddCharacterEvent(new Timestamp(4.5), xiangling.BurstHit);
+            world.AddCharacterEvent((4.5), xiangling.BurstHit);
 
 
             //Return to Xiangling and cast burst
-            world.AddCharacterEvent(new Timestamp(11), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(11.5), xiangling.Burst);
+            world.AddCharacterEvent((11), xiangling.SwitchUnit);
+            world.AddCharacterEvent((11.5), xiangling.Burst);
 
             //Cast burst again after Shogun buff expired;
-            world.AddCharacterEvent(new Timestamp(501), xiangling.Burst);
-            world.AddCharacterEvent(new Timestamp(503), xiangling.BurstHit);
+            world.AddCharacterEvent((501), xiangling.Burst);
+            world.AddCharacterEvent((503), xiangling.BurstHit);
 
             world.Simulate();
 
@@ -249,18 +249,18 @@ namespace Tcc
             World world = new World(enemies);
             world.SetUnits(xiangling, bennett, null, null);
 
-            world.AddCharacterEvent(new Timestamp(1), bennett.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(1.2), bennett.Burst);
+            world.AddCharacterEvent((1), bennett.SwitchUnit);
+            world.AddCharacterEvent((1.2), bennett.Burst);
 
-            world.AddCharacterEvent(new Timestamp(1.7), xiangling.SwitchUnit);
+            world.AddCharacterEvent((1.7), xiangling.SwitchUnit);
 
-            world.AddCharacterEvent(new Timestamp(3.8), xiangling.Skill);
+            world.AddCharacterEvent((3.8), xiangling.Skill);
 
-            world.AddCharacterEvent(new Timestamp(5.5), bennett.SwitchUnit);
+            world.AddCharacterEvent((5.5), bennett.SwitchUnit);
 
-            world.AddCharacterEvent(new Timestamp(16), xiangling.SwitchUnit);
+            world.AddCharacterEvent((16), xiangling.SwitchUnit);
 
-            world.AddCharacterEvent(new Timestamp(17), xiangling.Skill);
+            world.AddCharacterEvent((17), xiangling.Skill);
 
             world.Simulate();
 
@@ -281,40 +281,40 @@ namespace Tcc
             world.SetUnits(xiangling, bennett, shogun, null);
 
             //Switch to shogun and cast skill
-            world.AddCharacterEvent(new Timestamp(1), shogun.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(1.5), shogun.Skill);
+            world.AddCharacterEvent((1), shogun.SwitchUnit);
+            world.AddCharacterEvent((1.5), shogun.Skill);
 
             //Switch to Xiangling and cast burst
-            world.AddCharacterEvent(new Timestamp (1.8), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(2), xiangling.Burst);
+            world.AddCharacterEvent( (1.8), xiangling.SwitchUnit);
+            world.AddCharacterEvent((2), xiangling.Burst);
 
             //Switch to Bennett and cast burst
-            world.AddCharacterEvent(new Timestamp(4), bennett.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(4.5), bennett.Burst);
+            world.AddCharacterEvent((4), bennett.SwitchUnit);
+            world.AddCharacterEvent((4.5), bennett.Burst);
 
             //Xiangling burst hit off-field
-            world.AddCharacterEvent(new Timestamp(5), xiangling.BurstHit);
+            world.AddCharacterEvent((5), xiangling.BurstHit);
 
             //Switch to Xiangling and hit burst
-            world.AddCharacterEvent(new Timestamp(5.4), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(5.5), xiangling.BurstHit);
+            world.AddCharacterEvent((5.4), xiangling.SwitchUnit);
+            world.AddCharacterEvent((5.5), xiangling.BurstHit);
 
             //Cast Bennett burst a lot later after all buffs expired
-            world.AddCharacterEvent(new Timestamp(399), bennett.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(400), bennett.Burst);
+            world.AddCharacterEvent((399), bennett.SwitchUnit);
+            world.AddCharacterEvent((400), bennett.Burst);
 
             //Cast shogun E
-            world.AddCharacterEvent(new Timestamp(401), shogun.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(402), shogun.Skill);
+            world.AddCharacterEvent((401), shogun.SwitchUnit);
+            world.AddCharacterEvent((402), shogun.Skill);
 
             //Cast xiangling nado
-            world.AddCharacterEvent(new Timestamp(403), xiangling.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(404), xiangling.Burst);
-            world.AddCharacterEvent(new Timestamp(407), xiangling.BurstHit);
+            world.AddCharacterEvent((403), xiangling.SwitchUnit);
+            world.AddCharacterEvent((404), xiangling.Burst);
+            world.AddCharacterEvent((407), xiangling.BurstHit);
 
             //Switch off Xiangling and her nado hits off-field
-            world.AddCharacterEvent(new Timestamp(408), bennett.SwitchUnit);
-            world.AddCharacterEvent(new Timestamp(409), xiangling.BurstHit);
+            world.AddCharacterEvent((408), bennett.SwitchUnit);
+            world.AddCharacterEvent((409), xiangling.BurstHit);
 
             world.Simulate();
 

@@ -43,7 +43,7 @@ namespace Tcc.units
         protected int[] AutoAttackFrameData;
 
         // Base stats
-        protected readonly Dictionary<Types, AbilityStats> StartingAbilityStats = new();
+        public readonly Dictionary<Types, AbilityStats> StartingAbilityStats = new();
         
         // Artifact stats
         public ArtifactStats ArtifactStats;
@@ -68,26 +68,26 @@ namespace Tcc.units
         // Hooks
         public event EventHandler<DealDamageArgs> DealDamageHook; 
         
-        public event EventHandler<Timestamp> SkillActivatedHook;
-        public event EventHandler<Timestamp> BurstActivatedHook;
-        public event EventHandler<(Timestamp timestamp, Reaction reaction, World world)> TriggeredReactionHook;
-        public event EventHandler<(Timestamp timestamp, Element? element)> ParticleCollectedHook; // TODO Not fired by anything
+        public event EventHandler<double> SkillActivatedHook;
+        public event EventHandler<double> BurstActivatedHook;
+        public event EventHandler<(double timestamp, Reaction reaction, World world)> TriggeredReactionHook;
+        public event EventHandler<(double timestamp, Element? element)> ParticleCollectedHook; // TODO Not fired by anything
 
-        public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy enemy)> SwirlTriggeredHook;
+        public event EventHandler<(double timestamp, Reaction reaction, Enemy enemy)> SwirlTriggeredHook;
 
         public event EventHandler<NormalAttackArgs> NormalAttackHook;
 
-        public event EventHandler<Timestamp> EnemyDeathHook;
+        public event EventHandler<double> EnemyDeathHook;
 
         // TODO: probably make args class for all of these and  move them somewhere
         public class NormalAttackArgs: EventArgs
         {
-            public Timestamp Timestamp { get;}
-            public Timestamp Duration { get;}
+            public double Timestamp { get;}
+            public double Duration { get;}
             
             public World World { get; }
 
-            public NormalAttackArgs(Timestamp timestamp, Timestamp duration, World world)
+            public NormalAttackArgs(double timestamp, double duration, World world)
             {
                 Timestamp = timestamp;
                 Duration = duration;
@@ -97,12 +97,12 @@ namespace Tcc.units
         
         public class DealDamageArgs: EventArgs
         {
-            public Timestamp Timestamp { get;}
+            public double Timestamp { get;}
             public Unit Unit { get;}
             
             public World World { get; }
 
-            public DealDamageArgs(Timestamp timestamp, Unit unit, World world)
+            public DealDamageArgs(double timestamp, Unit unit, World world)
             {
                 Timestamp = timestamp;
                 Unit = unit;
@@ -182,21 +182,21 @@ namespace Tcc.units
             base.Reset();
         }
 
-        public abstract List<WorldEvent> Skill(Timestamp timestamp, params object[] p);
+        public abstract List<WorldEvent> Skill(double timestamp, params object[] p);
         
-        public abstract List<WorldEvent> Burst(Timestamp timestamp);
+        public abstract List<WorldEvent> Burst(double timestamp);
 
 
         // TODO: needs to be overwritten for bow and claymore characters who have weird CA
-        public List<WorldEvent> AutoAttack(Timestamp timestamp, AutoString autoString)
+        public List<WorldEvent> AutoAttack(double timestamp, AutoString autoString)
         {
             int normalCount = 1 + (int) autoString / 2;
             int doCharged = (int) autoString % 2;
             // for now i am going to write a naive implementation and later worry about characters with  
             // multiple hits corresponding to 1 normal or charged attack, ie xiangling and childe
             List<WorldEvent> hits = new List<WorldEvent>();
-            Timestamp start = timestamp;
-            Timestamp duration;
+            double start = timestamp;
+            double duration;
             HitType hitType = new HitType(Element.PHYSICAL, false, heavy: HasHeavyAttacks);
             for (int i = 0; i < normalCount; i++)
             {
@@ -245,12 +245,12 @@ namespace Tcc.units
             return 1;
         }*/
 
-        public List<WorldEvent> SwitchUnit(Timestamp timestamp) 
+        public List<WorldEvent> SwitchUnit(double timestamp) 
         {
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
         
-        public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy enemy, Timestamp timestamp)
+        public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy enemy, double timestamp)
         {
             EnemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
             foreach (var list in AbilityBuffs.Values) list.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -261,17 +261,17 @@ namespace Tcc.units
 
             if (enemy != null)
             {
-                foreach (var buff in EnemyBasedBuffs) result += buff.GetModifier((this, timestamp, enemy, statsFromUnit.firstPassStats));
+                foreach (var buff in EnemyBasedBuffs) result.Add(buff.GetModifier((this, timestamp, enemy, statsFromUnit.firstPassStats)));
             }
 
             if (ElementBasedBuffs.TryGetValue(element, out var elementBuffList))
             {
-                foreach (var buff in elementBuffList) result += buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats));
+                foreach (var buff in elementBuffList) result.Add(buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats)));
             }
 
             if (AbilityBuffs.TryGetValue(type, out var abilityBuffList))
             {
-                foreach (var buff in abilityBuffList) result += buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats));
+                foreach (var buff in abilityBuffList) result.Add(buff.GetModifier((this, timestamp, statsFromUnit.firstPassStats)));
             }
 
             return result;
@@ -281,17 +281,17 @@ namespace Tcc.units
         public void GiveEnergy(int energy) => CurrentEnergy = Math.Min(CurrentEnergy + energy, BurstEnergyCost);
         public void LoseEnergy(int energy) => CurrentEnergy = Math.Max(CurrentEnergy - energy, 0);
 
-        protected WorldEvent SkillActivated(Timestamp timestamp)
+        protected WorldEvent SkillActivated(double timestamp)
         {
             return new WorldEvent(timestamp, (world) => SkillActivatedHook?.Invoke(this, timestamp),$"Skill activated by {this}");
         }
 
-        protected WorldEvent NormalAttackUsed(Timestamp timestamp, Timestamp duration)
+        protected WorldEvent NormalAttackUsed(double timestamp, double duration)
         {
             return new WorldEvent(timestamp, world => NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world)));
         }
 
-        public WorldEvent ReactionTriggered(Timestamp timestamp, Reaction reaction)
+        public WorldEvent ReactionTriggered(double timestamp, Reaction reaction)
         {
             return new WorldEvent(timestamp, world =>
             {
@@ -303,7 +303,7 @@ namespace Tcc.units
         }
         
         
-        protected WorldEvent NormalAttackGeneralUsed(Timestamp timestamp, Timestamp duration)
+        protected WorldEvent NormalAttackGeneralUsed(double timestamp, double duration)
         {
             return new WorldEvent(timestamp, world =>
             {
@@ -315,34 +315,34 @@ namespace Tcc.units
             });
         }
 
-        public WorldEvent DealtDamage(Timestamp timestamp, Unit unit)
+        public WorldEvent DealtDamage(double timestamp, Unit unit)
         {
             return new WorldEvent(timestamp, world => DealDamageHook?.Invoke(this, 
                 new DealDamageArgs(timestamp, unit, world)));
         }
 
-        public WorldEvent EnemyDeath(Timestamp timestamp)
+        public WorldEvent EnemyDeath(double timestamp)
         {
             return new WorldEvent(timestamp, world => EnemyDeathHook?.Invoke(this, timestamp));
         }
 
 
-        protected WorldEvent BurstActivated(Timestamp timestamp)
+        protected WorldEvent BurstActivated(double timestamp)
         {
             return new WorldEvent(timestamp, (world) => BurstActivatedHook?.Invoke(this, timestamp), $"Burst activated by {this}");
         }
 
-        protected WorldEvent TriggeredReaction(Timestamp timestamp, Reaction reaction)
+        protected WorldEvent TriggeredReaction(double timestamp, Reaction reaction)
         {
             return new WorldEvent(timestamp, (world) => TriggeredReactionHook?.Invoke(this, (timestamp, reaction, world)));
         }
 
-        protected WorldEvent ParticleCollected(Timestamp timestamp, Element? element)
+        protected WorldEvent ParticleCollected(double timestamp, Element? element)
         {
             return new WorldEvent(timestamp, (world) => ParticleCollectedHook?.Invoke(this, (timestamp, element)));
         }
 
-        public WorldEvent TriggeredSwirl(Timestamp timestamp, Reaction reaction, Enemy enemy)
+        public WorldEvent TriggeredSwirl(double timestamp, Reaction reaction, Enemy enemy)
         {
             // make triggered swirl also activate reaction hook
             if (!ReactionTypes.IsSwirl(reaction))
@@ -383,6 +383,7 @@ namespace Tcc.units
                 Character.Xiangling => new Xiangling(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
                 Character.Xingqiu => new Xingqiu(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
                 Character.Fischl => new Fischl(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                Character.Beidou => new Beidou(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
                 _ => throw new ArgumentOutOfRangeException(nameof(u), "terrible unit constructor bullshit")
             };
         }

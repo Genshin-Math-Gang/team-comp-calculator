@@ -25,7 +25,7 @@ namespace Tcc.units
             LotusHitType = new HitType(Element.CRYO);
         }
 
-        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
+        public override List<WorldEvent> Skill(double timestamp, params object[] p)
         {
             return new List<WorldEvent>()
             {
@@ -39,7 +39,7 @@ namespace Tcc.units
             };
         }
 
-        public override List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(double timestamp)
         {
             // figure out some way to find number of enemies and make this work
             int num = /*Math.Max(world.Enemies.Count, 4)*/ 1;
@@ -51,7 +51,7 @@ namespace Tcc.units
             for (int i = 0; i < 10; i++)
             {
                 // need to adapt for number of enemies
-                Timestamp time = timestamp + new Timestamp(1.5 * i);
+                double time = timestamp + (1.5 * i);
                 for (int j = 0; j < num; j++)
                 {
                     time += .3;
@@ -64,7 +64,7 @@ namespace Tcc.units
         }
 
         // kinda deprecated
-        public List<WorldEvent> BurstIcicle(Timestamp timestamp)
+        public List<WorldEvent> BurstIcicle(double timestamp)
         {
             return new List<WorldEvent>()
             {
@@ -72,14 +72,14 @@ namespace Tcc.units
             };
         }
 
-        private WorldEvent Icicle(Timestamp timestamp)
+        private WorldEvent Icicle(double timestamp)
         {
             return new Hit(timestamp, 0, burstSnapshot.GetStats, this, Types.BURST,
                IcicleHitType,"Icicle hit");
         }
 
         // TODO: rewrite this to be up to standard later
-        public List<WorldEvent> ChargedAttack(Timestamp timestamp, params object[] param)
+        public List<WorldEvent> ChargedAttack(double timestamp, params object[] param)
         {
             int chargeLevel = (int) param[1];
             // TODO: what is icd override and how do i use it

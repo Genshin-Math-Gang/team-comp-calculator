@@ -14,9 +14,9 @@ namespace Tcc.artifacts
         static readonly AbilityModifier MODIFIER_4PC = _ => (Stats.DamagePercent, 0.5);
 
         const int ENERGY_COST_4PC = 15;
-        static readonly Timestamp COOLDOWN_4PC = new Timestamp(10);
+        static readonly double COOLDOWN_4PC = (10);
 
-        Timestamp cooldown4pcUntil;
+        double cooldown4pcUntil;
 
         public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));
 

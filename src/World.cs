@@ -31,10 +31,10 @@ namespace Tcc
 
 
 
-        public event EventHandler<(Timestamp timestamp, Unit attacker, Element element, Types attackType)>
+        public event EventHandler<(double timestamp, Unit attacker, Element element, Types attackType)>
             enemyHitHook;
 
-        public event EventHandler<(Unit from, Unit to, Timestamp timestamp)> unitSwapped;
+        public event EventHandler<(Unit from, Unit to, double timestamp)> unitSwapped;
 
         public World(List<Enemy> enemies)
         {
@@ -64,7 +64,7 @@ namespace Tcc
             for (int i = 0; i < actions.Count; i++)
             {
                 Unit u = units[actions[i].Character];
-                Timestamp t = actions[i].Timestamp;
+                double t = actions[i].Timestamp;
                 object[] p = actions[i].param;
                 // IF YOU GET WEIRD BUGS FROM SOMETHING CALLED AnonymousTypes,
                 // TRY CHANGING CODE FROM new {...} to new object[]{...}
@@ -128,7 +128,7 @@ namespace Tcc
             enemies.Add(enemy);
         }
 
-        public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> characterAction,
+        public void AddCharacterEvent(double timestamp, Func<double, object[], List<WorldEvent>> characterAction,
             params object[] param)
         {
             object[] p = {this, null};
@@ -136,17 +136,17 @@ namespace Tcc
             characterEvents.Add(new CharacterEvent(timestamp, characterAction, p));
         }
 
-        public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> characterAction)
+        public void AddCharacterEvent(double timestamp, Func<double, object[], List<WorldEvent>> characterAction)
         {
             characterEvents.Add(new CharacterEvent(timestamp, characterAction, this));
         }
 
-        public void AddCharacterEvent(Timestamp timestamp, Func<Timestamp, List<WorldEvent>> characterAction)
+        public void AddCharacterEvent(double timestamp, Func<double, List<WorldEvent>> characterAction)
         {
             characterEvents.Add(new CharacterEvent(timestamp, characterAction));
         }
 
-        public void SwitchUnit(Timestamp timestamp, Unit unit)
+        public void SwitchUnit(double timestamp, Unit unit)
         {
             unitSwapped?.Invoke(this, (OnFieldUnit, unit, timestamp));
             OnFieldUnit = unit;
@@ -162,7 +162,7 @@ namespace Tcc
             get => enemies;
         }
 
-        public void EnemyDeath(Timestamp timestamp, Enemy enemy)
+        public void EnemyDeath(double timestamp, Enemy enemy)
         {
             enemies.Remove(enemy);
             if (Verbose) Console.WriteLine($"Enemy {enemy} died at {timestamp}");
@@ -181,12 +181,12 @@ namespace Tcc
             queuedWorldEvents = new WorldEventQueue();
         }
 
-        public void DealDamage(Timestamp timestamp, SecondPassStatsPage statsPage, Unit unit,
-            Types type, Enemy enemy, int mvIndex, HitType hitType, string description = null)
+        public void DealDamage(double timestamp, SecondPassStatsPage statsPage, Unit unit,
+            Types type, Enemy enemy, double mvs, HitType hitType, string description = null)
         {
             
             var results = enemy.TakeDamage(timestamp, type, statsPage, unit, hitType,
-                mvIndex, r, isDeterministic);
+                mvs, r, isDeterministic);
             double final_damage = results.Item1;
             List<WorldEvent> events = results.Item2 ?? new List<WorldEvent>();
             // scuffed
@@ -209,7 +209,7 @@ namespace Tcc
         }
 
 
-        public void CalculateDamage(Timestamp timestamp, int mvIndex, SecondPassStatsPage statsPage,
+        public void CalculateDamage(double timestamp, double mvs, SecondPassStatsPage statsPage,
             Unit unit, Types type, HitType hitType, string description = null)
         {
 
@@ -222,7 +222,7 @@ namespace Tcc
                     foreach (Enemy enemy in enemies)
                     {
                         DealDamage(timestamp + i * hitType.Delay, statsPage, unit, type, enemy,
-                            mvIndex, hitType, description);
+                            mvs, hitType, description);
                     }
                 }
                 else
@@ -231,7 +231,7 @@ namespace Tcc
                     {
                         if (i > hitType.Bounces) break;
                         DealDamage(timestamp + i * hitType.Delay, statsPage, unit, type, enemy,
-                            mvIndex, hitType, description);
+                            mvs, hitType, description);
                         i++;
                     }
 
@@ -243,7 +243,7 @@ namespace Tcc
             }
         }
 
-        public void InfuseAbility(Timestamp startTime, Timestamp endTime, Anemo unit)
+        public void InfuseAbility(double startTime, double endTime, Anemo unit)
         {
             if (unit.GetInfusion() != Element.PHYSICAL) { return;}
             
@@ -290,7 +290,7 @@ namespace Tcc
             queuedWorldEvents.AddRange(events);
 
             queuedWorldEvents = queuedWorldEvents
-                .OrderBy((worldEvent) => worldEvent.Timestamp)
+                .OrderBy((worldEvent) => worldEvent.double)
                 .ToList();
         }*/
 

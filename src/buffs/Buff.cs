@@ -16,6 +16,6 @@ namespace Tcc.buffs
         public ModifierT GetModifier { get; }
 
         public abstract void AddToList(List<Buff<ModifierT>> buffs);
-        public abstract bool ShouldRemove(Timestamp currentTime);
+        public abstract bool ShouldRemove(double currentTime);
     }
 }

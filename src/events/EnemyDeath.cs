@@ -4,7 +4,7 @@ namespace Tcc.events
 {
     public class EnemyDeath: WorldEvent
     {
-        public EnemyDeath(Enemy enemy, Timestamp timestamp) : 
+        public EnemyDeath(Enemy enemy, double timestamp) : 
             base(timestamp, world => world.EnemyDeath(timestamp, enemy), priority: 0)
         {
             // this should work since it uses object equality 

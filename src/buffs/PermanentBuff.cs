@@ -21,6 +21,6 @@ namespace Tcc.buffs
             buffs.Add(this);
         }
 
-        public override bool ShouldRemove(Timestamp currentTime) => false;
+        public override bool ShouldRemove(double currentTime) => false;
     }
 }

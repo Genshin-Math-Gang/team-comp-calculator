@@ -6,10 +6,10 @@ namespace Tcc.buffs
 {
     public class RefreshableBuff<ModifierT>: Buff<ModifierT>
     {
-        readonly Timestamp expiryTime;
+        readonly double expiryTime;
         readonly int maxStacks;
 
-        public RefreshableBuff(Guid id, Timestamp expiryTime, ModifierT modifier, int maxStacks = 1): base(id, modifier)
+        public RefreshableBuff(Guid id, double expiryTime, ModifierT modifier, int maxStacks = 1): base(id, modifier)
         {
             this.expiryTime = expiryTime;
             this.maxStacks = maxStacks;
@@ -31,6 +31,6 @@ namespace Tcc.buffs
             }
         }
 
-        public override bool ShouldRemove(Timestamp currentTime) => currentTime >= expiryTime;
+        public override bool ShouldRemove(double currentTime) => currentTime >= expiryTime;
     }
 }

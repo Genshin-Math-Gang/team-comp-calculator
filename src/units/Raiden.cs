@@ -11,12 +11,12 @@ namespace Tcc.units
     public class Raiden: Unit
     {
         static readonly Guid SKILL_BUFF_ID = new Guid("0e88cab3-e1d1-4592-9059-b36e6595e25d");
-        static readonly Timestamp BUFF_DURATION = new Timestamp(25);
+        static readonly double BUFF_DURATION = (25);
         // raiden will need more ICD stuff but i need to find that
 
         private readonly HitType SkillHitType;
 
-        EventHandler<(Unit from, Unit to, Timestamp)> currentBuffListener = null;
+        EventHandler<(Unit from, Unit to, double)> currentBuffListener = null;
 
         public Raiden(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("raiden", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.ELECTRO, WeaponType.POLEARM) 
@@ -27,12 +27,12 @@ namespace Tcc.units
             SkillHitType = new HitType(Element.ELECTRO, true, icd: SkillICD);
         }
 
-        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
+        public override List<WorldEvent> Skill(double timestamp, params object[] p)
         {
             var events = new List<WorldEvent>();
             var expiryTime = timestamp + BUFF_DURATION; //Bugged because it was static
 
-            EventHandler<(Unit from, Unit to, Timestamp)> newBuffListener = null;
+            EventHandler<(Unit from, Unit to, double)> newBuffListener = null;
 
             events.Add(new WorldEvent(timestamp, (world) =>
             {
@@ -57,12 +57,12 @@ namespace Tcc.units
             return events;
         }
 
-        public override List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(double timestamp)
         {
             throw new NotImplementedException();
         }
 
-        private Buff<AbilityModifier> CreateSkillBuff(Timestamp expiryTime)
+        private Buff<AbilityModifier> CreateSkillBuff(double expiryTime)
         {
             return new RefreshableBuff<AbilityModifier>(
                 SKILL_BUFF_ID,
@@ -75,9 +75,9 @@ namespace Tcc.units
         }
         
 
-        /*public override Dictionary<string, Func<Timestamp, List<WorldEvent>>> GetCharacterEvents()
+        /*public override Dictionary<string, Func<double, List<WorldEvent>>> GetCharacterEvents()
         {
-            return new Dictionary<string, Func<Timestamp, List<WorldEvent>>>
+            return new Dictionary<string, Func<double, List<WorldEvent>>>
             {
                 { "Skill", Skill }
             };

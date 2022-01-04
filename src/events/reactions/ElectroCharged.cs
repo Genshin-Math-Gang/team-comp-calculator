@@ -8,7 +8,7 @@ namespace Tcc.events.reactions
     {
         private static readonly HitType ecType = new HitType(Element.ELECTRO, false, 3, reaction: Reaction.ELECTROCHARGED);
         public ElectroCharged(
-            Timestamp timestamp, SecondPassStatsPage stats, Unit unit): 
+            double timestamp, SecondPassStatsPage stats, Unit unit): 
             // TODO: check how many times it bounces
             // Does EC apply electro to nearby enemies
             base(

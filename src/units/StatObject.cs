@@ -84,7 +84,7 @@ namespace Tcc.units
         
         //public CapacityStats CapacityStats => CapacityBuffs.Aggregate(StartingCapacityStats, (total, buff) => total + buff.GetModifier());
 
-        public StatsPage GetFirstPassStats(Timestamp timestamp)
+        public StatsPage GetFirstPassStats(double timestamp)
         {
             FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
@@ -92,7 +92,7 @@ namespace Tcc.units
                 (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));
         }
 
-        public SecondPassStatsPage GetStatsPage(Timestamp timestamp)
+        public SecondPassStatsPage GetStatsPage(double timestamp)
         {
             var stats = new SecondPassStatsPage(GetFirstPassStats(timestamp));
             SecondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));

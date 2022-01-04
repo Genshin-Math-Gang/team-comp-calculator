@@ -11,7 +11,7 @@ namespace Tcc.units
 {
     public class Xingqiu: Unit
     {
-        private Timestamp lastBurstWave = -1;
+        private double lastBurstWave = -1;
         private bool ultActive = false;
         private int burstWaveCount = 0;
         private int[] burstWaveSwordCount;
@@ -36,7 +36,7 @@ namespace Tcc.units
 
 
         // TODO: frame data for xq e was done at 30 fps apparently since my pc sucks, need to cross check results
-        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
+        public override List<WorldEvent> Skill(double timestamp, params object[] p)
         {
             // TODO: make c4 work
             //double multiplier = (constellationLevel >= 4 && ultActive)? 1.5 : 1;
@@ -51,7 +51,7 @@ namespace Tcc.units
             };
         }
 
-        public override List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(double timestamp)
         {
 
             burstWaveCount = 0;
@@ -83,8 +83,8 @@ namespace Tcc.units
         // need to do recording to see how long it is
         public void RainSword(object? sender, NormalAttackArgs e)
         {
-            Timestamp timestamp = e.Timestamp;
-            Timestamp duration = e.Duration;
+            double timestamp = e.Timestamp;
+            double duration = e.Duration;
             // kinda scuffed but when it was 1 and not 0.99 it didn't work how i wanted
             if (timestamp + duration - lastBurstWave <= 0.99)
             {
@@ -93,12 +93,12 @@ namespace Tcc.units
 
             int bounces = burstWaveSwordCount[burstWaveCount];
             burstWaveCount += 1;
-            Timestamp newWave = Timestamp.Max(timestamp, lastBurstWave + 1);
+            double newWave = Math.Max(timestamp, lastBurstWave + 1);
             lastBurstWave = newWave;
             // check how many frames swords take to hit, 29 frames is filler
             // TODO: maybe make HitType for this but i would need 3 or to rewrite the class
             e.World.AddWorldEvent(new Hit(newWave + 29/60.0, 0, GetStatsPage, this, Types.BURST, 
-                new HitType(Element.HYDRO, bounces: bounces, delay:new Timestamp(0)), "Rain Sword"));
+                new HitType(Element.HYDRO, bounces: bounces, delay: 0), "Rain Sword"));
         }
 
     }

@@ -8,7 +8,7 @@ namespace Tcc.events.reactions
     {
         private static readonly HitType scHitType = new HitType(Element.CRYO, reaction: Reaction.SUPERCONDUCT);
         public Superconduct(
-            Timestamp timestamp, SecondPassStatsPage stats, Unit unit):
+            double timestamp, SecondPassStatsPage stats, Unit unit):
             base(
                 timestamp, (world) =>
                 {

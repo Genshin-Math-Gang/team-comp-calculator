@@ -11,7 +11,7 @@ namespace Tcc.units
     {
         private SnapshottedStats skillSnapshot;
         private readonly HitType skillType, summoningType, a4Type;
-        private Timestamp lastA4 = -1;
+        private double lastA4 = -1;
         public Fischl(int constellationLevel = 0, string level = "90", int autoLevel = 6, int skillLevel = 6,
             int burstLevel = 6) :
             base("fischl", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.ELECTRO,
@@ -23,7 +23,13 @@ namespace Tcc.units
             skillType = new HitType(Element.ELECTRO, false, icd: SkillICD);
         }
 
-        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
+        public override void Reset()
+        {
+            base.Reset();
+            lastA4 = -1;
+        }
+
+        public override List<WorldEvent> Skill(double timestamp, params object[] p)
         {
             List<WorldEvent> events = new List<WorldEvent> {SkillActivated(timestamp)};
             int hits = ConstellationLevel < 6 ? 10 : 12;
@@ -75,27 +81,27 @@ namespace Tcc.units
             return events;
         }
 
-        public override List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(double timestamp)
         {
             throw new NotImplementedException();
         }
 
-        public void A4(object? sender, (Timestamp timestamp, Reaction reaction, World world) tuple)
+        public void A4(object? sender, (double timestamp, Reaction reaction, World world) tuple)
         {
             if (tuple.timestamp - lastA4 > 0.5)
             {
                 return;
             }
             lastA4 = tuple.timestamp;
-            tuple.world.AddWorldEvent(new Hit(tuple.timestamp, 1,skillSnapshot.GetStats, this, Types.SKILL, 
+            tuple.world.AddWorldEvent(new Hit(tuple.timestamp, 0.8,skillSnapshot.GetStats, this, Types.SKILL, 
                 a4Type, "Fischl a4"));
         }
 
         public void C6(object? sender, NormalAttackArgs e)
         {
             // TODO: only hits once on normal attacks with multiple hits, like xiangling
-            Timestamp timestamp = e.Timestamp;
-            e.World.AddWorldEvent(new Hit(timestamp, 2, skillSnapshot.GetStats, this, Types.SKILL, 
+            double timestamp = e.Timestamp;
+            e.World.AddWorldEvent(new Hit(timestamp, 0.3, skillSnapshot.GetStats, this, Types.SKILL, 
                 skillType, "Fischl c6"));
         }
     }

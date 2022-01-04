@@ -16,9 +16,9 @@ namespace Tcc.stats
             this.type = type;
         }
 
-        public SecondPassStatsPage GetStats(Timestamp _) => stats;
+        public SecondPassStatsPage GetStats(double _) => stats;
 
-        public WorldEvent Snapshot(Timestamp timestamp)
+        public WorldEvent Snapshot(double timestamp)
         {
             return new WorldEvent(timestamp, (_) =>
             {

@@ -2,7 +2,7 @@
 {
     public class End: WorldEvent
     {
-        public End(Timestamp timestamp): 
+        public End(double timestamp): 
             base(timestamp, world => world.ClearQueue()) {}
     }
 }

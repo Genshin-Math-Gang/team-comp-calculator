@@ -10,7 +10,7 @@ namespace Tcc.events.reactions
         private static readonly HitType shatterHitType = new HitType(Element.PHYSICAL, reaction: Reaction.SHATTERED);
         // TODO: is shatter heavy
         public Shatter(
-            Timestamp timestamp, SecondPassStatsPage stats, Unit unit):
+            double timestamp, SecondPassStatsPage stats, Unit unit):
             base(
                 timestamp, (world) =>
                 {

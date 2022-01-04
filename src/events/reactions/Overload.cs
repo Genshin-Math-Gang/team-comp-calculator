@@ -9,7 +9,7 @@ namespace Tcc.events.reactions
 
         private static readonly HitType overloadHitType = new HitType(Element.PYRO, heavy:true, reaction: Reaction.OVERLOADED);
         public Overload(
-            Timestamp timestamp, SecondPassStatsPage stats, Unit unit): 
+            double timestamp, SecondPassStatsPage stats, Unit unit): 
             base(
             timestamp, (world) =>
             {

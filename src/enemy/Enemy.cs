@@ -14,7 +14,7 @@ namespace Tcc.enemy
         private Gauge gauge;
 
         private Dictionary<Guid, ICD> icdDict;
-        private readonly ICD noICD = new (new Timestamp(0), 0);
+        private readonly ICD noICD = new ((0), 0);
         
         private static Guid superconductID = new ("fb1fd9b8-6096-4dea-9e9a-5f3fa18976b8");
         private static StatsPage superconductDebuff =
@@ -22,7 +22,7 @@ namespace Tcc.enemy
         
         // dumb swirl hackery 
         private Dictionary<Reaction, int> swirlHitCounter;
-        private Timestamp swirlLastChecked;
+        private double swirlLastChecked;
         public double MaxHP;
 
         public Enemy(StatsPage statsPage = null, Gauge gauge = null) : base(statsPage ?? new StatsPage(Stats.HpBase, 10000000))
@@ -30,7 +30,7 @@ namespace Tcc.enemy
             this.gauge = gauge ?? new Gauge();
             icdDict = new Dictionary<Guid, ICD>();
             swirlHitCounter = new Dictionary<Reaction, int>();
-            swirlLastChecked = new Timestamp(0);
+            swirlLastChecked = (0);
             MaxHP = StartingStatsPage.Hp;
         }
 
@@ -45,8 +45,8 @@ namespace Tcc.enemy
         
         
         // TODO: make transformative reactions not terrible tomorrow 
-        public (double, List<WorldEvent>) TakeDamage(Timestamp timestamp, Types type,
-            SecondPassStatsPage statsOfUnit, Unit unit, HitType hitType, int index, Random r, bool deterministic)
+        public (double, List<WorldEvent>) TakeDamage(double timestamp, Types type,
+            SecondPassStatsPage statsOfUnit, Unit unit, HitType hitType, double mvs, Random r, bool deterministic)
         {
             Element element = hitType.Element;
             var unitAbilityStats = unit.GetAbilityStats(statsOfUnit, type, element, this, timestamp);
@@ -73,8 +73,8 @@ namespace Tcc.enemy
             double damage;
             if (type != Types.TRANSFORMATIVE)
             {
-                damage = reactionMultiplier *
-                         unitAbilityStats.CalculateHitMultiplier(index, element, r, deterministic) *
+                damage = reactionMultiplier * mvs *
+                         unitAbilityStats.CalculateHitMultiplier(element, r, deterministic) *
                          DefenceCalculator(timestamp, unit) *
                          ResistanceCalculation(timestamp, element, type, statsOfUnit);
             }
@@ -122,7 +122,7 @@ namespace Tcc.enemy
         
         
 
-        private double ResistanceCalculation (Timestamp timestamp, Element element, Types type, StatsPage statsOfUnit)
+        private double ResistanceCalculation (double timestamp, Element element, Types type, StatsPage statsOfUnit)
         {
             // idk if this is the correct function
             var resistance = GetFirstPassStats(timestamp)[Converter.ElementToRes(element)];
@@ -135,14 +135,14 @@ namespace Tcc.enemy
             };
         }
 
-        private double DefenceCalculator (Timestamp timestamp, Unit unit)
+        private double DefenceCalculator (double timestamp, Unit unit)
         {
             return (unit.Level + 100d)/((1/* TODO - statsOfUnit.DEFReduction*/) * (Level + 100) + unit.Level + 100);
         }
         
         public bool HasAura(Aura aura) => throw new NotImplementedException();
 
-        private List<WorldEvent> TakeDamage(Timestamp timestamp, double damage)
+        private List<WorldEvent> TakeDamage(double timestamp, double damage)
         {
             var events = new List<WorldEvent>();
             CurrentHp -= damage;

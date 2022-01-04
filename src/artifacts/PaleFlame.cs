@@ -16,7 +16,7 @@ namespace Tcc.artifacts
         static readonly FirstPassModifier MODIFIER_4PC_CONDITIONAL = (data) => 
             data.st.GetBuffCount(ID_4PC_STACK) == 2 ? (Stats.PhysicalDamageBonus, 0.25) : new StatsPage();
 
-        Timestamp cooldown4pcUntil;
+        double cooldown4pcUntil;
 
         public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));
 

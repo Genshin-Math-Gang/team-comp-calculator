@@ -18,7 +18,7 @@ namespace Tcc.artifacts
             {Stats.ShieldStrength, 0.3}
         });
 
-        Timestamp cooldown4pcUntil;
+        double cooldown4pcUntil;
 
         public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));
 

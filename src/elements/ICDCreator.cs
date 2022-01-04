@@ -5,18 +5,18 @@ namespace Tcc.elements
     public class ICDCreator
     {
         // TODO: i think its probably cleaner to add an ICD override somewhere in gauge but i will do that later
-        public readonly Timestamp TimePity;
+        public readonly double TimePity;
         public readonly int HitPity;
         public readonly Guid Guid;
 
         public ICDCreator(int time, int hit)
         {
-            TimePity = new Timestamp(time);
+            TimePity = (time);
             HitPity = hit;
             Guid = Guid.NewGuid();
         }
         
-        public ICDCreator(Timestamp time, int hit)
+        public ICDCreator(double time, int hit)
         {
             TimePity = time;
             HitPity = hit;
@@ -31,7 +31,7 @@ namespace Tcc.elements
 
         public ICDCreator()
         {
-            TimePity = new Timestamp(2.5);
+            TimePity = (2.5);
             HitPity = 3;
             Guid = Guid.NewGuid();
         }

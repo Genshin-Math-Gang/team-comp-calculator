@@ -5,11 +5,11 @@ namespace Tcc
     public struct Action
     {
         public int Character;
-        public Timestamp Timestamp;
+        public double Timestamp;
         public ActionType ActionType;
         public object[] param;
 
-        public Action(int character, Timestamp timestamp, ActionType type, params object[] p)
+        public Action(int character, double timestamp, ActionType type, params object[] p)
         {
             Character = character;
             Timestamp = timestamp;
@@ -17,7 +17,7 @@ namespace Tcc
             param = p;
         }
         
-        public Action(int character, Timestamp timestamp, ActionType type) : 
+        public Action(int character, double timestamp, ActionType type) : 
             this(character, timestamp, type, System.Array.Empty<object>()) { }
     }
 }

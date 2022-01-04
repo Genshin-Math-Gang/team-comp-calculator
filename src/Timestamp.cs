@@ -2,22 +2,23 @@ using System;
 
 namespace Tcc
 {
+    /*
     // We may eventually want to use frames, this abstraction means we change it in one place
-    public sealed class Timestamp : IComparable<Timestamp>
+    public sealed class double : IComparable<double>
     {
         readonly double time;
 
-        public Timestamp(double time)
+        public double(double time)
         {
             this.time = time;
         }
 
-        public Timestamp()
+        public double()
         {
             this.time = 0;
         }
 
-        public int CompareTo(Timestamp other)
+        public int CompareTo(double other)
         {
             if (other == null) throw new ArgumentNullException(nameof(other));
 
@@ -31,7 +32,7 @@ namespace Tcc
                 return false;
             }
 
-            return time == ((Timestamp) obj).time;
+            return time == ((double) obj).time;
         }
 
         public override int GetHashCode()
@@ -41,32 +42,32 @@ namespace Tcc
 
         // Would get reduced from double to int and replaced in favour of a function to generate a timestamp from frames if we switch
 
-        public static Timestamp operator -(Timestamp first, Timestamp second) =>
-            new Timestamp(first.time - second.time);
+        public static double operator -(double first, double second) =>
+            (first.time - second.time);
 
-        public static Timestamp operator +(Timestamp time1, Timestamp time2) =>
-            time1 == null || time2 == null ? new Timestamp(0) : new Timestamp(time1.time + time2.time);
+        public static double operator +(double time1, double time2) =>
+            time1 == null || time2 == null ? (0) : (time1.time + time2.time);
 
-        public static Timestamp operator *(int scalar, Timestamp time) => new Timestamp(scalar * time.time);
-        public static Timestamp operator *(double scalar, Timestamp time) => new Timestamp(scalar * time.time);
-        public static Timestamp operator *(Timestamp scalar, Timestamp time) => new Timestamp(scalar.time * time.time);
+        public static double operator *(int scalar, double time) => (scalar * time.time);
+        public static double operator *(double scalar, double time) => (scalar * time.time);
+        public static double operator *(double scalar, double time) => (scalar.time * time.time);
 
-        public static bool operator ==(Timestamp time1, Timestamp time2) => time1?.time == time2?.time;
-        public static bool operator !=(Timestamp time1, Timestamp time2) => time1?.time != time2?.time;
-        public static bool operator >(Timestamp time1, Timestamp time2) => time1?.time > time2?.time;
-        public static bool operator >=(Timestamp time1, Timestamp time2) => time1?.time >= time2?.time;
-        public static bool operator <(Timestamp time1, Timestamp time2) => time1?.time < time2?.time;
-        public static bool operator <=(Timestamp time1, Timestamp time2) => time1?.time <= time2?.time;
+        public static bool operator ==(double time1, double time2) => time1?.time == time2?.time;
+        public static bool operator !=(double time1, double time2) => time1?.time != time2?.time;
+        public static bool operator >(double time1, double time2) => time1?.time > time2?.time;
+        public static bool operator >=(double time1, double time2) => time1?.time >= time2?.time;
+        public static bool operator <(double time1, double time2) => time1?.time < time2?.time;
+        public static bool operator <=(double time1, double time2) => time1?.time <= time2?.time;
 
-        public static implicit operator double(Timestamp time) => time.time;
+        public static implicit operator double(double time) => time.time;
 
         public override string ToString() => $"t = {time:F3}";
 
-        public static Timestamp Max(Timestamp t1, Timestamp t2)
+        public static double Max(double t1, double t2)
         {
             return t1.CompareTo(t2) == 1 ? t1 : t2;
         }
 
-        public static implicit operator Timestamp(double d) => new(d);
-    }
+        public static implicit operator double(double d) => new(d);
+    }*/
 }

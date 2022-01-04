@@ -7,7 +7,7 @@ namespace Tcc.events.reactions
     public class Crystallize: WorldEvent
     {
         public Crystallize(
-            Timestamp timestamp, SecondPassStatsPage stats, Unit unit, Element element): 
+            double timestamp, SecondPassStatsPage stats, Unit unit, Element element): 
             // TODO: dumb double swirl and chain swirl 
             base(
                 timestamp,

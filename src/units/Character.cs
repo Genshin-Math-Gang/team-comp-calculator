@@ -10,6 +10,7 @@
         Xiangling,
         Xingqiu,
         Fischl,
+        Beidou,
         None
     }
 }

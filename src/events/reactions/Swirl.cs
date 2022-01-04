@@ -9,7 +9,7 @@ namespace Tcc.events.reactions
         // swirl on its own doesn't bounce, i tested with venti aimed shot on 2 grouped enemies and only 1 swirl instance per target
         // however when an anemo attack with aoe hits all enemies double swirl because swirl has aoe
         public Swirl(
-            Timestamp timestamp, SecondPassStatsPage stats, Unit unit, Element element): 
+            double timestamp, SecondPassStatsPage stats, Unit unit, Element element): 
             // TODO: dumb double swirl and chain swirl 
             // TODO: figure out ICD bullshit for transformative reactions
             base(

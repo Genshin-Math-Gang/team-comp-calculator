@@ -13,10 +13,10 @@ namespace Tcc.elements
     public class Gauge
     {        
         private Dictionary<Element, GaugeElement> gaugeDict = new Dictionary<Element, GaugeElement>();
-        private Timestamp LastChecked = 0;
+        private double LastChecked = 0;
         private Aura aura = Aura.NONE;
-        private Timestamp FreezeDuration = 0;
-        private Timestamp FreezeAura = 0;
+        private double FreezeDuration = 0;
+        private double FreezeAura = 0;
 
         public Gauge() {}
 
@@ -38,7 +38,7 @@ namespace Tcc.elements
             return 1 + 2.78 * em / (1400 + em) + bonus;
         }
         
-        public (double, List<WorldEvent>) ElementApplied(Timestamp timestamp, Element elementType, double gaugeStrength, 
+        public (double, List<WorldEvent>) ElementApplied(double timestamp, Element elementType, double gaugeStrength, 
             Unit unit, SecondPassStatsPage statsPage, Types type, ICD icd, bool isHeavy=false)
         {
 
@@ -301,14 +301,14 @@ namespace Tcc.elements
             return (1, transformativeReactions);
         }
 
-        private List<WorldEvent> TimeDecay(Timestamp timestamp, SecondPassStatsPage statsPage, Unit unit)
+        private List<WorldEvent> TimeDecay(double timestamp, SecondPassStatsPage statsPage, Unit unit)
         {
             if (timestamp < LastChecked)
             {
                 throw new ArgumentException("Time input before last checked, cannot go back in time");
             }
 
-            Timestamp timeSince = timestamp - LastChecked;
+            double timeSince = timestamp - LastChecked;
             LastChecked = timestamp;
             List<WorldEvent> ecTicks = new List<WorldEvent>();
             
@@ -316,12 +316,12 @@ namespace Tcc.elements
             // also i'm just ignoring how hit lag can change EC slightly because that is a mess
             if (aura == Aura.ELECTROCHARGED)
             {
-                Timestamp timer = new Timestamp(0);
+                double timer = (0);
                 while (timer < timeSince)
                 {
                     timer += 1;
-                    gaugeDict[Element.ELECTRO].TimeDecay(new Timestamp(1));
-                    gaugeDict[Element.HYDRO].TimeDecay(new Timestamp(1));
+                    gaugeDict[Element.ELECTRO].TimeDecay((1));
+                    gaugeDict[Element.HYDRO].TimeDecay((1));
                     DecreaseElement(Element.ELECTRO, 0.4);
                     DecreaseElement(Element.HYDRO, 0.4);
                     // trigger EC here
@@ -350,7 +350,7 @@ namespace Tcc.elements
             }
             if (aura == Aura.FROZEN)
             {
-                FreezeDuration = new Timestamp(Math.Min(0, FreezeDuration - timeSince));
+                FreezeDuration = (Math.Min(0, FreezeDuration - timeSince));
                 if (FreezeDuration == 0)
                 {
                     RemoveFrozen();
@@ -368,7 +368,7 @@ namespace Tcc.elements
             return ecTicks;
         }
 
-        private void ElementTimeDecay(Element element, Timestamp timeSince)
+        private void ElementTimeDecay(Element element, double timeSince)
         {
             GaugeElement gaugeElement = gaugeDict[element];
             double decay = timeSince / gaugeElement.DecayRate;
@@ -400,7 +400,7 @@ namespace Tcc.elements
 
         private void RemoveFrozen()
         {
-            FreezeDuration = new Timestamp(0);
+            FreezeDuration = (0);
             if (gaugeDict.ContainsKey(Element.CRYO))
             {
                 aura = Aura.CRYO;
@@ -416,7 +416,7 @@ namespace Tcc.elements
 
         private void DecreaseFrozen(double strength)
         {
-            FreezeAura = new Timestamp(Math.Min(FreezeAura - strength, 0));
+            FreezeAura = (Math.Min(FreezeAura - strength, 0));
             if (FreezeAura == 0)
             {
                 RemoveFrozen();
@@ -427,10 +427,10 @@ namespace Tcc.elements
         {
             aura = Aura.FROZEN;
             triggerStrength *= 0.8;
-            FreezeAura = new Timestamp(2 * Math.Min(auraStrength, triggerStrength));
+            FreezeAura = (2 * Math.Min(auraStrength, triggerStrength));
             // KQM lists the formula as 2*sqrt(5*FreezeStrength+4)-4, however they are also stupid and use aura tax
             // instead of multiplying reactions strengths by 5/4 which makes this formula and other things simpler
-            FreezeDuration = new Timestamp(4 * (Math.Sqrt(FreezeAura) - 1));
+            FreezeDuration = (4 * (Math.Sqrt(FreezeAura) - 1));
         }
     }
 }

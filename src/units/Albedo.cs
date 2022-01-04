@@ -11,7 +11,7 @@ namespace Tcc.Units
     public class Albedo: Unit
     {
         SnapshottedStats burstSnapshot;
-        private Timestamp lastIsotoma;
+        private double lastIsotoma;
         public Albedo(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6):
             base("Albedo", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.GEO, WeaponType.SWORD)
         {
@@ -21,7 +21,7 @@ namespace Tcc.Units
 
         }  
 
-        public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
+        public override List<WorldEvent> Skill(double timestamp, params object[] p)
         {
             return new List<WorldEvent>
             {
@@ -48,12 +48,12 @@ namespace Tcc.Units
 
         public void SolarIsotoma(object? sender, DealDamageArgs args)
         {
-            Timestamp timestamp = args.Timestamp;
+            double timestamp = args.Timestamp;
             if (timestamp - lastIsotoma <= 1.99)
             {
                 return;
             }
-            Timestamp newIsotoma = timestamp;
+            double newIsotoma = timestamp;
             lastIsotoma = newIsotoma;
             args.World.AddWorldEvent(new Hit(newIsotoma, 1, GetStatsPage, this, Types.SKILL,
                 new HitType(Element, heavy:true), "Solar Isotoma Hit"));
@@ -61,7 +61,7 @@ namespace Tcc.Units
  
 
 
-        public override List<WorldEvent> Burst(Timestamp timestamp)
+        public override List<WorldEvent> Burst(double timestamp)
         {
             return new List<WorldEvent>
             {

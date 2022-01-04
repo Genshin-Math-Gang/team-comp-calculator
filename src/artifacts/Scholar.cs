@@ -13,7 +13,7 @@ namespace Tcc.artifacts
 
         static readonly FirstPassModifier MODIFIER_2PC = (_) => (Stats.EnergyRecharge, 0.2);
 
-        Timestamp cooldown4pcUntil;
+        double cooldown4pcUntil;
 
         public override void Add2pc(World world, Unit unit) => unit.AddBuff(new PermanentBuff<FirstPassModifier>(ID_2PC, MODIFIER_2PC));
 

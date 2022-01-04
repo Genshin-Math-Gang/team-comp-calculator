@@ -3,28 +3,28 @@ namespace Tcc.elements
     
     public class ICD 
     {
-        private Timestamp lastHit;
+        private double lastHit;
         private int hitCounter;
-        private Timestamp timePity;
+        private double timePity;
         private int hitPity;
         
         
 
-        public ICD(Timestamp timePity, int hitPity)
+        public ICD(double timePity, int hitPity)
         {
             this.timePity = timePity;
             this.hitPity = hitPity;
             this.hitCounter = hitPity - 1;
-            this.lastHit = new Timestamp(0);
+            this.lastHit = (0);
         }
 
-        public ICD(): this(new Timestamp(2.5), 3) {}
+        public ICD(): this((2.5), 3) {}
         
-        public ICD((Timestamp, int) param): this(param.Item1, param.Item2) {}
+        public ICD((double, int) param): this(param.Item1, param.Item2) {}
         
 
 
-        public bool checkICD(Timestamp timestamp, int ignoreICD = 0)
+        public bool checkICD(double timestamp, int ignoreICD = 0)
         {
             hitCounter += 1;
 

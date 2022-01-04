@@ -5,24 +5,24 @@ namespace Tcc.events
 {
     public class CharacterEvent
     {
-        readonly Func<Timestamp, object[], List<WorldEvent>> worldEventGenerator;
+        readonly Func<double, object[], List<WorldEvent>> worldEventGenerator;
         private object[] param;
 
-        public CharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> worldEventGenerator, params object[] param)
+        public CharacterEvent(double timestamp, Func<double, object[], List<WorldEvent>> worldEventGenerator, params object[] param)
         {
             this.Timestamp = timestamp;
             this.param = param;
             this.worldEventGenerator = worldEventGenerator;
         }
         
-        public CharacterEvent(Timestamp timestamp, Func<Timestamp, List<WorldEvent>> worldEventGenerator)
+        public CharacterEvent(double timestamp, Func<double, List<WorldEvent>> worldEventGenerator)
         {
             this.Timestamp = timestamp;
             // this is sus as hell but i think it works
             this.worldEventGenerator = (t, p) => worldEventGenerator(t);
         }
         
-        public CharacterEvent(Timestamp timestamp, Func<Timestamp, object[], List<WorldEvent>> worldEventGenerator, World world)
+        public CharacterEvent(double timestamp, Func<double, object[], List<WorldEvent>> worldEventGenerator, World world)
         {
             this.Timestamp = timestamp;
             param = new[] {world};
@@ -31,7 +31,7 @@ namespace Tcc.events
         }
         
 
-        public Timestamp Timestamp { get; }
+        public double Timestamp { get; }
 
         public List<WorldEvent> GetWorldEvents() => worldEventGenerator(Timestamp, param);
     }

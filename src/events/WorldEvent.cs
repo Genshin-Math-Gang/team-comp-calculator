@@ -11,7 +11,7 @@ namespace Tcc.events
         // TODO: maybe this should be its own class but i am lazy rn
         private int priority;
 
-        public WorldEvent(Timestamp timestamp, Action<World> effect, String description=null, int priority=5, 
+        public WorldEvent(double timestamp, Action<World> effect, String description=null, int priority=5, 
             Action<bool, object[]> condition=null)
         {
             this.Timestamp = timestamp;
@@ -23,16 +23,17 @@ namespace Tcc.events
 
         public int CompareTo(WorldEvent other)
         {
-            int temp = Timestamp.CompareTo(other.Timestamp);
-            if (temp != 0)
+            // TODO: check this is fine
+            double temp = Timestamp - other.Timestamp;
+            return temp switch
             {
-                return temp;
-            }
-
-            return priority.CompareTo(other.priority);
+                <0 => -1,
+                >0 => 1,
+                _ => priority.CompareTo(other.priority)
+            };
         }
 
-        public Timestamp Timestamp { get; }
+        public double Timestamp { get; }
 
         public virtual void Apply(World world) => effect(world);
 

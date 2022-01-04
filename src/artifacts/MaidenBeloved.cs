@@ -17,7 +17,7 @@ namespace Tcc.artifacts
 
         public override void Add4pc(World world, Unit unit)
         {
-            EventHandler<Timestamp> addBuff = (_, timestamp) =>
+            EventHandler<double> addBuff = (_, timestamp) =>
             {
                 foreach(var unitInParty in world.GetUnits()) unitInParty.AddBuff(new RefreshableBuff<FirstPassModifier>(ID_4PC, timestamp + 10, MODIFIER_4PC));
             };
