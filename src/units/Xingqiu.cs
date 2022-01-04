@@ -11,7 +11,7 @@ namespace Tcc.units
 {
     public class Xingqiu: Unit
     {
-        private Timestamp lastBurstWave = new Timestamp(-1);
+        private Timestamp lastBurstWave = -1;
         private bool ultActive = false;
         private int burstWaveCount = 0;
         private int[] burstWaveSwordCount;
@@ -26,13 +26,19 @@ namespace Tcc.units
             BurstICD = new();
             SkillHitType = new HitType(Element.HYDRO);
         }
-        
-        
-        
+
+        public override void Reset()
+        {
+            ultActive = false;
+            lastBurstWave = -1;
+            base.Reset();
+        }
+
+
         // TODO: frame data for xq e was done at 30 fps apparently since my pc sucks, need to cross check results
         public override List<WorldEvent> Skill(Timestamp timestamp, params object[] p)
         {
-
+            // TODO: make c4 work
             //double multiplier = (constellationLevel >= 4 && ultActive)? 1.5 : 1;
             int indexShift = (ConstellationLevel >= 4 && ultActive) ? 2 : 1;
             return new List<WorldEvent>

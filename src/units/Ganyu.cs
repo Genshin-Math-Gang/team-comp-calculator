@@ -20,7 +20,7 @@ namespace Tcc.units
             skillSnapshot = new SnapshottedStats(this, Types.SKILL);
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
             AutoAttackFrameData = new[] {18, 43, 73, 117, 153, 190, 94, 115};
-            ICDCreator BurstICD = new ICDCreator();
+            BurstICD = new ICDCreator();
             IcicleHitType = new HitType(Element.CRYO, icd: BurstICD);
             LotusHitType = new HitType(Element.CRYO);
         }

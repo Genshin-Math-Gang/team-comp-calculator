@@ -19,6 +19,7 @@ namespace Tcc.stats
             );
         }*/
         
+        // maybe make an in place add to try to speedup some stuff
         public static SecondPassStatsPage operator +(SecondPassStatsPage page, StatsPage statsPage)
         {
             return new SecondPassStatsPage(

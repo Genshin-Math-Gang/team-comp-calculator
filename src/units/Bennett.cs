@@ -62,6 +62,7 @@ namespace Tcc.units
             };
         }
         
+
         public override List<WorldEvent> Burst(Timestamp timestamp)
         {
             var events = new List<WorldEvent> {

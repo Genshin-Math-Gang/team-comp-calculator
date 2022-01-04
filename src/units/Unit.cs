@@ -70,7 +70,7 @@ namespace Tcc.units
         
         public event EventHandler<Timestamp> SkillActivatedHook;
         public event EventHandler<Timestamp> BurstActivatedHook;
-        public event EventHandler<(Timestamp timestamp, int reaction)> TriggeredReactionHook; // TODO Not fired by anything
+        public event EventHandler<(Timestamp timestamp, Reaction reaction, World world)> TriggeredReactionHook;
         public event EventHandler<(Timestamp timestamp, Element? element)> ParticleCollectedHook; // TODO Not fired by anything
 
         public event EventHandler<(Timestamp timestamp, Reaction reaction, Enemy enemy)> SwirlTriggeredHook;
@@ -166,9 +166,20 @@ namespace Tcc.units
             
         }
 
-        public void Reset()
+        public virtual void Reset()
         {
             // need to implement this for all characters to make sure internal state gets updated
+            DealDamageHook = null;
+            BurstActivatedHook = null;
+            SkillActivatedHook = null;
+            EnemyDeathHook = null;
+            NormalAttackHook = null;
+            ParticleCollectedHook = null;
+            SwirlTriggeredHook = null;
+            TriggeredReactionHook = null;
+            // make some max hp thing
+            /*CurrentHp = MaxHp*/
+            base.Reset();
         }
 
         public abstract List<WorldEvent> Skill(Timestamp timestamp, params object[] p);
@@ -186,6 +197,7 @@ namespace Tcc.units
             List<WorldEvent> hits = new List<WorldEvent>();
             Timestamp start = timestamp;
             Timestamp duration;
+            HitType hitType = new HitType(Element.PHYSICAL, false, heavy: HasHeavyAttacks);
             for (int i = 0; i < normalCount; i++)
             {
                 if (i == 0)
@@ -204,8 +216,7 @@ namespace Tcc.units
                 // TODO: add check if user has elemental infusion
                 // TODO: apparently itto works weirdly with how his stats work so need to check that
                 // TODO: when i get around to adding different levels of aoe this will need to be changed
-                hits.Add(new Hit(timestamp + duration, i, GetStatsPage, this, Types.NORMAL, 
-                    new HitType( Element.PHYSICAL,false, heavy: HasHeavyAttacks), 
+                hits.Add(new Hit(timestamp + duration, i, GetStatsPage, this, Types.NORMAL, hitType, 
                     ToString() + " normal " + (i+1)));
             }
 
@@ -239,6 +250,7 @@ namespace Tcc.units
             return new List<WorldEvent> { new SwitchUnit(timestamp, this) };
         }
         
+        // is there some way so speed this up with caching
         public AbilityStats GetAbilityStats(SecondPassStatsPage statsFromUnit, Types type, Element element, Enemy enemy, Timestamp timestamp)
         {
             EnemyBasedBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
@@ -279,14 +291,27 @@ namespace Tcc.units
         {
             return new WorldEvent(timestamp, world => NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world)));
         }
+
+        public WorldEvent ReactionTriggered(Timestamp timestamp, Reaction reaction)
+        {
+            return new WorldEvent(timestamp, world =>
+            {
+                foreach (var unit in world.GetUnits())
+                {
+                    unit?.TriggeredReactionHook?.Invoke(this, (timestamp, reaction, world));
+                }
+            });
+        }
         
         
         protected WorldEvent NormalAttackGeneralUsed(Timestamp timestamp, Timestamp duration)
         {
-            return new WorldEvent(timestamp, world => {
+            return new WorldEvent(timestamp, world =>
+            {
+                var args = new NormalAttackArgs(timestamp, duration, world);
                 foreach (var unit in world.GetUnits())
                 {
-                    unit?.NormalAttackHook?.Invoke(this, new NormalAttackArgs(timestamp, duration, world));
+                    unit?.NormalAttackHook?.Invoke(this, args);
                 }
             });
         }
@@ -308,9 +333,9 @@ namespace Tcc.units
             return new WorldEvent(timestamp, (world) => BurstActivatedHook?.Invoke(this, timestamp), $"Burst activated by {this}");
         }
 
-        protected WorldEvent TriggeredReaction(Timestamp timestamp, int reaction)
+        protected WorldEvent TriggeredReaction(Timestamp timestamp, Reaction reaction)
         {
-            return new WorldEvent(timestamp, (world) => TriggeredReactionHook?.Invoke(this, (timestamp, reaction)));
+            return new WorldEvent(timestamp, (world) => TriggeredReactionHook?.Invoke(this, (timestamp, reaction, world)));
         }
 
         protected WorldEvent ParticleCollected(Timestamp timestamp, Element? element)
@@ -320,12 +345,22 @@ namespace Tcc.units
 
         public WorldEvent TriggeredSwirl(Timestamp timestamp, Reaction reaction, Enemy enemy)
         {
+            // make triggered swirl also activate reaction hook
             if (!ReactionTypes.IsSwirl(reaction))
             {
                 // throw some error
             }
 
-            return new WorldEvent(timestamp, _ => SwirlTriggeredHook?.Invoke(this, (timestamp, reaction, enemy)),
+            return new WorldEvent(timestamp, world =>
+                {
+                    SwirlTriggeredHook?.Invoke(this, (timestamp, reaction, enemy));
+                    // TODO: idk what the fuck i am doing
+                    foreach (var unit in world.GetUnits())
+                    {
+                        unit?.TriggeredReactionHook?.Invoke(this, (timestamp, reaction, world));
+                    }
+                    
+                },
                 $"{this} triggered swirl at {timestamp}", 1);
         }
 
@@ -348,6 +383,7 @@ namespace Tcc.units
                 Character.Sucrose => new Sucrose(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
                 Character.Xiangling => new Xiangling(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
                 Character.Xingqiu => new Xingqiu(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
+                Character.Fischl => new Fischl(u.Cons, u.Level, u.AutoLevel, u.SkillLevel, u.BurstLevel),
                 _ => throw new ArgumentOutOfRangeException(nameof(u), "terrible unit constructor bullshit")
             };
         }

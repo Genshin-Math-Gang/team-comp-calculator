@@ -24,7 +24,11 @@ namespace Tcc.stats
         }
 
         public double GetMotionValue(int mvIndex) => motionValues[mvIndex];
-        
+
+        public void Add(AbilityStats stats)
+        {
+            
+        }
 
         public static AbilityStats operator +(AbilityStats first, AbilityStats second)
         {

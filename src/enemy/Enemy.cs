@@ -23,14 +23,22 @@ namespace Tcc.enemy
         // dumb swirl hackery 
         private Dictionary<Reaction, int> swirlHitCounter;
         private Timestamp swirlLastChecked;
-        
+        public double MaxHP;
 
-        public Enemy(StatsPage statsPage = null, Gauge gauge = null) : base(statsPage ?? new StatsPage(Stats.HpBase, 100000))
+        public Enemy(StatsPage statsPage = null, Gauge gauge = null) : base(statsPage ?? new StatsPage(Stats.HpBase, 10000000))
         {
             this.gauge = gauge ?? new Gauge();
             icdDict = new Dictionary<Guid, ICD>();
             swirlHitCounter = new Dictionary<Reaction, int>();
             swirlLastChecked = new Timestamp(0);
+            MaxHP = StartingStatsPage.Hp;
+        }
+
+        public void Reset()
+        {
+            gauge.Reset();
+            CurrentHp = MaxHP;
+            // TODO: clear buffs
         }
 
         public Aura GetAura() => gauge.GetAura();
@@ -92,8 +100,7 @@ namespace Tcc.enemy
                     {
                         return (-1, null);
                     }
-
-                    events.Add(unit.TriggeredSwirl(timestamp, reaction, this));
+                    
                 }
                 else if (reactionType == Reaction.SUPERCONDUCT)
                 {

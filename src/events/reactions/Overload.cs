@@ -11,8 +11,13 @@ namespace Tcc.events.reactions
         public Overload(
             Timestamp timestamp, SecondPassStatsPage stats, Unit unit): 
             base(
-            timestamp, (world) => world.CalculateDamage(timestamp, 0, stats, unit, 
-                Types.TRANSFORMATIVE, overloadHitType), "Overload") 
+            timestamp, (world) =>
+            {
+                world.CalculateDamage(timestamp, 0, stats, unit,
+                    Types.TRANSFORMATIVE, overloadHitType, "Overload");
+                unit.ReactionTriggered(timestamp, Reaction.OVERLOADED);
+
+            })
         {
         }
     }

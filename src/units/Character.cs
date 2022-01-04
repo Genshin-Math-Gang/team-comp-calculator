@@ -9,6 +9,7 @@
         Sucrose,
         Xiangling,
         Xingqiu,
+        Fischl,
         None
     }
 }

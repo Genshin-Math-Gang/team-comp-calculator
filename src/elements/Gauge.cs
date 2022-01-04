@@ -13,14 +13,23 @@ namespace Tcc.elements
     public class Gauge
     {        
         private Dictionary<Element, GaugeElement> gaugeDict = new Dictionary<Element, GaugeElement>();
-        private Timestamp LastChecked = new Timestamp(0);
+        private Timestamp LastChecked = 0;
         private Aura aura = Aura.NONE;
-        private Timestamp FreezeDuration = new Timestamp(0);
-        private Timestamp FreezeAura = new Timestamp(0);
+        private Timestamp FreezeDuration = 0;
+        private Timestamp FreezeAura = 0;
 
         public Gauge() {}
 
         public Aura GetAura() => aura;
+
+        public void Reset()
+        {
+            LastChecked = 0;
+            aura = Aura.NONE;
+            gaugeDict.Clear();
+            FreezeAura = 0;
+            FreezeAura = 0;
+        }
 
         private static double MultiplicativeMultiplier (StatsPage stats, Reaction reaction)
         {

@@ -74,7 +74,22 @@ namespace Tcc.stats
                     throw new ArgumentOutOfRangeException(nameof(reaction), reaction, null);
             }
         }
+
+        public void Add(StatsPage st)
+        {
+            for (int i=0; i < st.StatValues.Length; i++)
+            {
+                StatValues[i] += st.StatValues[i];
+            }
+        }
         
+        public void Subtract(StatsPage st)
+        {
+            for (int i=0; i < st.StatValues.Length; i++)
+            {
+                StatValues[i] += st.StatValues[i];
+            }
+        }
         
         public static StatsPage operator +(StatsPage page, StatsPage page2)
         {

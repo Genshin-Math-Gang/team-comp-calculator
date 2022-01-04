@@ -12,9 +12,12 @@ namespace Tcc.events.reactions
         public Shatter(
             Timestamp timestamp, SecondPassStatsPage stats, Unit unit):
             base(
-                timestamp, (world) => world.CalculateDamage(timestamp, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, shatterHitType, "Shatter")
-            ) {
+                timestamp, (world) =>
+                {
+                    world.CalculateDamage(timestamp, 0, stats, unit,
+                        Types.TRANSFORMATIVE, shatterHitType, "Shatter");
+                    unit.ReactionTriggered(timestamp, Reaction.SHATTERED);
+                }) {
             
         }
     }

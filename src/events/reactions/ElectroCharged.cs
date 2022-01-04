@@ -12,8 +12,12 @@ namespace Tcc.events.reactions
             // TODO: check how many times it bounces
             // Does EC apply electro to nearby enemies
             base(
-                timestamp, (world) => world.CalculateDamage(timestamp, 0, stats, unit, 
-                    Types.TRANSFORMATIVE, ecType, "Electrocharged")
+                timestamp, (world) =>
+                {
+                    world.CalculateDamage(timestamp, 0, stats, unit,
+                        Types.TRANSFORMATIVE, ecType, "Electrocharged");
+                    unit.ReactionTriggered(timestamp, Reaction.ELECTROCHARGED);
+                }
             ) {
         }
     }

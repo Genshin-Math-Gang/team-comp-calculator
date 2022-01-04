@@ -67,8 +67,7 @@ namespace Tcc
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);*/
             var watch = new Stopwatch();
-            watch.Start();
-            int limit = (int) Math.Pow(10, 5);
+            int limit = (int) Math.Pow(10, 3);
             double[] totalDamage = new double[limit];
             ActionList actionList = new ActionList(
                 Character.Xingqiu,
@@ -85,7 +84,7 @@ namespace Tcc
                     new (1, 13, ActionType.Normal, new object[]{AutoString.N1}),
                     new (1, 14, ActionType.Normal, new object[]{AutoString.N1})
                 });
-            
+            watch.Start();
             Parallel.For<World>(0, limit, () => new World(actionList), (i, loop, world) =>
                 {
                     world.Simulate();

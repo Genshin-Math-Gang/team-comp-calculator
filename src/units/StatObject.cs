@@ -13,6 +13,8 @@ namespace Tcc.units
         // i made these non-readonly to make some very sus workaround but this means i need to be super careful
         protected StatsPage StartingStatsPage;
         protected string level;
+        protected StatsPage lastFirstPass;
+        protected SecondPassStatsPage lastStatsPage;
         public int Level
         {
             get
@@ -49,7 +51,17 @@ namespace Tcc.units
         protected readonly List<Buff<EnemyBasedModifier>> EnemyBasedBuffs = new();
         protected readonly Dictionary<Element, List<Buff<ElementBasedModifier>>> ElementBasedBuffs = new();
         protected readonly Dictionary<Types, List<Buff<AbilityModifier>>> AbilityBuffs = new();
-        
+
+        protected void Reset()
+        {
+            CapacityBuffs.Clear();
+            FirstPassBuffs.Clear();
+            SecondPassBuffs.Clear();
+            EnemyBasedBuffs.Clear();
+            ElementBasedBuffs.Clear();
+            AbilityBuffs.Clear();
+        }
+
         protected StatObject(string level = "90")
         {
             this.level = level;
@@ -74,18 +86,36 @@ namespace Tcc.units
 
         public StatsPage GetFirstPassStats(Timestamp timestamp)
         {
-            FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            /*FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
             return FirstPassBuffs.Aggregate(StartingStatsPage, 
-                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));
+                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));*/
+            if (lastFirstPass is null)
+            {
+                FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+                lastFirstPass = FirstPassBuffs.Aggregate(StartingStatsPage, 
+                    (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));
+                return lastFirstPass;
+            }
+
+            foreach (var buff in FirstPassBuffs)
+            {
+                if (buff.ShouldRemove(timestamp))
+                {
+                    lastFirstPass.Subtract(buff.GetModifier((this, timestamp)));
+                }
+                
+            }
+            return lastFirstPass;
         }
 
         public SecondPassStatsPage GetStatsPage(Timestamp timestamp)
         {
             var stats = new SecondPassStatsPage(GetFirstPassStats(timestamp));
             SecondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
-
-            return SecondPassBuffs.Aggregate(stats, (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
+            lastStatsPage = SecondPassBuffs.Aggregate(stats,
+                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
+            return lastStatsPage;
         }
         
         public void AddBuff(Buff<CapacityModifier> buff) => buff.AddToList(CapacityBuffs);

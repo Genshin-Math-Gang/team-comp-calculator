@@ -98,7 +98,13 @@ namespace Tcc
         {
             OnFieldUnit = units[0];
             // TODO: change the enemy thing later
-            enemies = new List<Enemy> {new Enemy()}; 
+            
+            // this code seems like it should be faster but isn't
+            /*foreach (var enemy in enemies)
+            {
+                enemy.Reset();
+            }*/
+            enemies = new List<Enemy>{new Enemy()};
             TotalDamage = new double[4];
             foreach (var u in units)
             {
@@ -114,7 +120,8 @@ namespace Tcc
             units = new Unit[] {onFieldUnit, unit2, unit3, unit4};
         }
 
-        public ReadOnlyCollection<Unit> GetUnits() => Array.AsReadOnly(units);
+        // how important is it for this to be readonly
+        public Unit[] GetUnits() => units;
 
         public void AddEnemy(Enemy enemy)
         {
