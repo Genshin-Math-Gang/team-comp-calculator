@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Tcc.buffs;
 using Tcc.elements;
 using Tcc.events;
 using Tcc.stats;
@@ -70,7 +71,16 @@ namespace Tcc.units
             }));
             if (ConstellationLevel == 6)
             {
-                // do debuff here
+                var debuff = new RefreshableBuff<FirstPassModifier>(c6debuff, timestamp + 15,
+                    _ => (Stats.ElectroDamageBonus, -0.15));
+                // all i know is this debuff applies after the initial cast
+                events.Add(new WorldEvent(timestamp + 46/60f, world =>
+                {
+                    foreach (var enemy in world.Enemies)
+                    {
+                        enemy.AddBuff(debuff);
+                    }
+                }));
             }
             return events;
         }
@@ -86,8 +96,8 @@ namespace Tcc.units
             }
 
             lastProc = timestamp;
-
-            e.World.AddWorldEvent(new Hit(timestamp, 1, burstSnapshot.GetStats, this, Types.BURST, bounceType, "Strombreaker bounce"));
+            e.World.AddWorldEvent(new Hit(timestamp, 1, burstSnapshot.GetStats, this, Types.BURST, 
+                bounceType, "Strombreaker bounce"));
         }
     }
 }
