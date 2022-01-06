@@ -7,7 +7,7 @@ namespace Tcc.stats
     public class StatsPage
     {
 
-        private double[] StatValues = new double[(int) Stats.IndependentMultiplier + 1];
+        private double[] StatValues = new double[43];
         
         public StatsPage(Dictionary<Stats, double> stats)
         {

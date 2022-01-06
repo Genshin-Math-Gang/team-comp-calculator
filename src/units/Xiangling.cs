@@ -19,10 +19,12 @@ namespace Tcc.units
             skillSnapshot = new SnapshottedStats(this, Types.SKILL);
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
             // TODO: kqm didn't include frames for xl CA but included n1c so i guessed, needs to be checked
-            AutoAttackFrameData = new[] {12, 38, 72, 141, 167, 78};
+            AutoAttackFrameData = new[] {0, 12, 38, 72, 141, 167, 78};
             BurstInitialICD = new();
             GuobaHitType = new HitType(Element.PYRO);
             BurstInitialType = new HitType(Element.PYRO, icd: BurstInitialICD);
+            // TODO: make proper frame counts for xiangling autos
+            AutoAttackHits = new[] {1, 1, 2, 4, 1};
             // TODO: make one for burst proper later
         }
         

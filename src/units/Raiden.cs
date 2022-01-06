@@ -21,8 +21,8 @@ namespace Tcc.units
         public Raiden(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("raiden", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.ELECTRO, WeaponType.POLEARM) 
         {
-            AutoAttackFrameData = new[] {14, 31, 56, 102, 151, 172, 44};
-            int[] AutoAttackBurstFrameData = new[] {12, 32, 54, 95, 139, 215, 50};
+            AutoAttackFrameData = new[] {0, 14, 31, 56, 102, 151, 172, 44};
+            int[] AutoAttackBurstFrameData = new[] {0, 12, 32, 54, 95, 139, 215, 50};
             SkillICD = new();
             SkillHitType = new HitType(Element.ELECTRO, true, icd: SkillICD);
         }

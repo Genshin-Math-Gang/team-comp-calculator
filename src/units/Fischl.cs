@@ -21,6 +21,7 @@ namespace Tcc.units
             summoningType = new HitType(Element.ELECTRO, icd: new ICDCreator(0,0));
             a4Type = new HitType(Element.ELECTRO, false, icd: new ICDCreator(0,0));
             skillType = new HitType(Element.ELECTRO, false, icd: SkillICD);
+            AutoAttackFrameData = new[] {0, 10, 28, 61, 102, 131, 182};
         }
 
         public override void Reset()

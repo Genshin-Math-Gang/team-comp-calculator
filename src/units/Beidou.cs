@@ -72,7 +72,7 @@ namespace Tcc.units
             if (ConstellationLevel == 6)
             {
                 var debuff = new RefreshableBuff<FirstPassModifier>(c6debuff, timestamp + 15,
-                    _ => (Stats.ElectroDamageBonus, -0.15));
+                    _ => (Stats.ElectroResistance, -0.15));
                 // all i know is this debuff applies after the initial cast
                 events.Add(new WorldEvent(timestamp + 46/60f, world =>
                 {

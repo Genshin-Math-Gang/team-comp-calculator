@@ -89,16 +89,22 @@ namespace Tcc.units
             FirstPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
 
             return FirstPassBuffs.Aggregate(StartingStatsPage, 
-                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp)));
+                (statsPage, buff) => statsPage.Add(buff.GetModifier((this, timestamp))));
         }
 
         public SecondPassStatsPage GetStatsPage(double timestamp)
         {
-            var stats = new SecondPassStatsPage(GetFirstPassStats(timestamp));
-            SecondPassBuffs.RemoveAll((buff) => buff.ShouldRemove(timestamp));
+            var stats = GetFirstPassStats(timestamp);
+            // this should be doing the same thing but faster idk
+            foreach (var buff in SecondPassBuffs)
+            {
+                if (buff.ShouldRemove(timestamp)) SecondPassBuffs.Remove(buff);
+                stats.Add(buff.GetModifier((this, timestamp, stats)));
+            }
+            /*SecondPassBuffs.RemoveAll(buff => buff.ShouldRemove(timestamp));
             lastStatsPage = SecondPassBuffs.Aggregate(stats,
-                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats.firstPassStats)));
-            return lastStatsPage;
+                (statsPage, buff) => statsPage + buff.GetModifier((this, timestamp, stats)));*/
+            return new SecondPassStatsPage(stats);
         }
         
         public void AddBuff(Buff<CapacityModifier> buff) => buff.AddToList(CapacityBuffs);

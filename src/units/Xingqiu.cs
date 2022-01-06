@@ -1,7 +1,9 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Runtime.InteropServices;
+using Tcc.buffs;
 using Tcc.elements;
 using Tcc.events;
 using Tcc.stats;
@@ -16,7 +18,11 @@ namespace Tcc.units
         private int burstWaveCount = 0;
         private int[] burstWaveSwordCount;
         private readonly HitType SkillHitType;
-        
+
+        private static Guid c2guid = Guid.NewGuid();
+
+
+
         public Xingqiu(int constellationLevel=0, string level="90", int autoLevel=6, int skillLevel=6, int burstLevel=6): 
             base("xingqiu", level, constellationLevel, autoLevel, skillLevel, burstLevel, Element.HYDRO, WeaponType.SWORD)
         {
@@ -25,6 +31,7 @@ namespace Tcc.units
             AutoAttackFrameData = new[] {9, 34, 59, 78, 116, 160, 195, 63};
             BurstICD = new();
             SkillHitType = new HitType(Element.HYDRO);
+            AutoAttackHits = new[] {1, 1, 2, 1, 2};
         }
 
         public override void Reset()
@@ -56,7 +63,7 @@ namespace Tcc.units
 
             burstWaveCount = 0;
             int duration = ConstellationLevel >= 2 ? 18 : 15;
-
+            
             return new List<WorldEvent>
             {
                 BurstActivated(timestamp),
@@ -97,8 +104,20 @@ namespace Tcc.units
             lastBurstWave = newWave;
             // check how many frames swords take to hit, 29 frames is filler
             // TODO: maybe make HitType for this but i would need 3 or to rewrite the class
-            e.World.AddWorldEvent(new Hit(newWave + 29/60.0, 0, GetStatsPage, this, Types.BURST, 
-                new HitType(Element.HYDRO, bounces: bounces, delay: 0), "Rain Sword"));
+            switch (ConstellationLevel)
+            {
+                case < 2:
+                    e.World.AddWorldEvent(new Hit(newWave + 29/60.0, 0, GetStatsPage, this, Types.BURST, 
+                        new HitType(Element.HYDRO, bounces: bounces, delay: 0), "Rain Sword"));
+                    break;
+                default:
+                    e.World.AddWorldEvent(new Hit(newWave + 29/60.0, 0, GetStatsPage, this, Types.BURST, 
+                        new HitType(Element.HYDRO, bounces: bounces, delay: 0), "Rain Sword", 
+                        debuff: new RefreshableBuff<FirstPassModifier>(c2guid, newWave + 269/60.0, 
+                            _ => (Stats.HydroResistance, -0.15), 1)));
+                    break;
+            }
+
         }
 
     }

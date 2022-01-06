@@ -18,6 +18,7 @@ namespace Tcc.Units
             
             this.burstSnapshot = new SnapshottedStats(this, Types.BURST);
             lastIsotoma = 0;
+            AutoAttackFrameData = new[] {0, 12, 30, 59, 98, 152, 54};
 
         }  
 

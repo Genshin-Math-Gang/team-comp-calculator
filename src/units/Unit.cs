@@ -41,6 +41,7 @@ namespace Tcc.units
         
         // assume 60 fps
         protected int[] AutoAttackFrameData;
+        protected int[] AutoAttackHits = new[] {1, 1, 1, 1, 1, 1, 1};
 
         // Base stats
         public readonly Dictionary<Types, AbilityStats> StartingAbilityStats = new();
@@ -198,17 +199,10 @@ namespace Tcc.units
             double start = timestamp;
             double duration;
             HitType hitType = new HitType(Element.PHYSICAL, false, heavy: HasHeavyAttacks);
-            for (int i = 0; i < normalCount; i++)
+            for (int i = 1; i < normalCount + 1; i++)
             {
-                if (i == 0)
-                {
-                    duration = AutoAttackFrameData[i] / 60.0;
-                }
-                else
-                {
-                    duration = (AutoAttackFrameData[i] - AutoAttackFrameData[i - 1]) / 60.0;
-                    start += AutoAttackFrameData[i-1] / 60.0;
-                }
+                duration = (AutoAttackFrameData[i] - AutoAttackFrameData[i - 1]) / 60.0;
+                start += AutoAttackFrameData[i-1] / 60.0;
 
                 hits.Add(NormalAttackGeneralUsed(start, duration));
                 // rn i'm assuming that the hit lands at the end of the duration which seems reasonable

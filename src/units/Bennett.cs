@@ -28,7 +28,7 @@ namespace Tcc.units
 
         {
             burstBuffSnapshot = new SnapshottedStats(this, Types.BURST);
-            AutoAttackFrameData = new[] {12, 32, 63, 118, 167, 100};
+            AutoAttackFrameData = new[] {0, 12, 32, 63, 118, 167, 100};
             BurstHitType = new HitType(Element, gauge: 2);
             BurstHitType = new HitType(Element);
         }

@@ -2,13 +2,13 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Tcc.artifacts;
 using Tcc.buffs;
 using Tcc.enemy;
 using Tcc.events;
 using Tcc.stats;
 using Tcc.units;
+using static System.Threading.Tasks.Parallel;
 
 namespace Tcc
 {
@@ -67,10 +67,10 @@ namespace Tcc
             watch.Stop();
             Console.WriteLine(watch.ElapsedMilliseconds);*/
             var watch = new Stopwatch();
-            int limit = (int) Math.Pow(10, 5);
+            int limit = (int) Math.Pow(10, 3);
             double[] totalDamage = new double[limit];
             ActionList actionList = new ActionList(
-                Character.Xingqiu,
+                new (Character.Xingqiu, cons:2),
                 Character.Bennett,
                 Character.Xiangling,
                 Character.Sucrose, new List<Action>
@@ -85,7 +85,7 @@ namespace Tcc
                     new (1, 14, ActionType.Normal, new object[]{AutoString.N1})
                 });
             watch.Start();
-            Parallel.For<World>(0, limit, () => new World(actionList), (i, loop, world) =>
+            For<World>(0, limit, () => new World(actionList), (i, loop, world) =>
                 {
                     world.Simulate();
                     totalDamage[i] = world.TotalDamage[0] + world.TotalDamage[1];

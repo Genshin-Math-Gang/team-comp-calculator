@@ -19,7 +19,7 @@ namespace Tcc.units
             base("sucrose", level, constellationLevel, autoLevel, skillLevel, burstLevel, WeaponType.CATALYST)
         {
             burstSnapshot = new SnapshottedStats(this, Types.BURST);
-            AutoAttackFrameData = new[] {19, 38, 70, 101, 132, 53};
+            AutoAttackFrameData = new[] {0, 19, 38, 70, 101, 132, 53};
             BurstICD = new ICDCreator(0,0);
             AnemoHitType = new HitType(Element.ANEMO);
             ConditionalHitType = new HitType(InfusionRef);
